@@ -488,11 +488,9 @@ type GlassBsdf() =
     let sharphandler _ _ = u.Distribution <- Sharp; u.ExpireSolution true
     let beckmannhandler _ _ = u.Distribution <- Beckmann; u.ExpireSolution true
     let ggxhandler _ _ = u.Distribution <- GGX; u.ExpireSolution true
-    let asihkminhandler _ _ = u.Distribution <- Asihkmin_Shirley; u.ExpireSolution true
     GH_DocumentObject.Menu_AppendItem(menu, "Sharp", sharphandler, true, u.Distribution = Sharp) |> ignore
     GH_DocumentObject.Menu_AppendItem(menu, "Beckmann", beckmannhandler, true, u.Distribution = Beckmann) |> ignore
     GH_DocumentObject.Menu_AppendItem(menu, "GGX", ggxhandler, true, u.Distribution = GGX) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "Asihkmin Shirley", asihkminhandler, true, u.Distribution = Asihkmin_Shirley) |> ignore
 
   interface ICyclesNode with
     member u.NodeName = "glass_bsdf"
