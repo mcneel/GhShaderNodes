@@ -248,7 +248,6 @@ type DiffuseBsdf() =
   override u.SolveInstance(DA: IGH_DataAccess) =
     u.Message <- ""
     let c = Utils.readColor(u, DA, 0, "Couldn't read diffuse color")
-    let f = Utils.readFloat(u, DA, 1, "Couldn't read diffuse roughness")
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
