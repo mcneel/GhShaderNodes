@@ -205,6 +205,31 @@ type BlendNode() =
       let x = Utils.GetInputsXml inputs
       Utils.GetNodeXml node nickname x
 
+type TransparentBsdf() =
+  inherit GH_Component("Transparent BSDF", "transparent", "Transparent BSDF node for shader graph", "Shader", "BSDF")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "transparent color", GH_ParamAccess.item, Color.Gray) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("BSDF", "BSDF", "Transparent BSDF", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("15f77ebf-ae59-4c49-80b1-362a7168f85f")
+
+  override u.Icon = Icons.Diffuse
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c = Utils.readColor(u, DA, 0, "Couldn't read transparent color")
+
+    DA.SetData(0, Utils.createColor c) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "transparent_bsdf"
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      Utils.GetNodeXml node nickname x
+
 type DiffuseBsdf() =
   inherit GH_Component("Diffuse BSDF", "diffuse", "Diffuse BSDF node for shader graph", "Shader", "BSDF")
 
