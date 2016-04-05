@@ -258,6 +258,33 @@ type DiffuseBsdf() =
       let x = Utils.GetInputsXml inputs
       Utils.GetNodeXml node nickname x
 
+type VelvetBsdf() =
+  inherit GH_Component("Velvet BSDF", "velvet", "Velvet BSDF node for shader graph", "Shader", "BSDF")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "velvet color", GH_ParamAccess.item, Color.Gray) |> ignore
+    mgr.AddNumberParameter("Sigma", "S", "Sigma of velvet bsdf", GH_ParamAccess.item, 1.0) |> ignore
+    mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("BSDF", "BSDF", "Velvet BSDF", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("d85aeb1d-e42f-43b6-86d6-ddf9cae5a633")
+
+  override u.Icon = Icons.Diffuse
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c = Utils.readColor(u, DA, 0, "Couldn't read velvet color")
+
+    DA.SetData(0, Utils.createColor c) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "velvet_bsdf"
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      Utils.GetNodeXml node nickname x
+
 type TextureCoordinate() =
   inherit GH_Component("Texture Coordinate", "texcoord", "Texture Coordinate for point being sampled", "Shader", "Input")
 
