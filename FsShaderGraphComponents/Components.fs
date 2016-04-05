@@ -341,6 +341,59 @@ type Distribution = Sharp | Beckmann | GGX | Asihkmin_Shirley with
   member u.toString = Utils.toString u
   static member fromString s = Utils.fromString<Distribution> s
 
+type AnisotropicBsdf() =
+  inherit GH_Component("Anisotropic BSDF", "anisotropic", "Anisotropic BSDF node for shader graph", "Shader", "BSDF")
+
+  member val Distribution = GGX with get, set
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "anisotropic color", GH_ParamAccess.item, Color.DarkBlue) |> ignore
+    mgr.AddNumberParameter("Roughness", "Rgh", "Roughness of anisotropic bsdf", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Rotation", "R", "Rotation", GH_ParamAccess.item, 1.4) |> ignore
+    mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+    mgr.AddVectorParameter("Tangent", "T", "Tangent", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("BSDF", "BSDF", "Anisotropic BSDF", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("bab1082a-4c74-4d07-9c63-d3f40a178c6a")
+
+  override u.Icon = Icons.Glossy
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c = Utils.readColor(u, DA, 0, "Couldn't read anisotropic color")
+
+    u.Message <- u.Distribution.toString.Replace('_', ' ')
+
+    DA.SetData(0, Utils.createColor c) |> ignore
+
+  override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
+    writer.SetString("Distribution", u.Distribution.toString) |> ignore
+    base.Write(writer)
+
+  override u.Read(reader:GH_IO.Serialization.GH_IReader) =
+    if reader.ItemExists("Distribution") then
+      u.Distribution <-
+        let d = Distribution.fromString (reader.GetString "Distribution")
+        match d with | None -> GGX | _ -> d.Value
+
+    base.Read(reader)
+
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let beckmannhandler _ _ = u.Distribution <- Beckmann; u.ExpireSolution true
+    let ggxhandler _ _ = u.Distribution <- GGX; u.ExpireSolution true
+    let asihkminhandler _ _ = u.Distribution <- Asihkmin_Shirley; u.ExpireSolution true
+    GH_DocumentObject.Menu_AppendItem(menu, "Beckmann", beckmannhandler, true, u.Distribution = Beckmann) |> ignore
+    GH_DocumentObject.Menu_AppendItem(menu, "GGX", ggxhandler, true, u.Distribution = GGX) |> ignore
+    GH_DocumentObject.Menu_AppendItem(menu, "Asihkmin Shirley", asihkminhandler, true, u.Distribution = Asihkmin_Shirley) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "anisotropic_bsdf"
+    member u.GetXml node nickname inputs =
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
+      Utils.GetNodeXml node nickname x
+
 type GlassBsdf() =
   inherit GH_Component("Glass BSDF", "glass", "Glass BSDF node for shader graph", "Shader", "BSDF")
 
