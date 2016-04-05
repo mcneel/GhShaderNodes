@@ -394,6 +394,58 @@ type AnisotropicBsdf() =
       let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
       Utils.GetNodeXml node nickname x
 
+type RefractionBsdf() =
+  inherit GH_Component("Refraction BSDF", "refraction", "Refraction BSDF node for shader graph", "Shader", "BSDF")
+
+  member val Distribution = Sharp with get, set
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "refraction color", GH_ParamAccess.item, Color.DarkBlue) |> ignore
+    mgr.AddNumberParameter("Roughness", "R", "Roughness of refraction bsdf", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("IOR", "I", "IOR of refraction bsdf", GH_ParamAccess.item, 1.4) |> ignore
+    mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("BSDF", "BSDF", "Refraction BSDF", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("e32dffe3-e31a-45a6-9d13-4fb0eefe4ff5")
+
+  override u.Icon = Icons.Glossy
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c = Utils.readColor(u, DA, 0, "Couldn't read refraction color")
+
+    u.Message <- u.Distribution.toString.Replace('_', ' ')
+
+    DA.SetData(0, Utils.createColor c) |> ignore
+
+  override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
+    writer.SetString("Distribution", u.Distribution.toString) |> ignore
+    base.Write(writer)
+
+  override u.Read(reader:GH_IO.Serialization.GH_IReader) =
+    if reader.ItemExists("Distribution") then
+      u.Distribution <-
+        let d = Distribution.fromString (reader.GetString "Distribution")
+        match d with | None -> Sharp | _ -> d.Value
+
+    base.Read(reader)
+
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let sharphandler _ _ = u.Distribution <- Sharp; u.ExpireSolution true
+    let beckmannhandler _ _ = u.Distribution <- Beckmann; u.ExpireSolution true
+    let ggxhandler _ _ = u.Distribution <- GGX; u.ExpireSolution true
+    GH_DocumentObject.Menu_AppendItem(menu, "Sharp", sharphandler, true, u.Distribution = Sharp) |> ignore
+    GH_DocumentObject.Menu_AppendItem(menu, "Beckmann", beckmannhandler, true, u.Distribution = Beckmann) |> ignore
+    GH_DocumentObject.Menu_AppendItem(menu, "GGX", ggxhandler, true, u.Distribution = GGX) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "refraction_bsdf"
+    member u.GetXml node nickname inputs =
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
+      Utils.GetNodeXml node nickname x
+
 type GlassBsdf() =
   inherit GH_Component("Glass BSDF", "glass", "Glass BSDF node for shader graph", "Shader", "BSDF")
 
