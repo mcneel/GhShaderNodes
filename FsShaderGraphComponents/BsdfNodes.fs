@@ -42,6 +42,33 @@ type BlendNode() =
       let x = Utils.GetInputsXml inputs
       Utils.GetNodeXml node nickname x
 
+type AddClosureNode() =
+  inherit GH_Component("Add", "add", "Add two BSDF nodes", "Shader", "Operation")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Closure1", "1", "First closure input", GH_ParamAccess.item, Color.Coral) |> ignore
+    mgr.AddColourParameter("Closure2", "2", "Second closure input", GH_ParamAccess.item, Color.Chocolate) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("Closure", "C", "Add of Closure1 and Closure2", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("f7929217-6fbb-4bd5-b74f-9763816dc38c")
+
+  override u.Icon = Icons.Add
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c1 = Utils.readColor(u, DA, 0, "Couldn't read Closure 1")
+    let c2 = Utils.readColor(u, DA, 1, "Couldn't read Closure 2")
+    DA.SetData(0, Utils.createColor c1) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "add_closure"
+
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      Utils.GetNodeXml node nickname x
+
 type TransparentBsdf() =
   inherit GH_Component("Transparent BSDF", "transparent", "Transparent BSDF node for shader graph", "Shader", "BSDF")
 

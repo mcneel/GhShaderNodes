@@ -108,7 +108,6 @@ type LightPathNode() =
     mgr.AddNumberParameter("RayDepth", "RD", "Ray Depth", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("TransparentDepth", "TD", "Transparent Depth", GH_ParamAccess.item) |> ignore
 
-
   override u.ComponentGuid = new Guid("9ba94ea6-d977-47ba-807c-b4b68fa9dea8")
 
   override u.Icon = Icons.Emission
