@@ -306,16 +306,6 @@ type CyclesRenderer()  =
     m_session <- new Session(m_client, session_params, scene)
     m_session.Reset((uint32)size.Width, (uint32)size.Height, (uint32)Samples);
 
-    (*m_log = Log;
-    m_cb = null;
-    m_up = null;
-    m_display = DisplayUpdate;
-    Session.UpdateCallback = m_up;
-    Session.UpdateTileCallback = null;
-    Session.WriteTileCallback = m_cb;
-    Session.DisplayUpdateCallback = m_display;
-    CSycles.set_logger(m_client.Id, m_log);*)
-
     CSycles.set_logger(m_client.Id, 
       fun s -> System.Diagnostics.Debug.WriteLine(s)
     )
@@ -326,7 +316,7 @@ type CyclesRenderer()  =
         let mutable bufsize = (uint32)0
         let mutable bufstride = (uint32)0
 
-        lock m_bitmaplock (fun _ -> 
+        let update_bitmap() =
           CSycles.session_get_buffer_info(m_client.Id, m_session.Id, &bufsize, &bufstride)
           if m_render<>null && bufsize > (uint32)0 && bufsize = (uint32 (rd.Width * rd.Height * 4)) && m_render.Size = rd then
             m_session.DrawNogl(rd.Width, rd.Height)
@@ -341,7 +331,7 @@ type CyclesRenderer()  =
                 match m_hasdata with
                 | true -> m_render.SetPixel(x, y, Color.FromArgb(a, r, g, b))
                 | _ -> m_render.SetPixel(x, y, Color.FromArgb(255, rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255)))
-        ) |> ignore
+        lock m_bitmaplock update_bitmap
         match sample with
         | sample when (sample % 10) = 0 -> Grasshopper.Instances.InvalidateCanvas()
         | sample when Samples = sample -> Grasshopper.Instances.InvalidateCanvas()
@@ -397,7 +387,6 @@ and CyclesRendererAttributes(owner:CyclesRenderer) as i =
     let y1 = I.Bounds.Bottom - 3.0f;
 
     m_cyclesRect <- RectangleF.FromLTRB(x0, y0, x1, y1);
-    //m_cyclesRect = GH_Convert.ToRectangle(m_cyclesRect);
 
     if old <> m_cyclesRect then
       dimchangedEvt.Trigger(I.RenderDimension.Size)
@@ -431,7 +420,7 @@ and CyclesRendererAttributes(owner:CyclesRenderer) as i =
       match I.Owner.IsInited with
       | false -> ()
       | true ->
-        lock I.Owner.BitmapLock ( fun _ -> graphics.DrawImage(I.Owner.Bitmap, render_rect.Location)) |> ignore
+        lock I.Owner.BitmapLock ( fun _ -> graphics.DrawImage(I.Owner.Bitmap, render_rect.Location))
 
       let style = GH_CapsuleRenderEngine.GetImpliedStyle(palette, I.Selected, I.Owner.Locked, I.Owner.Hidden)
       GH_ComponentAttributes.RenderComponentParameters(canvas, graphics, I.Owner, style) |> ignore
