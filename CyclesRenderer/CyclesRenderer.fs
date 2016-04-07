@@ -273,11 +273,9 @@ type CyclesRenderer()  =
     | _ -> attr.RenderDimensionChanged |> Observable.add (fun x -> 
       if m_inited then
         I.PauseRendering()
-        let size = I.RenderSize
-        lock m_bitmaplock (
-          fun () ->
-            m_render <- new Bitmap((size:Size).Width, (size:Size).Height)
-        ) |> ignore
+        let resize() = 
+          m_render <- new Bitmap((x:Size).Width, (x:Size).Height)
+        lock m_bitmaplock resize
         I.ContinueRendering()
       )
     I.AddRuntimeMessage(GH_RuntimeMessageLevel.Remark, String.Format("Using device {0} {1}", dev.Name, dev.Description))
@@ -402,7 +400,7 @@ and CyclesRendererAttributes(owner:CyclesRenderer) as i =
     //m_cyclesRect = GH_Convert.ToRectangle(m_cyclesRect);
 
     if old <> m_cyclesRect then
-      dimchangedEvt.Trigger(true)
+      dimchangedEvt.Trigger(I.RenderDimension.Size)
 
   override I.Render(canvas:GH_Canvas, graphics:Graphics, channel:GH_CanvasChannel) =
     match channel with
