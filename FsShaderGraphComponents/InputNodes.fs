@@ -89,4 +89,50 @@ type LayerWeightNode() =
       let x = Utils.GetInputsXml inputs
       Utils.GetNodeXml node nickname x
 
+type LightPathNode() =
+  inherit GH_Component("Light Path", "light path", "Light Path", "Shader", "Input")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    ()
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddNumberParameter("IsCameraRay", "CR", "Is Camera Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsShadowRay", "SR", "Is Shadow Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsDiffuseRay", "DR", "Is Diffuse Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsGlossyRay", "GR", "Is Glossy Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsSingularRay", "SingR", "Is Singular Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsReflectionRay", "RR", "Is Reflection Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsTransmissionRay", "TR", "Is Transmission Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsVolumeScatterRay", "VSR", "Is VolumeScatter Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("RayLength", "RL", "Ray Length", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("RayDepth", "RD", "Ray Depth", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("TransparentDepth", "TD", "Transparent Depth", GH_ParamAccess.item) |> ignore
+
+
+  override u.ComponentGuid = new Guid("9ba94ea6-d977-47ba-807c-b4b68fa9dea8")
+
+  override u.Icon = Icons.Emission
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+
+    DA.SetData(0, 1.0) |> ignore
+    DA.SetData(1, 1.0) |> ignore
+    DA.SetData(2, 1.0) |> ignore
+    DA.SetData(3, 1.0) |> ignore
+    DA.SetData(4, 1.0) |> ignore
+    DA.SetData(5, 1.0) |> ignore
+    DA.SetData(6, 1.0) |> ignore
+    DA.SetData(7, 1.0) |> ignore
+    DA.SetData(8, 1.0) |> ignore
+    DA.SetData(9, 1.0) |> ignore
+    DA.SetData(10, 1.0) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "light_path"
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      Utils.GetNodeXml node nickname x
+
+
 
