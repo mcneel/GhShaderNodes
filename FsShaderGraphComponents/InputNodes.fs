@@ -62,6 +62,42 @@ type TextureCoordinate() =
       let x = Utils.GetInputsXml inputs
       Utils.GetNodeXml node nickname x
 
+type Geometry() =
+  inherit GH_Component("Geometry", "geom", "Geometry info for the point being sampled", "Shader", "Input")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    ()
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddVectorParameter("Position", "P", "Position", GH_ParamAccess.item) |> ignore
+    mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item) |> ignore
+    mgr.AddVectorParameter("Tangent", "T", "Tangent", GH_ParamAccess.item) |> ignore
+    mgr.AddVectorParameter("True Normal", "TN", "True Normal", GH_ParamAccess.item) |> ignore
+    mgr.AddVectorParameter("Incoming", "I", "Incoming", GH_ParamAccess.item) |> ignore
+    mgr.AddVectorParameter("Parametric", "Pr", "Parametric", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("Backfacing", "Bf", "Backfacing", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("Pointiness", "Pt", "Pointiness", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("1268d35e-8912-45c1-9642-0b29ec4f1ff9")
+
+  override u.Icon = Icons.TC
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    DA.SetData(0, Vector3d.Zero) |> ignore
+    DA.SetData(1, Vector3d.Zero) |> ignore
+    DA.SetData(2, Vector3d.Zero) |> ignore
+    DA.SetData(3, Vector3d.Zero) |> ignore
+    DA.SetData(4, Vector3d.Zero) |> ignore
+    DA.SetData(5, Vector3d.Zero) |> ignore
+    DA.SetData(6, 0.0) |> ignore
+    DA.SetData(7, 0.0) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "geometry"
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      Utils.GetNodeXml node nickname x
+
 type LayerWeightNode() =
   inherit GH_Component("Layer Weight", "layer weight", "Layer weight", "Shader", "Input")
 
