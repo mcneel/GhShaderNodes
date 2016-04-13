@@ -148,6 +148,13 @@ type ColorRampNode() =
     DA.SetData(0, Utils.createColor (128, 128, 128)) |> ignore
     DA.SetData(1, 0.5) |> ignore
 
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let append_menu (it:InterpolationTypes) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Interpolation <- it; u.ExpireSolution true), true, u.Interpolation= it) |> ignore
+    append_menu Linear
+    append_menu Ease
+    append_menu Constant
+
   interface ICyclesNode with
     member u.NodeName = "color_ramp"
 
