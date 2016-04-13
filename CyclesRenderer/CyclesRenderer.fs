@@ -61,14 +61,20 @@ type CyclesRenderer()  =
   inherit GH_Component("Cycles", "cycles", "Cycles renderer", "Render", "Cycles")
   let m_client = new Client()
   let m_bitmaplock = new obj()
-  let Samples = 50
+  let Samples = 5000
   let mutable (m_session:Session) = null
   let mutable m_inited = false
   let mutable (m_render:Bitmap) = null
   let mutable m_hasdata = false
+  let mutable bgshader = new ccl.Shader(m_client, Shader.ShaderType.World)
   let shaders = new List<Shader>()
   let meshes = new List<Mesh>()
   let objects = new List<ccl.Object>()
+
+  let defaultbg =
+    "<background name=\"bg\" color=\"1 0 0\" strength=\"1\" />
+    <connect from=\"bg background\" to=\"output surface\" />
+    "
 
   let rnd = new Random()
 
@@ -116,11 +122,10 @@ type CyclesRenderer()  =
 
   override I.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddMeshParameter("Meshes", "M", "Collection of meshes", GH_ParamAccess.list) |> ignore
-    //mgr.AddPointParameter("Locations", "L", "Collection of locations", GH_ParamAccess.list) |> ignore
     mgr.AddTextParameter("Shader XML", "S", "Shader XML definition list", GH_ParamAccess.list) |> ignore
     mgr.AddPointParameter("Camera Location", "CL", "Camera location", GH_ParamAccess.item) |> ignore
     mgr.AddPointParameter("Camera LookAt", "LA", "Camera look-at location", GH_ParamAccess.item) |> ignore
-    //mgr.AddVectorParameter("Camera Up", "CU", "Camera up vector", GH_ParamAccess.item) |> ignore
+    mgr.AddTextParameter("Background Shader", "BS", "Background Shader", GH_ParamAccess.item, "") |> ignore
 
   override I.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
     ()
@@ -129,19 +134,14 @@ type CyclesRenderer()  =
     I.PauseRendering()
     m_session.Scene.Lock()
     let mutable meshlist = new List<GH_Mesh>()
-    //let mutable locs = new List<GH_Point>()
     let mutable xmlshaders = new List<GH_String>()
     let mutable cl = new GH_Point()
     let mutable la = new GH_Point()
-    //let mutable up = new GH_Vector()
     let mutable md = DA.GetDataList(0, meshlist)
+    let mutable bg = new GH_String();
     match md with
     | false -> m_hasdata <- false
     | true -> ()
-(*    md <- DA.GetDataList(1, locs)
-    match md with
-    | false -> m_hasdata <- false
-    | true -> () *)
     md <- DA.GetDataList(1, xmlshaders)
     match md with
     | false -> m_hasdata <- false
@@ -154,16 +154,35 @@ type CyclesRenderer()  =
     match md with
     | false -> m_hasdata <- false
     | true -> ()
-(*    md <- DA.GetData(5, &up) 
+    md <- DA.GetData(4, &bg);
     match md with
     | false -> m_hasdata <- false
-    | true -> () *)
+    | true -> ()
 
     let tfm = (Transform.LookAt(
                 new float4((float32)cl.Value.X, (float32)cl.Value.Y, (float32)cl.Value.Z),
                 new float4((float32)la.Value.X, (float32)la.Value.Y, (float32)la.Value.Z),
                 new float4(0.0f, 0.0f, -1.0f)
     ) * Transform.Scale(1.0f, -1.0f, 1.0f))
+
+    let bgshaderxml =
+      match bg.IsValid with
+      | false -> defaultbg
+      | true ->
+        match bg.Value with
+        | "" -> defaultbg
+        | _ -> bg.Value
+    bgshader <- m_session.Scene.Background.Shader
+    bgshader.Recreate()
+    let bgxmlmem = Encoding.UTF8.GetBytes(bgshaderxml)
+    ( use xmlstream = new MemoryStream(bgxmlmem)
+      let settings = new System.Xml.XmlReaderSettings(ConformanceLevel = System.Xml.ConformanceLevel.Fragment, IgnoreComments = true, IgnoreProcessingInstructions = true, IgnoreWhitespace = true)
+      let reader = System.Xml.XmlReader.Create(xmlstream, settings);
+
+      ccl.Utilities.Instance.ReadNodeGraph(&bgshader, reader);
+    )
+
+    bgshader.Tag()
 
     let mutable shidx = 0
     for ghstring in xmlshaders do
@@ -176,8 +195,8 @@ type CyclesRenderer()  =
         sh.Name <- Guid.NewGuid.ToString()
         addnew <- true;
 
-      sh.Recreate();
-      let xmlmem = Encoding.UTF8.GetBytes(shaderXml);
+      sh.Recreate()
+      let xmlmem = Encoding.UTF8.GetBytes(shaderXml)
       ( use xmlstream = new MemoryStream(xmlmem)
         let settings = new System.Xml.XmlReaderSettings(ConformanceLevel = System.Xml.ConformanceLevel.Fragment, IgnoreComments = true, IgnoreProcessingInstructions = true, IgnoreWhitespace = true)
         let reader = System.Xml.XmlReader.Create(xmlstream, settings);
@@ -265,6 +284,7 @@ type CyclesRenderer()  =
       m_session.Destroy()
 
     base.RemovedFromDocument(document);
+
   override I.AddedToDocument(document:GH_Document) =
     let dev = Device.FirstCuda
     let attr = I.m_attributes :?> CyclesRendererAttributes
@@ -290,6 +310,19 @@ type CyclesRenderer()  =
     lock m_bitmaplock (fun _ ->
       m_render <- new Bitmap(size.Width, size.Height)
     )
+
+    bgshader.Recreate()
+    let bgxmlmem = Encoding.UTF8.GetBytes(defaultbg)
+    ( use xmlstream = new MemoryStream(bgxmlmem)
+      let settings = new System.Xml.XmlReaderSettings(ConformanceLevel = System.Xml.ConformanceLevel.Fragment, IgnoreComments = true, IgnoreProcessingInstructions = true, IgnoreWhitespace = true)
+      let reader = System.Xml.XmlReader.Create(xmlstream, settings);
+
+      ccl.Utilities.Instance.ReadNodeGraph(&bgshader, reader);
+      scene.AddShader(bgshader) |> ignore
+    )
+
+    bgshader.Tag()
+    scene.Background.Shader <- bgshader
 
     let session_params = new SessionParameters(m_client, dev)
     session_params.Experimental <- false
