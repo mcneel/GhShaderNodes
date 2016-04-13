@@ -42,6 +42,33 @@ type BlendNode() =
       let x = Utils.GetInputsXml inputs
       Utils.GetNodeXml node nickname x
 
+type BackgroundNode() =
+  inherit GH_Component("Background", "background", "Background two BSDF nodes", "Shader", "Operation")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "Color input", GH_ParamAccess.item, Color.Aquamarine) |> ignore
+    mgr.AddNumberParameter("Strength", "S", "Background strength", GH_ParamAccess.item, 1.0) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("Background", "B", "Background output", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32")
+
+  override u.Icon = Icons.Output
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c1 = Utils.readColor(u, DA, 0, "Couldn't read input color")
+    let f = Utils.readFloat(u, DA, 1, "Couldn't read strength")
+    DA.SetData(0, Utils.createColor c1) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "background"
+
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+
 type AddClosureNode() =
   inherit GH_Component("Add", "add", "Add two BSDF nodes", "Shader", "Operation")
 
