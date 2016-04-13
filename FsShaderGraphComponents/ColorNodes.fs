@@ -3,6 +3,7 @@
 open FsShaderGraphComponents
 
 open System
+open System.Linq
 open System.Drawing
 open System.Windows.Forms
 
@@ -102,5 +103,67 @@ type MixRgbNode() =
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
       let t = String.Format(" type=\"{0}\" ", u.Blend.toStringR)
-      Utils.GetNodeXml node nickname (x+t)
+      "<" + (Utils.GetNodeXml node nickname (x+t)) + "/>"
 
+type InterpolationTypes =
+  | Constant
+  | Linear
+  | Ease
+  member u.toString = Utils.toString u
+  member u.toStringR = (u.toString)
+  static member fromString s = Utils.fromString<InterpolationTypes> s
+
+type ColorRampNode() =
+  inherit GH_Component("Color Ramp", "color ramp", "Convert a float to a color according a gradient specification (RGB only)", "Shader", "Color")
+
+  member val Interpolation = Linear with get, set
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Stop Colours", "SC", "List of colours", GH_ParamAccess.list) |> ignore
+    mgr.AddNumberParameter("Stop Positions", "SP", "List of stop positions", GH_ParamAccess.list) |> ignore
+    mgr.AddNumberParameter("Fac", "F", "0.0 left side, 1.0 right side", GH_ParamAccess.item, 0.5) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("Color", "C", "Blend of Color1 and Color2", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("Alpha", "A", "0.0 left side, 1.0 right side", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("dc8abb5a-5a92-4148-8118-b397929d7bb3")
+
+  override u.Icon = Icons.Blend
+
+  override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
+    writer.SetString("Interpolation", u.Interpolation.toString) |> ignore
+    base.Write(writer)
+
+  override u.Read(reader:GH_IO.Serialization.GH_IReader) =
+    if reader.ItemExists("Interpolation") then
+      u.Interpolation <-
+        let d = InterpolationTypes.fromString (reader.GetString "Interpolation")
+        match d with None -> Linear | _ -> d.Value
+
+    base.Read(reader)
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- u.Interpolation.toStringR
+    DA.SetData(0, Utils.createColor (128, 128, 128)) |> ignore
+    DA.SetData(1, 0.5) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "color_ramp"
+
+    member u.GetXml node nickname inputs =
+      let i = inputs.Where(fun x -> x.Name = "Fac").ToList()
+      let x = Utils.GetInputsXml i
+      let t = String.Format(" interpolation=\"{0}\" ", u.Interpolation.toStringR)
+      let stops =
+        match inputs.[0].VolatileDataCount = inputs.[1].VolatileDataCount with
+        | false -> ""
+        | true ->
+          let cl = seq[for i in inputs.[0].VolatileData.Branch(0) do
+                        let c = Utils.castAs<GH_Colour>(i)
+                        yield Utils.ColorXml(c.Value)]
+          let sl = seq[for i in inputs.[1].VolatileData.Branch(0) do
+                        let nr = Utils.castAs<GH_Number>(i)
+                        yield nr.Value]
+          Seq.zip cl sl |> Seq.map (fun x -> String.Format("\t<stop color=\"{0}\" position=\"{1}\" />", fst x, snd x)) |> String.concat "\n"
+      "<" + (Utils.GetNodeXml node nickname (x+t)) + ">\n" + stops + "\n</color_ramp>"

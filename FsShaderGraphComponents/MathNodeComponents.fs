@@ -56,7 +56,7 @@ type MathBaseNode(name, nickname, description, category, subcategory, outputdesc
     member u.NodeName = "math"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      Utils.GetNodeXml node nickname (x + String.Format(" operation=\"{0}\"", u.Name))
+      "<" + Utils.GetNodeXml node nickname (x + String.Format(" operation=\"{0}\"", u.Name)) + " />"
 
 type MathAdd() =
   inherit MathBaseNode("Add", "add", "Add two floats", "Shader", "Math", "Value1+Value2", (+))

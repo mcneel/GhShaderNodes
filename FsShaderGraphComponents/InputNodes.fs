@@ -60,7 +60,7 @@ type TextureCoordinate() =
     member u.NodeName = "texture_coordinate"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      Utils.GetNodeXml node nickname x
+      "<" + Utils.GetNodeXml node nickname x + "/>"
 
 type Geometry() =
   inherit GH_Component("Geometry", "geom", "Geometry info for the point being sampled", "Shader", "Input")
@@ -96,7 +96,7 @@ type Geometry() =
     member u.NodeName = "geometry"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      Utils.GetNodeXml node nickname x
+      "<" + Utils.GetNodeXml node nickname x + "/>"
 
 type LayerWeightNode() =
   inherit GH_Component("Layer Weight", "layer weight", "Layer weight", "Shader", "Input")
@@ -123,7 +123,7 @@ type LayerWeightNode() =
     member u.NodeName = "layer_weight"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      Utils.GetNodeXml node nickname x
+      "<" + Utils.GetNodeXml node nickname x + "/>"
 
 type LightPathNode() =
   inherit GH_Component("Light Path", "light path", "Light Path", "Shader", "Input")
@@ -167,7 +167,7 @@ type LightPathNode() =
     member u.NodeName = "light_path"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      Utils.GetNodeXml node nickname x
+      "<" + Utils.GetNodeXml node nickname x + "/>"
 
 
 

@@ -39,5 +39,5 @@ type NoiseTextureNode() =
     member u.NodeName = "noise_texture"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      Utils.GetNodeXml node nickname x
+      "<" + Utils.GetNodeXml node nickname x + "/>"
 

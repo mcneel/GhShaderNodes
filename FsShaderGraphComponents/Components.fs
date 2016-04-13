@@ -216,7 +216,8 @@ type OutputNode() =
       let getxml (b1 : GH_Component, nodename, nickname, inps : List<IGH_Param>) =
         match box b1 with
         | :? ICyclesNode as cn -> cn.GetXml nodename nickname inps
-        | _ -> Utils.GetNodeXml b1.Name (b1.InstanceGuid.ToString()) ""
+        | _ ->
+          "<" + (Utils.GetNodeXml b1.Name (b1.InstanceGuid.ToString()) "") + " />"
 
       let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
       let nodn = nodename(n)
@@ -232,7 +233,7 @@ type OutputNode() =
                                         | "output" -> ""
                                         | _ ->
                                           nd.[n.InstanceGuid] <- true
-                                          "<" + xml + "/>"
+                                          xml
 
     let ValueNodeXml (n:GH_NumberSlider) =
       let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
