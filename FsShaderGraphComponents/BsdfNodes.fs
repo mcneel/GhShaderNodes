@@ -40,7 +40,7 @@ type BlendNode() =
 
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type BackgroundNode() =
   inherit GH_Component("Background", "background", "Background two BSDF nodes", "Shader", "Operation")
@@ -67,7 +67,7 @@ type BackgroundNode() =
 
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type AddClosureNode() =
   inherit GH_Component("Add", "add", "Add two BSDF nodes", "Shader", "Operation")
@@ -94,7 +94,7 @@ type AddClosureNode() =
 
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type TransparentBsdf() =
   inherit GH_Component("Transparent BSDF", "transparent", "Transparent BSDF node for shader graph", "Shader", "BSDF")
@@ -119,7 +119,7 @@ type TransparentBsdf() =
     member u.NodeName = "transparent_bsdf"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type DiffuseBsdf() =
   inherit GH_Component("Diffuse BSDF", "diffuse", "Diffuse BSDF node for shader graph", "Shader", "BSDF")
@@ -146,7 +146,7 @@ type DiffuseBsdf() =
     member u.NodeName = "diffuse_bsdf"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type VelvetBsdf() =
   inherit GH_Component("Velvet BSDF", "velvet", "Velvet BSDF node for shader graph", "Shader", "BSDF")
@@ -173,7 +173,7 @@ type VelvetBsdf() =
     member u.NodeName = "velvet_bsdf"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type AnisotropicBsdf() =
   inherit GH_Component("Anisotropic BSDF", "anisotropic", "Anisotropic BSDF node for shader graph", "Shader", "BSDF")
@@ -226,7 +226,7 @@ type AnisotropicBsdf() =
     member u.NodeName = "anisotropic_bsdf"
     member u.GetXml node nickname inputs =
       let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type RefractionBsdf() =
   inherit GH_Component("Refraction BSDF", "refraction", "Refraction BSDF node for shader graph", "Shader", "BSDF")
@@ -278,7 +278,7 @@ type RefractionBsdf() =
     member u.NodeName = "refraction_bsdf"
     member u.GetXml node nickname inputs =
       let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlassBsdf() =
   inherit GH_Component("Glass BSDF", "glass", "Glass BSDF node for shader graph", "Shader", "BSDF")
@@ -331,7 +331,7 @@ type GlassBsdf() =
     member u.NodeName = "glass_bsdf"
     member u.GetXml node nickname inputs =
       let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlossyBsdf() =
   inherit GH_Component("Glossy BSDF", "glossy", "Glossy BSDF node for shader graph", "Shader", "BSDF")
@@ -385,7 +385,7 @@ type GlossyBsdf() =
     member u.NodeName = "glossy_bsdf"
     member u.GetXml node nickname inputs =
       let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type EmissionBsdf() =
   inherit GH_Component("Emission BSDF", "emission", "Emission BSDF node for shader graph", "Shader", "BSDF")
@@ -412,5 +412,38 @@ type EmissionBsdf() =
     member u.NodeName = "emission"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      "<" + (Utils.GetNodeXml node nickname x) + "/>"
+      "<" + (Utils.GetNodeXml node nickname x) + " />"
+
+type SubsurfaceScatteringBsdf() =
+  inherit GH_Component("Subsurface Scattering BSDF", "subsurface scattering", "Subsurface Scattering BSDF node for shader graph", "Shader", "BSDF")
+
+  member val Falloff = Cubic with get, set
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "Color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
+    mgr.AddNumberParameter("Scale", "Sc", "Scale", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Sharpness", "Sh", "Sharpness", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Texture Blur", "Tb", "Amount of blur", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddVectorParameter("Radius", "R", "Radius", GH_ParamAccess.item, new Vector3d(1.0, 1.0, 1.0)) |> ignore
+    mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("BSSRDF", "BSSRDF", "BSSRDF", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("8b3abb10-4593-4f34-b96f-cb4ed0f64ae7")
+
+  override u.Icon = Icons.Emission
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c = Utils.readColor(u, DA, 0, "Couldn't read subsurface scattering color")
+
+    DA.SetData(0, Utils.createColor c) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "subsurface_scattering"
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      let ft = String.Format(" falloff=\"{0}\" ", u.Falloff.toString)
+      "<" + Utils.GetNodeXml node nickname (x + ft) + " />"
 

@@ -164,7 +164,7 @@ module Utils =
   let GetInputsXml (inputs:List<IGH_Param>) =
     String.Concat([for i in inputs -> 
                     let t = GetDataXml(i)
-                    match (fst t) with "" -> "" | _ -> (fst t).ToLowerInvariant() + "=\""+ (snd t) + "\" "
+                    match (fst t) with "" -> "" | _ -> (fst t).Replace(" ", "_").ToLowerInvariant() + "=\""+ (snd t) + "\" "
     ])
 
   let GetNodeXml node name data =
@@ -174,6 +174,10 @@ module Utils =
 type Distribution = Sharp | Beckmann | GGX | Asihkmin_Shirley with
   member u.toString = Utils.toString u
   static member fromString s = Utils.fromString<Distribution> s
+
+type Falloff = Cubic | Gaussian | Burley with
+  member u.toString = Utils.toString u
+  static member fromString s = Utils.fromString<Falloff> s
 
 /// The output node for the shader system. This node is responsible for
 /// driving the XML generation of a shader graph.
