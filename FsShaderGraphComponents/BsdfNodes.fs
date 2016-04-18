@@ -215,12 +215,11 @@ type AnisotropicBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let beckmannhandler _ _ = u.Distribution <- Beckmann; u.ExpireSolution true
-    let ggxhandler _ _ = u.Distribution <- GGX; u.ExpireSolution true
-    let asihkminhandler _ _ = u.Distribution <- Asihkmin_Shirley; u.ExpireSolution true
-    GH_DocumentObject.Menu_AppendItem(menu, "Beckmann", beckmannhandler, true, u.Distribution = Beckmann) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "GGX", ggxhandler, true, u.Distribution = GGX) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "Asihkmin Shirley", asihkminhandler, true, u.Distribution = Asihkmin_Shirley) |> ignore
+    let append_menu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+    append_menu Beckmann
+    append_menu GGX
+    append_menu Asihkmin_Shirley
 
   interface ICyclesNode with
     member u.NodeName = "anisotropic_bsdf"
@@ -267,12 +266,11 @@ type RefractionBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let sharphandler _ _ = u.Distribution <- Sharp; u.ExpireSolution true
-    let beckmannhandler _ _ = u.Distribution <- Beckmann; u.ExpireSolution true
-    let ggxhandler _ _ = u.Distribution <- GGX; u.ExpireSolution true
-    GH_DocumentObject.Menu_AppendItem(menu, "Sharp", sharphandler, true, u.Distribution = Sharp) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "Beckmann", beckmannhandler, true, u.Distribution = Beckmann) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "GGX", ggxhandler, true, u.Distribution = GGX) |> ignore
+    let append_menu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+    append_menu Sharp
+    append_menu Beckmann
+    append_menu GGX
 
   interface ICyclesNode with
     member u.NodeName = "refraction_bsdf"
@@ -320,12 +318,11 @@ type GlassBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let sharphandler _ _ = u.Distribution <- Sharp; u.ExpireSolution true
-    let beckmannhandler _ _ = u.Distribution <- Beckmann; u.ExpireSolution true
-    let ggxhandler _ _ = u.Distribution <- GGX; u.ExpireSolution true
-    GH_DocumentObject.Menu_AppendItem(menu, "Sharp", sharphandler, true, u.Distribution = Sharp) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "Beckmann", beckmannhandler, true, u.Distribution = Beckmann) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "GGX", ggxhandler, true, u.Distribution = GGX) |> ignore
+    let append_menu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+    append_menu Sharp
+    append_menu Beckmann
+    append_menu GGX
 
   interface ICyclesNode with
     member u.NodeName = "glass_bsdf"
@@ -372,14 +369,12 @@ type GlossyBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let sharphandler _ _ = u.Distribution <- Sharp; u.ExpireSolution true
-    let beckmannhandler _ _ = u.Distribution <- Beckmann; u.ExpireSolution true
-    let ggxhandler _ _ = u.Distribution <- GGX; u.ExpireSolution true
-    let asihkminhandler _ _ = u.Distribution <- Asihkmin_Shirley; u.ExpireSolution true
-    GH_DocumentObject.Menu_AppendItem(menu, "Sharp", sharphandler, true, u.Distribution = Sharp) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "Beckmann", beckmannhandler, true, u.Distribution = Beckmann) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "GGX", ggxhandler, true, u.Distribution = GGX) |> ignore
-    GH_DocumentObject.Menu_AppendItem(menu, "Asihkmin Shirley", asihkminhandler, true, u.Distribution = Asihkmin_Shirley) |> ignore
+    let append_menu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+    append_menu Sharp
+    append_menu Beckmann
+    append_menu GGX
+    append_menu Asihkmin_Shirley
 
   interface ICyclesNode with
     member u.NodeName = "glossy_bsdf"

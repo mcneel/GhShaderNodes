@@ -14,6 +14,8 @@ open Grasshopper.Kernel.Attributes
 open Grasshopper.Kernel.Types
 open Grasshopper.Kernel.Special
 
+open RhinoCyclesCore.Materials
+
 open ShaderGraphResources
 
 open System.Diagnostics
@@ -125,6 +127,8 @@ module Utils =
     u.Message <- SetMessage (not r) msg
     f.Value
 
+  let randomColor = Color.FromArgb(rnd.Next(0, 255), rnd.Next(0, 255), rnd.Next(0, 255))
+
   /// Create a GH_Colour from given IntColor
   let createColor c = new GH_Colour(Color.FromArgb((R c), (G c), (B c)))
 
@@ -173,6 +177,7 @@ module Utils =
 /// Distributions used in several nodes: Glass, Glossy, Refraction
 type Distribution = Sharp | Beckmann | GGX | Asihkmin_Shirley with
   member u.toString = Utils.toString u
+  member u.toStringR = (u.toString).Replace("_", " ")
   static member fromString s = Utils.fromString<Distribution> s
 
 type Falloff = Cubic | Gaussian | Burley with
@@ -184,16 +189,43 @@ type Falloff = Cubic | Gaussian | Burley with
 type OutputNode() =
   inherit GH_Component("Output", "output", "Output node for shader graph", "Shader", "Output")
 
+  member val MatId = Guid.Empty with get, set
+
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
-    mgr.AddColourParameter("Surface", "surface", "connect surface shader tree here.", GH_ParamAccess.item, Color.Black) |> ignore
+    mgr.AddColourParameter("Surface", "S", "connect surface shader tree here.", GH_ParamAccess.item, Color.Black) |> ignore
+    mgr.AddColourParameter("Volume", "V", "connect volume shader nodes here.", GH_ParamAccess.item, Color.GreenYellow) |> ignore
+    mgr.AddNumberParameter("Displacement", "D", "connect displacement nodes here.", GH_ParamAccess.item, 0.0) |> ignore
 
   override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
-    mgr.AddColourParameter("Pixel", "P", "Pixel colour through evaluation of the tree", GH_ParamAccess.item) |> ignore
     mgr.AddTextParameter("Xml", "X", "tree as xml", GH_ParamAccess.item) |> ignore
 
   override u.ComponentGuid = new Guid("14df22af-d119-4f69-a536-34a30ddb175e")
 
   override u.Icon = Icons.Output
+
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let append_menu name id =
+      GH_DocumentObject.Menu_AppendItem(menu, name, (fun _ _ -> u.MatId <- id; u.ExpireSolution true), true, u.MatId = id) |> ignore
+    //let rms = Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(fun rm -> rm.TypeName = "Cycles Xml")
+    let mc = Rhino.RhinoDoc.ActiveDoc.Materials.Count
+    let rms = Rhino.RhinoDoc.ActiveDoc.Materials.Select(fun i -> i.Name, i.Id )
+    for rm in rms do append_menu (fst rm) (snd rm)
+
+  member u.IsBackground =
+    match u.Params.Input.[0].SourceCount>0 with
+    | false -> false
+    | true ->
+      let s = u.Params.Input.[0].Sources.[0]
+      let st = s.GetType()
+      match st with
+      | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> false
+      | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> false
+      | _ -> 
+        let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
+        match attrp with
+        | null -> false
+        | _ -> attrp.Owner.ComponentGuid = new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32")
+
 
   override u.SolveInstance(DA : IGH_DataAccess) =
     u.Message <- ""
@@ -256,8 +288,7 @@ type OutputNode() =
       | _ ->
         nd.[n.InstanceGuid] <- true
         String.Format(ccl.Utilities.Instance.NumberFormatInfo, "<color name=\"{0}\" value=\"{1}\" />\n", nn, Utils.ColorXml(n.Colour))
-
-    /// Get all XML node tags for all the nodes that are connected to the
+      /// Get all XML node tags for all the nodes that are connected to the
     /// given node.
     let CollectNodeTags (n:GH_Component) =
       /// tail-recursively generate all tags
@@ -392,7 +423,7 @@ type OutputNode() =
                 match x with
                 | (null, _, _, _) -> accum
                 | (_, _, _, _) -> 
-                  let thistag = connecttag (x) //(Utils.ToC x), (Utils.ToS x), (Utils.FromS x), (Utils.FromC x))
+                  let thistag = connecttag (x)
                   let contags = colcontags ((Utils.FromC x), accum)
                   conrec xs contags + thistag
             conrec comp_attrs acc
@@ -404,9 +435,32 @@ type OutputNode() =
     let connecttagsxml = CollectConnectTags (u)
 
     let s = Utils.readColor(u, DA, 0, "Couldn't read Surface")
+    let v = Utils.readColor(u, DA, 1, "Couldn't read Volume");
 
-    DA.SetData(0, Utils.createColor s) |> ignore
-    DA.SetData(1, nodetagsxml + connecttagsxml) |> ignore
+    let mutable m = Rhino.RhinoDoc.ActiveDoc.Materials.Where(fun m -> m.Id = u.MatId).FirstOrDefault()
+    match u.IsBackground with
+    | true ->
+      let mutable env = Utils.castAs<XmlEnvironment>(Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground)
+      match env with
+      | null -> u.Message <- "NO BG"
+      | _ ->
+        env.SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
+        Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
+      ()
+    | false ->
+      match m with
+      | null ->
+        u.Message <- "NO MATERIAL"
+      | _ ->
+        let rm = m.RenderMaterial
+        Utils.castAs<XmlMaterial>(rm).SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
+        u.Message <- m.Name
+        m.DiffuseColor <- Utils.randomColor
+        rm.SimulateMaterial(&m, true)
+        m.CommitChanges() |> ignore
+
+
+    DA.SetData(0, nodetagsxml + connecttagsxml) |> ignore
 
   interface ICyclesNode with
     member u.NodeName = "output"
