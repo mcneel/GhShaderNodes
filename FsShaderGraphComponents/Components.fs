@@ -177,7 +177,7 @@ module Utils =
 /// Distributions used in several nodes: Glass, Glossy, Refraction
 type Distribution = Sharp | Beckmann | GGX | Asihkmin_Shirley with
   member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", " ")
+  member u.toStringR = (u.toString).Replace("_", "-")
   static member fromString s = Utils.fromString<Distribution> s
 
 type Falloff = Cubic | Gaussian | Burley with
@@ -207,24 +207,36 @@ type OutputNode() =
     let append_menu name id =
       GH_DocumentObject.Menu_AppendItem(menu, name, (fun _ _ -> u.MatId <- id; u.ExpireSolution true), true, u.MatId = id) |> ignore
     //let rms = Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(fun rm -> rm.TypeName = "Cycles Xml")
-    let mc = Rhino.RhinoDoc.ActiveDoc.Materials.Count
-    let rms = Rhino.RhinoDoc.ActiveDoc.Materials.Select(fun i -> i.Name, i.Id )
+//    let rms = Rhino.RhinoDoc.ActiveDoc.Materials.Where(fun x -> Utils.castAs<XmlMaterial>(x.RenderMaterial.TopLevelParent)<>null).Select(fun i -> i.Name, i.RenderMaterialInstanceId).Distinct()
+    let rms = Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(fun x -> Utils.castAs<XmlMaterial>(x)<>null).Select(fun i -> i.Name, i.Id).Distinct()
     for rm in rms do append_menu (fst rm) (snd rm)
 
   member u.IsBackground =
     match u.Params.Input.[0].SourceCount>0 with
     | false -> false
     | true ->
-      let s = u.Params.Input.[0].Sources.[0]
-      let st = s.GetType()
-      match st with
-      | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> false
-      | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> false
-      | _ -> 
-        let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
-        match attrp with
-        | null -> false
-        | _ -> attrp.Owner.ComponentGuid = new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32")
+      let rec has_bg_node (n:GH_Component) (acc:bool) (*: bool list*) =
+        //let s = n.Params.Input.[0].Sources.[0]
+        [for inp in n.Params.Input ->
+          match inp.SourceCount>0 with
+          | false -> false || acc
+          | true ->
+            let s = inp.Sources.[0]
+            let st = s.GetType()
+            match st with
+            | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> false || acc
+            | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> false || acc
+            | _ -> 
+              let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
+              match attrp with
+              | null -> false || acc
+              | _ ->
+                match attrp.Owner.ComponentGuid = new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32") with
+                | true -> true || acc
+                | false -> has_bg_node (Utils.castAs<GH_Component>(attrp.Owner)) acc
+        ].Any(fun x -> x = true)
+        
+      has_bg_node u false
 
 
   override u.SolveInstance(DA : IGH_DataAccess) =
@@ -437,7 +449,6 @@ type OutputNode() =
     let s = Utils.readColor(u, DA, 0, "Couldn't read Surface")
     let v = Utils.readColor(u, DA, 1, "Couldn't read Volume");
 
-    let mutable m = Rhino.RhinoDoc.ActiveDoc.Materials.Where(fun m -> m.Id = u.MatId).FirstOrDefault()
     match u.IsBackground with
     | true ->
       let mutable env = Utils.castAs<XmlEnvironment>(Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground)
@@ -448,16 +459,20 @@ type OutputNode() =
         Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
       ()
     | false ->
+      let mutable m = Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(fun m -> m.Id = u.MatId).FirstOrDefault()
       match m with
       | null ->
         u.Message <- "NO MATERIAL"
       | _ ->
-        let rm = m.RenderMaterial
-        Utils.castAs<XmlMaterial>(rm).SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
+        Utils.castAs<XmlMaterial>(m).SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
         u.Message <- m.Name
-        m.DiffuseColor <- Utils.randomColor
-        rm.SimulateMaterial(&m, true)
-        m.CommitChanges() |> ignore
+        let mutable mm = Utils.castAs<Rhino.DocObjects.Material>(null)
+        for mm in Rhino.RhinoDoc.ActiveDoc.Materials.Where(fun x -> x.RenderMaterialInstanceId = m.Id) do
+          mm.DiffuseColor <- Utils.randomColor
+          mm.CommitChanges() |> ignore
+        //m.DiffuseColor <- Utils.randomColor
+        //rm.SimulateMaterial(&m, true)
+        //m.CommitChanges() |> ignore
 
 
     DA.SetData(0, nodetagsxml + connecttagsxml) |> ignore
