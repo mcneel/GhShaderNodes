@@ -198,7 +198,7 @@ type AnisotropicBsdf() =
     u.Message <- ""
     let c = Utils.readColor(u, DA, 0, "Couldn't read anisotropic color")
 
-    u.Message <- u.Distribution.toString.Replace('_', ' ')
+    u.Message <- u.Distribution.toStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
@@ -224,7 +224,7 @@ type AnisotropicBsdf() =
   interface ICyclesNode with
     member u.NodeName = "anisotropic_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type RefractionBsdf() =
@@ -249,7 +249,7 @@ type RefractionBsdf() =
     u.Message <- ""
     let c = Utils.readColor(u, DA, 0, "Couldn't read refraction color")
 
-    u.Message <- u.Distribution.toString.Replace('_', ' ')
+    u.Message <- u.Distribution.toStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
@@ -275,7 +275,7 @@ type RefractionBsdf() =
   interface ICyclesNode with
     member u.NodeName = "refraction_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlassBsdf() =
@@ -301,7 +301,7 @@ type GlassBsdf() =
     let c = Utils.readColor(u, DA, 0, "Couldn't read glass color")
     let f = Utils.readFloat(u, DA, 1, "Couldn't read glass roughness")
 
-    u.Message <- u.Distribution.toString.Replace('_', ' ')
+    u.Message <- u.Distribution.toStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
@@ -327,7 +327,7 @@ type GlassBsdf() =
   interface ICyclesNode with
     member u.NodeName = "glass_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlossyBsdf() =
@@ -352,7 +352,7 @@ type GlossyBsdf() =
     let c = Utils.readColor(u, DA, 0, "Couldn't read glossy color")
     let f = Utils.readFloat(u, DA, 1, "Couldn't read glossy roughness")
 
-    u.Message <- u.Distribution.toString.Replace('_', ' ')
+    u.Message <- u.Distribution.toStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
@@ -379,7 +379,7 @@ type GlossyBsdf() =
   interface ICyclesNode with
     member u.NodeName = "glossy_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toString.Replace('_', ' '))
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type EmissionBsdf() =
