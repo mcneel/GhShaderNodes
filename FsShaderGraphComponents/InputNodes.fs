@@ -72,7 +72,7 @@ type Geometry() =
     mgr.AddVectorParameter("Position", "P", "Position", GH_ParamAccess.item) |> ignore
     mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item) |> ignore
     mgr.AddVectorParameter("Tangent", "T", "Tangent", GH_ParamAccess.item) |> ignore
-    mgr.AddVectorParameter("True Normal", "TN", "True Normal", GH_ParamAccess.item) |> ignore
+    mgr.AddVectorParameter("TrueNormal", "TN", "True Normal", GH_ParamAccess.item) |> ignore
     mgr.AddVectorParameter("Incoming", "I", "Incoming", GH_ParamAccess.item) |> ignore
     mgr.AddVectorParameter("Parametric", "Pr", "Parametric", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("Backfacing", "Bf", "Backfacing", GH_ParamAccess.item) |> ignore
