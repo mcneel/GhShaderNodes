@@ -262,3 +262,79 @@ type EnvironmentTextureNode() =
       let t = String.Format(" src=\"{0}\" ", u.EnvironmentFile)
       "<" + Utils.GetNodeXml node nickname (x+t) + " />"
 
+type WaveTypes =
+  | Bands
+  | Rings
+  member u.toString = Utils.toString u
+  member u.toStringR = u.toString
+  static member fromString s = Utils.fromString<WaveTypes> s
+
+type WaveProfiles =
+  | Sine
+  | Saw
+  member u.toString = Utils.toString u
+  member u.toStringR = u.toString
+  static member fromString s = Utils.fromString<WaveProfiles> s
+
+type WaveTextureNode() =
+  inherit GH_Component("Wave", "wave", "Wave", "Shader", "Texture")
+
+  member val Wave = Bands with get, set
+  member val Profile = Sine with get, set
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddVectorParameter("Vector", "V", "Vector", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+    mgr.AddNumberParameter("Scale", "S", "Scale", GH_ParamAccess.item, 1.0) |> ignore
+    mgr.AddNumberParameter("Detail", "D", "Detail", GH_ParamAccess.item, 2.0) |> ignore
+    mgr.AddNumberParameter("Detail Scale", "DS", "Detail Scale", GH_ParamAccess.item, 1.0) |> ignore
+    mgr.AddNumberParameter("Distortion", "Dx", "Distortion", GH_ParamAccess.item, 0.0) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("Color", "C", "Color", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("Fac", "F", "Fac", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("89660e7d-cf92-4fed-b61c-0231edd76504")
+
+  override u.Icon = Icons.Emission
+
+  override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
+    writer.SetString("Wave", u.Wave.toString) |> ignore
+    writer.SetString("Profile", u.Profile.toString) |> ignore
+    base.Write(writer)
+
+  override u.Read(reader:GH_IO.Serialization.GH_IReader) =
+    if reader.ItemExists("Wave") then
+      u.Wave <-
+        let d = WaveTypes.fromString (reader.GetString "Wave")
+        match d with None -> Bands | _ -> d.Value
+
+    if reader.ItemExists("Profile") then
+      u.Profile <-
+        let d = WaveProfiles.fromString (reader.GetString "Profile")
+        match d with None -> Sine | _ -> d.Value
+
+    base.Read(reader)
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- u.Wave.toStringR
+
+    DA.SetData(0, new GH_Colour(Color.Beige)) |> ignore
+    DA.SetData(1, 0.5) |> ignore
+
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let append_menu (gt:WaveTypes) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Wave <- gt; u.ExpireSolution true), true, u.Wave = gt) |> ignore
+    append_menu Bands
+    append_menu Rings
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    let append_profile_menu (gt:WaveProfiles) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Profile <- gt; u.ExpireSolution true), true, u.Profile = gt) |> ignore
+    append_profile_menu Sine
+    append_profile_menu Saw
+
+  interface ICyclesNode with
+    member u.NodeName = "wave_texture"
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      let t = String.Format(" wave_type=\"{0}\" ", u.Wave.toStringR)
+      "<" + Utils.GetNodeXml node nickname (x+t) + " />"
