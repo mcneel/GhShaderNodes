@@ -139,7 +139,7 @@ type LightPathNode() =
     mgr.AddNumberParameter("IsSingularRay", "SingR", "Is Singular Ray", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("IsReflectionRay", "RR", "Is Reflection Ray", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("IsTransmissionRay", "TR", "Is Transmission Ray", GH_ParamAccess.item) |> ignore
-    mgr.AddNumberParameter("IsVolumeScatterRay", "VSR", "Is VolumeScatter Ray", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("IsVolumeScatterRay", "VSR", "Is Volume Scatter Ray", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("RayLength", "RL", "Ray Length", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("RayDepth", "RD", "Ray Depth", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("TransparentDepth", "TD", "Transparent Depth", GH_ParamAccess.item) |> ignore
