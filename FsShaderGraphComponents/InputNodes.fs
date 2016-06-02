@@ -169,5 +169,32 @@ type LightPathNode() =
       let x = Utils.GetInputsXml inputs
       "<" + Utils.GetNodeXml node nickname x + "/>"
 
+type LightFalloffNode() =
+  inherit GH_Component("Light Falloff", "light falloff", "Light Falloff", "Shader", "Input")
 
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddNumberParameter("Strength", "Str", "Strength", GH_ParamAccess.item, 100.0) |> ignore
+    mgr.AddNumberParameter("Smooth", "Sm", "Smooth", GH_ParamAccess.item, 0.0) |> ignore
+    ()
 
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddNumberParameter("Quadratic", "Q", "Quadratic", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("Linear", "L", "Linear", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("Constant", "C", "Constant", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("5232b3d2-80ac-44f2-bc9e-b6c066d2c6ac")
+
+  override u.Icon = Icons.Emission
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+
+    DA.SetData(0, 1.0) |> ignore
+    DA.SetData(1, 1.0) |> ignore
+    DA.SetData(2, 1.0) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "light_falloff"
+    member u.GetXml node nickname inputs =
+      let x = Utils.GetInputsXml inputs
+      "<" + Utils.GetNodeXml node nickname x + "/>"
