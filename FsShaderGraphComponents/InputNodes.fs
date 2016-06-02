@@ -143,6 +143,7 @@ type LightPathNode() =
     mgr.AddNumberParameter("RayLength", "RL", "Ray Length", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("RayDepth", "RD", "Ray Depth", GH_ParamAccess.item) |> ignore
     mgr.AddNumberParameter("TransparentDepth", "TD", "Transparent Depth", GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("TransmissionDepth", "TD", "Transmission Depth", GH_ParamAccess.item) |> ignore
 
   override u.ComponentGuid = new Guid("9ba94ea6-d977-47ba-807c-b4b68fa9dea8")
 
@@ -162,6 +163,7 @@ type LightPathNode() =
     DA.SetData(8, 1.0) |> ignore
     DA.SetData(9, 1.0) |> ignore
     DA.SetData(10, 1.0) |> ignore
+    DA.SetData(11, 1.0) |> ignore
 
   interface ICyclesNode with
     member u.NodeName = "light_path"
