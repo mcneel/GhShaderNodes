@@ -19,12 +19,12 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
-    <OutputPath>..\..\Rhino\rhino\src4\bin\Release\Plug-ins\Grasshopper\Components\</OutputPath>
+    <OutputPath>..\..\Rhino\rhino\src4\bin\Debug\Plug-ins\Grasshopper\Components\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\$(Configuration)\FsShaderGraphComponents.XML</DocumentationFile>
     <StartAction>Program</StartAction>
-    <StartProgram>D:\Dev\Rhino\rhino\src4\bin\Release\Rhino.exe</StartProgram>
+    <StartProgram>D:\Dev\Rhino\rhino\src4\bin\Debug\Rhino.exe</StartProgram>
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
     <StartArguments>/nosplash</StartArguments>
   </PropertyGroup>

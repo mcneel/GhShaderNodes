@@ -85,7 +85,7 @@ type MixRgbNode() =
     if reader.ItemExists("Blend") then
       u.Blend <-
         let d = BlendTypes.fromString (reader.GetString "Blend")
-        match d with | None -> Mix | _ -> d.Value
+        match d with | Option.None -> Mix | _ -> d.Value
 
     base.Read(reader)
 
@@ -139,7 +139,7 @@ type ColorRampNode() =
     if reader.ItemExists("Interpolation") then
       u.Interpolation <-
         let d = InterpolationTypes.fromString (reader.GetString "Interpolation")
-        match d with None -> Linear | _ -> d.Value
+        match d with Option.None -> Linear | _ -> d.Value
 
     base.Read(reader)
 

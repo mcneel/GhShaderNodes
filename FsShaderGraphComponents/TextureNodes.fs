@@ -78,7 +78,7 @@ type GradientTextureNode() =
     if reader.ItemExists("Gradient") then
       u.Gradient <-
         let d = GradientTypes.fromString (reader.GetString "Gradient")
-        match d with None -> Linear | _ -> d.Value
+        match d with Option.None -> Linear | _ -> d.Value
 
     base.Read(reader)
 
@@ -146,7 +146,7 @@ type MusgraveTextureNode() =
     if reader.ItemExists("Musgrave") then
       u.Musgrave <-
         let d = MusgraveTypes.fromString (reader.GetString "Musgrave")
-        match d with None -> FBM | _ -> d.Value
+        match d with Option.None -> MusgraveTypes.FBM | _ -> d.Value
 
     base.Read(reader)
 
@@ -176,6 +176,10 @@ type ImageTextureNode() =
   inherit GH_Component("Image", "image", "Image", "Shader", "Texture")
 
   member val ImageFile = "" with get, set
+  member val Interpolation = Interpolation.Linear with get, set
+  member val Projection = TextureProjection.Flat with get, set
+  member val TextureExtension = Repeat with get, set
+  member val ColorSpace = ColorSpace.None with get, set
 
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddVectorParameter("Vector", "V", "Vector", GH_ParamAccess.item, Vector3d.Zero) |> ignore
@@ -190,37 +194,95 @@ type ImageTextureNode() =
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
     writer.SetString("Image", u.ImageFile) |> ignore
+    writer.SetString("ImTexInterpolation", u.Interpolation.toString) |> ignore
+    writer.SetString("ImTexColorSpace", u.ColorSpace.toString) |> ignore
+    writer.SetString("ImTexTextureExtension", u.TextureExtension.toString) |> ignore
+    writer.SetString("ImTexProjection", u.Projection.toString) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Image") then
       u.ImageFile <- reader.GetString "Image"
+    if reader.ItemExists("ImTexInterpolation") then
+      let interp = Interpolation.fromString (reader.GetString "ImTexInterpolation")
+      u.Interpolation <-
+        match interp with | Option.None -> Interpolation.None | _ -> interp.Value
+    if reader.ItemExists("ImTexColorSpace") then
+      let colorspace = ColorSpace.fromString (reader.GetString "ImTexColorSpace")
+      u.ColorSpace <-
+        match colorspace with | Option.None -> ColorSpace.None | _ -> colorspace.Value
+    if reader.ItemExists("ImTexTextureExtension") then
+      let extension = TextureExtension.fromString (reader.GetString "ImTexTextureExtension")
+      u.TextureExtension <-
+        match extension with | Option.None -> TextureExtension.Repeat | _ -> extension.Value
+    if reader.ItemExists("ImTexProjection") then
+      let projection = TextureProjection.fromString (reader.GetString "ImTexProjection")
+      u.Projection <-
+        match projection with | Option.None -> TextureProjection.Flat | _ -> projection.Value
 
     base.Read(reader)
 
   override u.SolveInstance(DA: IGH_DataAccess) =
-    u.Message <- u.ImageFile
+    u.Message <- System.IO.Path.GetFileName(u.ImageFile)
 
     DA.SetData(0, new GH_Colour(Color.Beige)) |> ignore
     DA.SetData(1, 0.5) |> ignore
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    GH_DocumentObject.Menu_AppendTextItem(menu, u.ImageFile,
-      (fun sender evargs -> u.ImageFile <- sender.Text; u.ExpireSolution(true)),
-      (fun sender evargs -> ()),
-      false) |> ignore
+    let append_interpolation_menu (gt:Interpolation) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Interpolation <- gt; u.ExpireSolution true), true, u.Interpolation = gt) |> ignore
+    let append_extension_menu (gt:TextureExtension) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.TextureExtension <- gt; u.ExpireSolution true), true, u.TextureExtension = gt) |> ignore
+    let append_colorspace_menu (gt:ColorSpace) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.ColorSpace <- gt; u.ExpireSolution true), true, u.ColorSpace = gt) |> ignore
+    let append_projection_menu (gt:TextureProjection) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Projection <- gt; u.ExpireSolution true), true, u.Projection = gt) |> ignore
+    let fd = lazy (
+      let mutable fdi = new System.Windows.Forms.OpenFileDialog()
+      fdi.Filter <- "Image Files(*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|All files (*.*)|*.*"
+      let res = fdi.ShowDialog()
+      match res with
+      | DialogResult.OK -> fdi.FileName
+      | _ -> ""
+      )
+    GH_DocumentObject.Menu_AppendItem(menu, "Select Image File...", (fun _ _ -> u.ImageFile <- fd.Force(); u.ExpireSolution(true))) |> ignore
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    append_interpolation_menu Interpolation.None
+    append_interpolation_menu Interpolation.Linear
+    append_interpolation_menu Interpolation.Closest
+    append_interpolation_menu Interpolation.Cubic
+    append_interpolation_menu Interpolation.Smart
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    append_extension_menu TextureExtension.Repeat
+    append_extension_menu TextureExtension.Extend
+    append_extension_menu TextureExtension.Clip
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    append_colorspace_menu ColorSpace.None
+    append_colorspace_menu ColorSpace.Color
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    append_projection_menu TextureProjection.Flat
+    append_projection_menu TextureProjection.Box
+    append_projection_menu TextureProjection.Sphere
+    append_projection_menu TextureProjection.Tube
 
   interface ICyclesNode with
     member u.NodeName = "image_texture"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
       let t = String.Format(" src=\"{0}\" ", u.ImageFile)
-      "<" + Utils.GetNodeXml node nickname (x+t) + " />"
+      let interp = String.Format(" interpolation=\"{0}\" ", u.Interpolation.toString)
+      let extension = String.Format(" extension=\"{0}\" ", u.TextureExtension.toString)
+      let projection = String.Format(" projection=\"{0}\" ", u.Projection.toString)
+      let cs = String.Format(" color_space=\"{0}\" ", u.ColorSpace.toString)
+      "<" + Utils.GetNodeXml node nickname (x+t+interp+extension+projection+cs) + " />"
 
 type EnvironmentTextureNode() =
   inherit GH_Component("Environment", "environment", "Environment", "Shader", "Texture")
 
   member val EnvironmentFile = "" with get, set
+  member val Projection = EnvironmentProjection.Equirectangular with get, set
+  member val Interpolation = Interpolation.Linear with get, set
+  member val ColorSpace = ColorSpace.None with get, set
 
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddVectorParameter("Vector", "V", "Vector", GH_ParamAccess.item, Vector3d.Zero) |> ignore
@@ -235,25 +297,64 @@ type EnvironmentTextureNode() =
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
     writer.SetString("Environment", u.EnvironmentFile) |> ignore
+    writer.SetString("Projection", u.Projection.toStringR) |> ignore
+    writer.SetString("Interpolation", u.Interpolation.toStringR) |> ignore
+    writer.SetString("ColorSpace", u.ColorSpace.toStringR) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Environment") then
       u.EnvironmentFile <- reader.GetString "Environment"
+    if reader.ItemExists("Projection") then
+      let interp = EnvironmentProjection.fromString (reader.GetString "Projection")
+      u.Projection <-
+        match interp with | Option.None -> EnvironmentProjection.Equirectangular | _ -> interp.Value
+    if reader.ItemExists("Interpolation") then
+      let interp = Interpolation.fromString (reader.GetString "Interpolation")
+      u.Interpolation <-
+        match interp with | Option.None -> Interpolation.Linear | _ -> interp.Value
+    if reader.ItemExists("ColorSpace") then
+      let interp = ColorSpace.fromString (reader.GetString "Interpolation")
+      u.ColorSpace <-
+        match interp with | Option.None -> ColorSpace.None | _ -> interp.Value
 
     base.Read(reader)
 
   override u.SolveInstance(DA: IGH_DataAccess) =
-    u.Message <- u.EnvironmentFile
+    u.Message <- System.IO.Path.GetFileName(u.EnvironmentFile)
 
     DA.SetData(0, new GH_Colour(Color.Beige)) |> ignore
     DA.SetData(1, 0.5) |> ignore
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    GH_DocumentObject.Menu_AppendTextItem(menu, u.EnvironmentFile,
-      (fun sender evargs -> u.EnvironmentFile <- sender.Text; u.ExpireSolution(true)),
-      (fun sender evargs -> ()),
-      false) |> ignore
+    let append_interpolation_menu (gt:Interpolation) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Interpolation <- gt; u.ExpireSolution true), true, u.Interpolation = gt) |> ignore
+    let append_colorspace_menu (gt:ColorSpace) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.ColorSpace <- gt; u.ExpireSolution true), true, u.ColorSpace = gt) |> ignore
+    let append_projection_menu (gt:EnvironmentProjection) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Projection <- gt; u.ExpireSolution true), true, u.Projection = gt) |> ignore
+    let fd = lazy (
+      let mutable fdi = new System.Windows.Forms.OpenFileDialog()
+      fdi.Filter <- "Image Files(*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|All files (*.*)|*.*"
+      let res = fdi.ShowDialog()
+      match res with
+      | DialogResult.OK -> fdi.FileName
+      | _ -> ""
+      )
+    GH_DocumentObject.Menu_AppendItem(menu, "Select Environment File...", (fun _ _ -> u.EnvironmentFile <- fd.Force(); u.ExpireSolution(true))) |> ignore
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    append_projection_menu EnvironmentProjection.Equirectangular
+    append_projection_menu EnvironmentProjection.Mirror_Ball
+    append_projection_menu EnvironmentProjection.Wallpaper
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    append_interpolation_menu Interpolation.None
+    append_interpolation_menu Interpolation.Linear
+    append_interpolation_menu Interpolation.Closest
+    append_interpolation_menu Interpolation.Cubic
+    append_interpolation_menu Interpolation.Smart
+    GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
+    append_colorspace_menu ColorSpace.None
+    append_colorspace_menu ColorSpace.Color
 
   interface ICyclesNode with
     member u.NodeName = "environment_texture"
@@ -306,12 +407,12 @@ type WaveTextureNode() =
     if reader.ItemExists("Wave") then
       u.Wave <-
         let d = WaveTypes.fromString (reader.GetString "Wave")
-        match d with None -> Bands | _ -> d.Value
+        match d with Option.None -> Bands | _ -> d.Value
 
     if reader.ItemExists("Profile") then
       u.Profile <-
         let d = WaveProfiles.fromString (reader.GetString "Profile")
-        match d with None -> Sine | _ -> d.Value
+        match d with Option.None -> Sine | _ -> d.Value
 
     base.Read(reader)
 

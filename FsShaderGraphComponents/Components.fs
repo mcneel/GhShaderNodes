@@ -174,6 +174,31 @@ module Utils =
   let GetNodeXml node name data =
     node + " name=\"" + name + "\" " + data
 
+type Interpolation = None | Linear | Closest | Cubic | Smart with
+  member u.toString = Utils.toString u
+  member u.toStringR = (u.toString).Replace("_", "-")
+  static member fromString s = Utils.fromString<Interpolation> s
+
+type EnvironmentProjection = Equirectangular | Mirror_Ball | Wallpaper with
+  member u.toString = Utils.toString u
+  member u.toStringR = (u.toString).Replace("_", " ")
+  static member fromString s = Utils.fromString<EnvironmentProjection> ((s:string).Replace(" ", "_"))
+
+type TextureProjection = Flat | Box | Sphere | Tube with
+  member u.toString = Utils.toString u
+  member u.toStringR = (u.toString).Replace("_", "-")
+  static member fromString s = Utils.fromString<TextureProjection> s
+
+type TextureExtension = Repeat | Extend | Clip with
+  member u.toString = Utils.toString u
+  member u.toStringR = (u.toString).Replace("_", "-")
+  static member fromString s = Utils.fromString<TextureExtension> s
+
+type ColorSpace = None | Color with
+  member u.toString = Utils.toString u
+  member u.toStringR = (u.toString).Replace("_", "-")
+  static member fromString s = Utils.fromString<ColorSpace> s
+
 /// Distributions used in several nodes: Glass, Glossy, Refraction
 type Distribution = Sharp | Beckmann | GGX | Asihkmin_Shirley with
   member u.toString = Utils.toString u

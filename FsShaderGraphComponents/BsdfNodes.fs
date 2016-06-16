@@ -210,7 +210,7 @@ type AnisotropicBsdf() =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
         let d = Distribution.fromString (reader.GetString "Distribution")
-        match d with | None -> GGX | _ -> d.Value
+        match d with | Option.None -> GGX | _ -> d.Value
 
     base.Read(reader)
 
@@ -261,7 +261,7 @@ type RefractionBsdf() =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
         let d = Distribution.fromString (reader.GetString "Distribution")
-        match d with | None -> Sharp | _ -> d.Value
+        match d with | Option.None -> Sharp | _ -> d.Value
 
     base.Read(reader)
 
@@ -313,7 +313,7 @@ type GlassBsdf() =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
         let d = Distribution.fromString (reader.GetString "Distribution")
-        match d with | None -> Sharp | _ -> d.Value
+        match d with | Option.None -> Sharp | _ -> d.Value
 
     base.Read(reader)
 
@@ -364,7 +364,7 @@ type GlossyBsdf() =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
         let d = Distribution.fromString (reader.GetString "Distribution")
-        match d with | None -> Sharp | _ -> d.Value
+        match d with | Option.None -> Sharp | _ -> d.Value
 
     base.Read(reader)
 
