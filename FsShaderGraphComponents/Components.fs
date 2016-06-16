@@ -489,7 +489,9 @@ type OutputNode() =
       | null ->
         u.Message <- "NO MATERIAL"
       | _ ->
+        Utils.castAs<XmlMaterial>(m).BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
         Utils.castAs<XmlMaterial>(m).SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
+        Utils.castAs<XmlMaterial>(m).EndChange()
         u.Message <- m.Name
         let mutable mm = Utils.castAs<Rhino.DocObjects.Material>(null)
         for mm in Rhino.RhinoDoc.ActiveDoc.Materials.Where(fun x -> x.RenderMaterialInstanceId = m.Id) do
