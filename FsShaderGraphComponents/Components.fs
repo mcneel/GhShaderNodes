@@ -200,7 +200,7 @@ type ColorSpace = None | Color with
   static member fromString s = Utils.fromString<ColorSpace> s
 
 /// Distributions used in several nodes: Glass, Glossy, Refraction
-type Distribution = Sharp | Beckmann | GGX | Asihkmin_Shirley with
+type Distribution = Sharp | Beckmann | GGX | Ashihkmin_Shirley with
   member u.toString = Utils.toString u
   member u.toStringR = (u.toString).Replace("_", "-")
   static member fromString s = Utils.fromString<Distribution> s
