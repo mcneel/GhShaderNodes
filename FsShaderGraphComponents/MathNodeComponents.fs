@@ -16,8 +16,8 @@ type MathBaseNode(name, nickname, description, category, subcategory, outputdesc
 
   let mutable m_useclamp = false
 
-  member u.outputdesc = outputdescription
-  member u.op = op
+  member u.OutputDesc = outputdescription
+  member u.Op = op
 
   member u.UseClamp
     with get() = m_useclamp
@@ -28,13 +28,13 @@ type MathBaseNode(name, nickname, description, category, subcategory, outputdesc
     mgr.AddNumberParameter("Value2", "2", "Second value", GH_ParamAccess.item, 0.0) |> ignore
 
   override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
-    mgr.AddNumberParameter("Value", "R", u.outputdesc, GH_ParamAccess.item) |> ignore
+    mgr.AddNumberParameter("Value", "R", u.OutputDesc, GH_ParamAccess.item) |> ignore
 
   override u.SolveInstance(DA : IGH_DataAccess) =
     let v1 = Utils.readFloat(u, DA, 0, "Couldn't read Value1")
     let v2 = Utils.readFloat(u, DA, 1, "Couldn't read Value2")
 
-    let r = match u.UseClamp with true -> u.Message <- "UseClamp = true"; max (min (u.op v1 v2) 1.0) 0.0 | _ -> u.Message <- "UseClamp = false"; u.op v1 v2
+    let r = match u.UseClamp with true -> u.Message <- "UseClamp = true"; max (min (u.Op v1 v2) 1.0) 0.0 | _ -> u.Message <- "UseClamp = false"; u.Op v1 v2
 
     DA.SetData(0, r) |> ignore
 
@@ -49,8 +49,8 @@ type MathBaseNode(name, nickname, description, category, subcategory, outputdesc
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let useclamp_handler _ _ = u.UseClamp <- not u.UseClamp; u.ExpireSolution true
-    GH_DocumentObject.Menu_AppendItem(menu, "Use Clamp", useclamp_handler, true, u.UseClamp) |> ignore
+    let handler _ _ = u.UseClamp <- not u.UseClamp; u.ExpireSolution true
+    GH_DocumentObject.Menu_AppendItem(menu, "Use Clamp", handler, true, u.UseClamp) |> ignore
 
   interface ICyclesNode with
     member u.NodeName = "math"

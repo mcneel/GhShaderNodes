@@ -198,25 +198,25 @@ type AnisotropicBsdf() =
     u.Message <- ""
     let c = Utils.readColor(u, DA, 0, "Couldn't read anisotropic color")
 
-    u.Message <- u.Distribution.toStringR
+    u.Message <- u.Distribution.ToStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
-    writer.SetString("Distribution", u.Distribution.toString) |> ignore
+    writer.SetString("Distribution", u.Distribution.ToString) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
-        let d = Distribution.fromString (reader.GetString "Distribution")
+        let d = Distribution.FromString (reader.GetString "Distribution")
         match d with | Option.None -> GGX | _ -> d.Value
 
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
     let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
     append_menu Beckmann
     append_menu GGX
     append_menu Ashihkmin_Shirley
@@ -224,7 +224,7 @@ type AnisotropicBsdf() =
   interface ICyclesNode with
     member u.NodeName = "anisotropic_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type RefractionBsdf() =
@@ -249,25 +249,25 @@ type RefractionBsdf() =
     u.Message <- ""
     let c = Utils.readColor(u, DA, 0, "Couldn't read refraction color")
 
-    u.Message <- u.Distribution.toStringR
+    u.Message <- u.Distribution.ToStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
-    writer.SetString("Distribution", u.Distribution.toString) |> ignore
+    writer.SetString("Distribution", u.Distribution.ToString) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
-        let d = Distribution.fromString (reader.GetString "Distribution")
+        let d = Distribution.FromString (reader.GetString "Distribution")
         match d with | Option.None -> Sharp | _ -> d.Value
 
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
     let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
     append_menu Sharp
     append_menu Beckmann
     append_menu GGX
@@ -275,7 +275,7 @@ type RefractionBsdf() =
   interface ICyclesNode with
     member u.NodeName = "refraction_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlassBsdf() =
@@ -301,25 +301,25 @@ type GlassBsdf() =
     let c = Utils.readColor(u, DA, 0, "Couldn't read glass color")
     let f = Utils.readFloat(u, DA, 1, "Couldn't read glass roughness")
 
-    u.Message <- u.Distribution.toStringR
+    u.Message <- u.Distribution.ToStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
-    writer.SetString("Distribution", u.Distribution.toString) |> ignore
+    writer.SetString("Distribution", u.Distribution.ToString) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
-        let d = Distribution.fromString (reader.GetString "Distribution")
+        let d = Distribution.FromString (reader.GetString "Distribution")
         match d with | Option.None -> Sharp | _ -> d.Value
 
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
     let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
     append_menu Sharp
     append_menu Beckmann
     append_menu GGX
@@ -327,7 +327,7 @@ type GlassBsdf() =
   interface ICyclesNode with
     member u.NodeName = "glass_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlossyBsdf() =
@@ -352,25 +352,25 @@ type GlossyBsdf() =
     let c = Utils.readColor(u, DA, 0, "Couldn't read glossy color")
     let f = Utils.readFloat(u, DA, 1, "Couldn't read glossy roughness")
 
-    u.Message <- u.Distribution.toStringR
+    u.Message <- u.Distribution.ToStringR
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
-    writer.SetString("Distribution", u.Distribution.toString) |> ignore
+    writer.SetString("Distribution", u.Distribution.ToString) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Distribution") then
       u.Distribution <-
-        let d = Distribution.fromString (reader.GetString "Distribution")
+        let d = Distribution.FromString (reader.GetString "Distribution")
         match d with | Option.None -> Sharp | _ -> d.Value
 
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
     let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.toStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
     append_menu Sharp
     append_menu Beckmann
     append_menu GGX
@@ -379,7 +379,7 @@ type GlossyBsdf() =
   interface ICyclesNode with
     member u.NodeName = "glossy_bsdf"
     member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.toStringR)
+      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type EmissionBsdf() =
@@ -439,6 +439,6 @@ type SubsurfaceScatteringBsdf() =
     member u.NodeName = "subsurface_scattering"
     member u.GetXml node nickname inputs =
       let x = Utils.GetInputsXml inputs
-      let ft = String.Format(" falloff=\"{0}\" ", u.Falloff.toString)
+      let ft = String.Format(" falloff=\"{0}\" ", u.Falloff.ToString)
       "<" + Utils.GetNodeXml node nickname (x + ft) + " />"
 

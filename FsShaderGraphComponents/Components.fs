@@ -18,8 +18,6 @@ open RhinoCyclesCore.Materials
 
 open ShaderGraphResources
 
-open System.Diagnostics
-
 /// type that signals Grasshopper to continue loading. Here we
 /// do necessary initialisation
 type Priority() = 
@@ -87,11 +85,11 @@ module Utils =
   let LessThen a b = match (<) a b with true -> 1.0 | _ -> 0.0
 
   /// Give first (R) component of triplet (IntColor)
-  let R (_r:int, _:int, _:int) = _r
+  let R (r:int, _:int, _:int) = r
   /// Give second (G) component of triplet (IntColor)
-  let G (_:int, _g:int, _:int) = _g
+  let G (_:int, g:int, _:int) = g
   /// Give third (B) component of triplet (IntColor)
-  let B (_:int, _:int, _b:int) = _b
+  let B (_:int, _:int, b:int) = b
 
   let FromC (x:obj, _:IGH_Param, _:IGH_Param, _:obj) = x
   let FromS (_:obj, x:IGH_Param, _:IGH_Param, _:obj) = x
@@ -103,6 +101,8 @@ module Utils =
   /// Convert a byte channel to float
   let RGBChanToFloat (b:byte) = (float32 b)/255.0f
 
+  let (|IntColor|) (c:Color) = 
+    ((int c.R), (int c.G), (int c.B))
   let IntColorFromColor (c:Color) =
     ((int c.R), (int c.G), (int c.B))
 
@@ -112,18 +112,18 @@ module Utils =
   /// Read color from given component data access at index idx. component
   /// message will be set to msg if reading the data failed.
   /// Returns an IntColor.
-  let readColor(u:GH_Component, DA:IGH_DataAccess, idx:int, msg) : IntColor =
+  let readColor(u:GH_Component, da:IGH_DataAccess, idx:int, msg) : IntColor =
     let mutable c = new GH_Colour()
-    let r = DA.GetData(idx, &c)
+    let r = da.GetData(idx, &c)
     u.Message <- SetMessage (not r) msg
     IntColorFromColor(c.Value)
 
   /// Read float from given component data access at index idx. component
   /// message will be set to msg if reading the data failed.
   /// Returns a float.
-  let readFloat(u:GH_Component, DA:IGH_DataAccess, idx:int, msg) : float =
+  let readFloat(u:GH_Component, da:IGH_DataAccess, idx:int, msg) : float =
     let mutable f = new GH_Number()
-    let r = DA.GetData(idx, &f)
+    let r = da.GetData(idx, &f)
     u.Message <- SetMessage (not r) msg
     f.Value
 
@@ -175,39 +175,39 @@ module Utils =
     node + " name=\"" + name + "\" " + data
 
 type Interpolation = None | Linear | Closest | Cubic | Smart with
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", "-")
-  static member fromString s = Utils.fromString<Interpolation> s
+  member u.ToString = Utils.toString u
+  member u.ToStringR = (u.ToString).Replace("_", "-")
+  static member FromString s = Utils.fromString<Interpolation> s
 
 type EnvironmentProjection = Equirectangular | Mirror_Ball | Wallpaper with
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", " ")
-  static member fromString s = Utils.fromString<EnvironmentProjection> ((s:string).Replace(" ", "_"))
+  member u.ToString = Utils.toString u
+  member u.ToStringR = (u.ToString).Replace("_", " ")
+  static member FromString s = Utils.fromString<EnvironmentProjection> ((s:string).Replace(" ", "_"))
 
 type TextureProjection = Flat | Box | Sphere | Tube with
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", "-")
-  static member fromString s = Utils.fromString<TextureProjection> s
+  member u.ToString = Utils.toString u
+  member u.ToStringR = (u.ToString).Replace("_", "-")
+  static member FromString s = Utils.fromString<TextureProjection> s
 
 type TextureExtension = Repeat | Extend | Clip with
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", "-")
-  static member fromString s = Utils.fromString<TextureExtension> s
+  member u.ToString = Utils.toString u
+  member u.ToStringR = (u.ToString).Replace("_", "-")
+  static member FromString s = Utils.fromString<TextureExtension> s
 
 type ColorSpace = None | Color with
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", "-")
-  static member fromString s = Utils.fromString<ColorSpace> s
+  member u.ToString = Utils.toString u
+  member u.ToStringR = (u.ToString).Replace("_", "-")
+  static member FromString s = Utils.fromString<ColorSpace> s
 
 /// Distributions used in several nodes: Glass, Glossy, Refraction
 type Distribution = Sharp | Beckmann | GGX | Ashihkmin_Shirley with
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", "-")
-  static member fromString s = Utils.fromString<Distribution> s
+  member u.ToString = Utils.toString u
+  member u.ToStringR = (u.ToString).Replace("_", "-")
+  static member FromString s = Utils.fromString<Distribution> s
 
 type Falloff = Cubic | Gaussian | Burley with
-  member u.toString = Utils.toString u
-  static member fromString s = Utils.fromString<Falloff> s
+  member u.ToString = Utils.toString u
+  static member FromString s = Utils.fromString<Falloff> s
 
 /// The output node for the shader system. This node is responsible for
 /// driving the XML generation of a shader graph.
@@ -229,42 +229,42 @@ type OutputNode() =
   override u.Icon = Icons.Output
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu name id =
+    let appendMenu name id =
       GH_DocumentObject.Menu_AppendItem(menu, name, (fun _ _ -> u.MatId <- id; u.ExpireSolution true), true, u.MatId = id) |> ignore
     //let rms = Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(fun rm -> rm.TypeName = "Cycles Xml")
 //    let rms = Rhino.RhinoDoc.ActiveDoc.Materials.Where(fun x -> Utils.castAs<XmlMaterial>(x.RenderMaterial.TopLevelParent)<>null).Select(fun i -> i.Name, i.RenderMaterialInstanceId).Distinct()
     let rms = Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(fun x -> Utils.castAs<XmlMaterial>(x)<>null).Select(fun i -> i.Name, i.Id).Distinct()
-    for rm in rms do append_menu (fst rm) (snd rm)
+    for rm in rms do appendMenu (fst rm) (snd rm)
 
   member u.IsBackground =
     match u.Params.Input.[0].SourceCount>0 with
     | false -> false
     | true ->
-      let rec has_bg_node (n:GH_Component) (acc:bool) (*: bool list*) =
+      let rec hasBgNode (n:GH_Component) (acc:bool) (*: bool list*) =
         //let s = n.Params.Input.[0].Sources.[0]
         [for inp in n.Params.Input ->
           match inp.SourceCount>0 with
-          | false -> false || acc
+          | false -> acc
           | true ->
             let s = inp.Sources.[0]
             let st = s.GetType()
             match st with
-            | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> false || acc
-            | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> false || acc
+            | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> acc
+            | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> acc
             | _ -> 
               let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
               match attrp with
-              | null -> false || acc
+              | null -> acc
               | _ ->
                 match attrp.Owner.ComponentGuid = new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32") with
-                | true -> true || acc
-                | false -> has_bg_node (Utils.castAs<GH_Component>(attrp.Owner)) acc
-        ].Any(fun x -> x = true)
+                | true -> acc
+                | false -> hasBgNode (Utils.castAs<GH_Component>(attrp.Owner)) acc
+        ].Any(fun x -> x)
         
-      has_bg_node u false
+      hasBgNode u false
 
 
-  override u.SolveInstance(DA : IGH_DataAccess) =
+  override u.SolveInstance(da : IGH_DataAccess) =
     u.Message <- ""
 
     let doc = u.OnPingDocument()
@@ -278,7 +278,7 @@ type OutputNode() =
     /// Generate XML representation for given <c>GH_Component</c>
     /// </summary>
     /// <param name="n">GH_Component to generate XML representation of</param>
-    let ComponentToXml (n:GH_Component) =
+    let componentToXml (n:GH_Component) =
 
       /// Get the NodeName from a <c>GH_Component</c>. If <c>GH_Component</c> doesn't
       /// implement <c>ICyclesNode</c> this will be the empty string "".
@@ -308,7 +308,7 @@ type OutputNode() =
                                           nd.[n.InstanceGuid] <- true
                                           xml
 
-    let ValueNodeXml (n:GH_NumberSlider) =
+    let valueNodeXml (n:GH_NumberSlider) =
       let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
       let nn = n.InstanceGuid.ToString()
       match dontdoit with
@@ -317,7 +317,7 @@ type OutputNode() =
         nd.[n.InstanceGuid] <- true
         String.Format(ccl.Utilities.Instance.NumberFormatInfo, "<value name=\"{0}\" value=\"{1}\" />\n", nn, n.CurrentValue)
 
-    let ColorNodeXml (n:GH_ColourPickerObject) =
+    let colorNodeXml (n:GH_ColourPickerObject) =
       let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
       let nn = n.InstanceGuid.ToString()
       match dontdoit with
@@ -327,7 +327,7 @@ type OutputNode() =
         String.Format(ccl.Utilities.Instance.NumberFormatInfo, "<color name=\"{0}\" value=\"{1}\" />\n", nn, Utils.ColorXml(n.Colour))
       /// Get all XML node tags for all the nodes that are connected to the
     /// given node.
-    let CollectNodeTags (n:GH_Component) =
+    let collectNodeTags (n:GH_Component) =
       /// tail-recursively generate all tags
       let rec colnodetags (_n:obj, acc) =
         match _n with
@@ -335,11 +335,11 @@ type OutputNode() =
         | _ ->
           let ntype = _n.GetType()
           match ntype with
-          | ntype when ntype.IsEquivalentTo(typeof<GH_NumberSlider>) -> acc + ValueNodeXml(_n :?> GH_NumberSlider)
-          | ntype when ntype.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> acc + ColorNodeXml(_n :?> GH_ColourPickerObject)
+          | ntype when ntype.IsEquivalentTo(typeof<GH_NumberSlider>) -> acc + valueNodeXml(_n :?> GH_NumberSlider)
+          | ntype when ntype.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> acc + colorNodeXml(_n :?> GH_ColourPickerObject)
           | _ ->
             let n = Utils.castAs<GH_Component>(_n)
-            let compxml = ComponentToXml(n)
+            let compxml = componentToXml(n)
             let lf =
               match compxml with
               | "" -> ""
@@ -378,7 +378,7 @@ type OutputNode() =
 
       colnodetags (n, "")
 
-    let CollectConnectTags (n:GH_Component) =
+    let collectConnectTags (n:GH_Component) =
       let doneconns = new Dictionary<SocketsInfo, bool>()
       /// create <connect> tag
       /// <param name="toinp">GH_Component connected to</param>
@@ -386,7 +386,7 @@ type OutputNode() =
       /// <param name="fromsock">Socket on from connected from</param>
       /// <param name="from">GH_Component or other connected from</param>
       let connecttag (sinf:SocketsInfo) = //_toinp:obj, tosock:IGH_Param, fromsock:IGH_Param, from:obj) =
-        let MapGhToCycles (comp:obj) (sock:IGH_Param) =
+        let mapGhToCycles (comp:obj) (sock:IGH_Param) =
           let t = comp.GetType()
           match t with
           | t when t.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> ("color", "color")
@@ -420,8 +420,8 @@ type OutputNode() =
             | _ -> 
               let c = from :?> GH_Component
               c.InstanceGuid.ToString()
-          let (fromcompname, fromsockname) = MapGhToCycles from fromsock
-          let (tocompname, tosockname) = MapGhToCycles toinp tosock
+          let (fromcompname, fromsockname) = mapGhToCycles from fromsock
+          let (tocompname, tosockname) = mapGhToCycles toinp tosock
 
           match fromstr with
           | "" -> ""
@@ -466,13 +466,13 @@ type OutputNode() =
             conrec comp_attrs acc
       colcontags (n, "")
 
-    let nodetagsxml = CollectNodeTags (u) + "\n"
+    let nodetagsxml = collectNodeTags (u) + "\n"
     // reset dictionary flags
     for o in doc.Objects do nd.[o.InstanceGuid] <- false
-    let connecttagsxml = CollectConnectTags (u)
+    let connecttagsxml = collectConnectTags (u)
 
-    let s = Utils.readColor(u, DA, 0, "Couldn't read Surface")
-    let v = Utils.readColor(u, DA, 1, "Couldn't read Volume");
+    let s = Utils.readColor(u, da, 0, "Couldn't read Surface")
+    let v = Utils.readColor(u, da, 1, "Couldn't read Volume");
 
     match u.IsBackground with
     | true ->
@@ -502,7 +502,7 @@ type OutputNode() =
         //m.CommitChanges() |> ignore
 
 
-    DA.SetData(0, nodetagsxml + connecttagsxml) |> ignore
+    da.SetData(0, nodetagsxml + connecttagsxml) |> ignore
 
   interface ICyclesNode with
     member u.NodeName = "output"
