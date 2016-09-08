@@ -58,8 +58,8 @@ type TextureCoordinate() =
 
   interface ICyclesNode with
     member u.NodeName = "texture_coordinate"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + Utils.GetNodeXml node nickname x + "/>"
 
 type Geometry() =
@@ -94,8 +94,8 @@ type Geometry() =
 
   interface ICyclesNode with
     member u.NodeName = "geometry"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + Utils.GetNodeXml node nickname x + "/>"
 
 type LayerWeightNode() =
@@ -121,8 +121,8 @@ type LayerWeightNode() =
 
   interface ICyclesNode with
     member u.NodeName = "layer_weight"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + Utils.GetNodeXml node nickname x + "/>"
 
 type LightPathNode() =
@@ -167,8 +167,8 @@ type LightPathNode() =
 
   interface ICyclesNode with
     member u.NodeName = "light_path"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + Utils.GetNodeXml node nickname x + "/>"
 
 type LightFalloffNode() =
@@ -197,6 +197,34 @@ type LightFalloffNode() =
 
   interface ICyclesNode with
     member u.NodeName = "light_falloff"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
+      "<" + Utils.GetNodeXml node nickname x + "/>"
+
+type FresnelNode() =
+  inherit GH_Component("Fresnel", "light falloff", "Fresnel", "Shader", "Input")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddNumberParameter("IOR", "I", "Index of Refraction", GH_ParamAccess.item, 1.45) |> ignore
+    mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+    ()
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddNumberParameter("Fac", "F", "Factor", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("b9cca29d-2c77-42cd-a99d-70eb880c02ac")
+
+  override u.Icon = Icons.Emission
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+
+    DA.SetData(0, 1.0) |> ignore
+    DA.SetData(1, 1.0) |> ignore
+    DA.SetData(2, 1.0) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "fresnel"
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + Utils.GetNodeXml node nickname x + "/>"

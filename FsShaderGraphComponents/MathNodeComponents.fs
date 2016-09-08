@@ -54,8 +54,8 @@ type MathBaseNode(name, nickname, description, category, subcategory, outputdesc
 
   interface ICyclesNode with
     member u.NodeName = "math"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + Utils.GetNodeXml node nickname (x + String.Format(" type=\"{0}\"", u.Name)) + " />"
 
 type MathAdd() =

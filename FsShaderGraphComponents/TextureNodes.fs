@@ -38,8 +38,8 @@ type NoiseTextureNode() =
 
   interface ICyclesNode with
     member u.NodeName = "noise_texture"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + Utils.GetNodeXml node nickname x + " />"
 
 type GradientTypes =
@@ -101,8 +101,8 @@ type GradientTextureNode() =
 
   interface ICyclesNode with
     member u.NodeName = "gradient_texture"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       let t = String.Format(" interpolation=\"{0}\" ", u.Gradient.toStringR)
       "<" + Utils.GetNodeXml node nickname (x+t) + " />"
 
@@ -167,8 +167,8 @@ type MusgraveTextureNode() =
 
   interface ICyclesNode with
     member u.NodeName = "musgrave_texture"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       let t = String.Format(" musgrave_type=\"{0}\" ", u.Musgrave.toStringR)
       "<" + Utils.GetNodeXml node nickname (x+t) + " />"
 
@@ -267,8 +267,8 @@ type ImageTextureNode() =
 
   interface ICyclesNode with
     member u.NodeName = "image_texture"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       let t = String.Format(" src=\"{0}\" ", u.ImageFile)
       let interp = String.Format(" interpolation=\"{0}\" ", u.Interpolation.ToString)
       let extension = String.Format(" extension=\"{0}\" ", u.TextureExtension.ToString)
@@ -358,8 +358,8 @@ type EnvironmentTextureNode() =
 
   interface ICyclesNode with
     member u.NodeName = "environment_texture"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       let t = String.Format(" src=\"{0}\" ", u.EnvironmentFile)
       "<" + Utils.GetNodeXml node nickname (x+t) + " />"
 
@@ -435,7 +435,7 @@ type WaveTextureNode() =
 
   interface ICyclesNode with
     member u.NodeName = "wave_texture"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       let t = String.Format(" wave_type=\"{0}\" ", u.Wave.toStringR)
       "<" + Utils.GetNodeXml node nickname (x+t) + " />"

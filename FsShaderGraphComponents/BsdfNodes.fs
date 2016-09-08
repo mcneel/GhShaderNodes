@@ -38,8 +38,8 @@ type BlendNode() =
   interface ICyclesNode with
     member u.NodeName = "mix_closure"
 
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type BackgroundNode() =
@@ -65,8 +65,8 @@ type BackgroundNode() =
   interface ICyclesNode with
     member u.NodeName = "background"
 
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type AddClosureNode() =
@@ -92,8 +92,8 @@ type AddClosureNode() =
   interface ICyclesNode with
     member u.NodeName = "add_closure"
 
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type TransparentBsdf() =
@@ -117,8 +117,8 @@ type TransparentBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "transparent_bsdf"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type DiffuseBsdf() =
@@ -144,8 +144,8 @@ type DiffuseBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "diffuse_bsdf"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type VelvetBsdf() =
@@ -171,8 +171,8 @@ type VelvetBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "velvet_bsdf"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type AnisotropicBsdf() =
@@ -223,8 +223,8 @@ type AnisotropicBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "anisotropic_bsdf"
-    member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+    member u.GetXml node nickname inputs iteration =
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type RefractionBsdf() =
@@ -274,8 +274,8 @@ type RefractionBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "refraction_bsdf"
-    member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+    member u.GetXml node nickname inputs iteration =
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlassBsdf() =
@@ -326,8 +326,8 @@ type GlassBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "glass_bsdf"
-    member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+    member u.GetXml node nickname inputs iteration =
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlossyBsdf() =
@@ -378,8 +378,8 @@ type GlossyBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "glossy_bsdf"
-    member u.GetXml node nickname inputs =
-      let x = (Utils.GetInputsXml inputs) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+    member u.GetXml node nickname inputs iteration =
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type EmissionBsdf() =
@@ -405,8 +405,8 @@ type EmissionBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "emission"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type SubsurfaceScatteringBsdf() =
@@ -437,8 +437,8 @@ type SubsurfaceScatteringBsdf() =
 
   interface ICyclesNode with
     member u.NodeName = "subsurface_scattering"
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       let ft = String.Format(" falloff=\"{0}\" ", u.Falloff.ToString)
       "<" + Utils.GetNodeXml node nickname (x + ft) + " />"
 

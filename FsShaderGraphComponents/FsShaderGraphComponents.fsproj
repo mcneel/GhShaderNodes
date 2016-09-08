@@ -18,14 +18,14 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <Tailcalls>false</Tailcalls>
+    <Tailcalls>true</Tailcalls>
     <OutputPath>..\..\Rhino\rhino\src4\bin\Debug\Plug-ins\Grasshopper\Components\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\$(Configuration)\FsShaderGraphComponents.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\FsShaderGraphComponents.XML</DocumentationFile>
     <StartAction>Program</StartAction>
     <StartProgram>D:\Dev\Rhino\rhino\src4\bin\Debug\Rhino.exe</StartProgram>
-    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <StartArguments>/nosplash</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

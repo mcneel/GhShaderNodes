@@ -100,8 +100,8 @@ type MixRgbNode() =
   interface ICyclesNode with
     member u.NodeName = "mix"
 
-    member u.GetXml node nickname inputs =
-      let x = Utils.GetInputsXml inputs
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
       let t = String.Format(" type=\"{0}\" ", u.Blend.toStringR)
       "<" + (Utils.GetNodeXml node nickname (x+t)) + "/>"
 
@@ -158,9 +158,9 @@ type ColorRampNode() =
   interface ICyclesNode with
     member u.NodeName = "color_ramp"
 
-    member u.GetXml node nickname inputs =
+    member u.GetXml node nickname inputs iteration =
       let i = inputs.Where(fun x -> x.Name = "Fac").ToList()
-      let x = Utils.GetInputsXml i
+      let x = Utils.GetInputsXml (i, iteration)
       let t = String.Format(" interpolation=\"{0}\" ", u.Interpolation.toStringR)
       let stops =
         match inputs.[0].VolatileDataCount = inputs.[1].VolatileDataCount with
@@ -174,3 +174,47 @@ type ColorRampNode() =
                         yield nr.Value]
           Seq.zip cl sl |> Seq.map (fun x -> String.Format("\t<stop color=\"{0}\" position=\"{1}\" />", fst x, snd x)) |> String.concat "\n"
       "<" + (Utils.GetNodeXml node nickname (x+t)) + ">\n" + stops + "\n</color_ramp>"
+
+type ColorToLuminanceNode() =
+  inherit GH_Component("Color2Luminance", "color -> luminance", "Convert input color to luminance value", "Shader", "Color")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "Input color", GH_ParamAccess.item) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddNumberParameter("Val", "V", "Luminance value", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("677f0004-2f9a-48da-897e-1deae4552b4f")
+
+  override u.Icon = Icons.Blend
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    DA.SetData(0, 0.5) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "rgb_to_luminance"
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
+      "<" + Utils.GetNodeXml node nickname x + "/>"
+
+type ColorToLuminanceCNode() =
+  inherit GH_Component("Color2LuminanceC", "color -> luminance C", "Convert input color to luminance (color)", "Shader", "Color")
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Color", "C", "Input color", GH_ParamAccess.item) |> ignore
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("Val", "V", "Luminance Color", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("8e29a696-bf5e-4604-bfec-d0e504ee541d")
+
+  override u.Icon = Icons.Blend
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    DA.SetData(0, Utils.createColor(128, 128, 128)) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "rgb_to_luminance"
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
+      "<" + Utils.GetNodeXml node nickname x + "/>"

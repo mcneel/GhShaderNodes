@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderGraphResources", "GhShaderGraph\ShaderGraphResources.csproj", "{C98C53E7-E900-49CE-B730-C70495BCB18D}"
 EndProject
@@ -23,10 +23,8 @@ Global
 		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.Debug|Any CPU.ActiveCfg = Release|Any CPU
 		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
