@@ -16,6 +16,7 @@ open Grasshopper.Kernel.Special
 open RhinoCyclesCore.Materials
 
 open ShaderGraphResources
+open RhinoCyclesCore.Environments
 
 /// type that signals Grasshopper to continue loading. Here we
 /// do necessary initialisation
@@ -207,7 +208,7 @@ type ColorSpace = None | Color with
   static member FromString s = Utils.fromString<ColorSpace> s
 
 /// Distributions used in several nodes: Glass, Glossy, Refraction
-type Distribution = Sharp | Beckmann | GGX | Ashihkmin_Shirley with
+type Distribution = Sharp | Beckmann | GGX | Ashihkmin_Shirley | Multiscatter_GGX with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", "-")
   static member FromString s = Utils.fromString<Distribution> s
@@ -330,7 +331,7 @@ type OutputNode() =
 
     let valueNodeXml (n:GH_NumberSlider) =
       let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
-      let nn = n.InstanceGuid.ToString()
+      let nn = n.InstanceGuid.ToString() + "_" + n.ImpliedNickName.ToLowerInvariant().Replace(" ", "_")
       match dontdoit with
       | true -> ""
       | _ ->
@@ -369,7 +370,7 @@ type OutputNode() =
               match compxml with
               | "" -> ""
               | _ -> "\n"
-            let comp_attrs = [
+            let compAttrs = [
               for inp in n.Params.Input do
                 let s =
                   match iteration < inp.SourceCount with
@@ -390,6 +391,7 @@ type OutputNode() =
                       | null -> null
                       | _ -> Utils.castAs<obj>(attrp.Owner)
                 yield tst]
+            let filteredCompAttrs = compAttrs |> List.filter (isNull >> not)
 
             /// generate string for inputs of this component
             /// this essentially recurses back into colnodetags.
@@ -398,15 +400,12 @@ type OutputNode() =
               match lst with
               | [] -> accum
               | (x:obj)::xs ->
-                match x with
-                | null -> accum
-                | _ ->
                   let nodetags = colnodetags (x, accum)
                   // recurse
                   compstr xs nodetags
             // start iterating over all attributes of attached nodes
             // given this component XML
-            compstr comp_attrs acc + compxml+lf
+            compstr filteredCompAttrs acc + compxml+lf
 
       colnodetags (n, "")
 
@@ -425,7 +424,7 @@ type OutputNode() =
           | t when t.IsEquivalentTo(typeof<GH_NumberSlider>) -> ("value", "value")
           | _ ->
             let n = Utils.castAs<GH_Component>(comp)
-            (n.Name, sock.Name.ToLowerInvariant())
+            (n.Name, sock.Name.ToLowerInvariant().Replace(" ", "_"))
         let dontdoit = doneconns.ContainsKey(sinf)
         match dontdoit with
         | true -> ""
@@ -448,7 +447,7 @@ type OutputNode() =
                                                                       cp.InstanceGuid.ToString()
             | t when t.IsEquivalentTo(typeof<GH_NumberSlider>) ->
                                                                       let ns = from :?> GH_NumberSlider
-                                                                      ns.InstanceGuid.ToString()
+                                                                      ns.InstanceGuid.ToString() + "_" + ns.ImpliedNickName.ToLowerInvariant().Replace(" ", "_")
             | _ -> 
               let c = from :?> GH_Component
               c.InstanceGuid.ToString()
@@ -470,7 +469,7 @@ type OutputNode() =
           | _ ->
             let n = Utils.castAs<GH_Component>(_n)
 
-            let comp_attrs = [
+            let compAttrs = [
               for inp in n.Params.Input do
                 let s =
                   match iteration < inp.SourceCount with
@@ -492,17 +491,16 @@ type OutputNode() =
                       | _ -> Utils.castAs<obj>(attrp.Owner)
                 yield (tst, s, inp, Utils.castAs<obj>(n))]
 
+            let filteredCompAttrs = compAttrs |> List.filter (fun (x, _, _, _) -> x |> isNull |> not)
+
             let rec conrec lst accum =
               match lst with
               | [] -> accum
               | (x:SocketsInfo)::xs ->
-                match x with
-                | (null, _, _, _) -> accum
-                | (_, _, _, _) -> 
                   let thistag = connecttag (x)
                   let contags = colcontags ((Utils.FromC x), accum)
                   conrec xs contags + thistag
-            conrec comp_attrs acc
+            conrec filteredCompAttrs acc
       colcontags (n, "")
 
     let nodetagsxml = collectNodeTags (u, da.Iteration) + "\n"

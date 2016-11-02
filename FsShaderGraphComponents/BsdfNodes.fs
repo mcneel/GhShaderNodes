@@ -178,7 +178,7 @@ type VelvetBsdf() =
 type AnisotropicBsdf() =
   inherit GH_Component("Anisotropic BSDF", "anisotropic", "Anisotropic BSDF node for shader graph", "Shader", "BSDF")
 
-  member val Distribution = GGX with get, set
+  member val Distribution = Multiscatter_GGX with get, set
 
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddColourParameter("Color", "C", "anisotropic color", GH_ParamAccess.item, Color.DarkBlue) |> ignore
@@ -198,7 +198,7 @@ type AnisotropicBsdf() =
     u.Message <- ""
     let c = Utils.readColor(u, DA, 0, "Couldn't read anisotropic color")
 
-    u.Message <- u.Distribution.ToStringR
+    u.Message <- u.Distribution.ToString
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
@@ -215,16 +215,18 @@ type AnisotropicBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
-    append_menu Beckmann
-    append_menu GGX
-    append_menu Ashihkmin_Shirley
+    let appendMenu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true),
+        true, u.Distribution = it) |> ignore
+    appendMenu Beckmann
+    appendMenu GGX
+    appendMenu Multiscatter_GGX
+    appendMenu Ashihkmin_Shirley
 
   interface ICyclesNode with
     member u.NodeName = "anisotropic_bsdf"
     member u.GetXml node nickname inputs iteration =
-      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToString)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type RefractionBsdf() =
@@ -249,7 +251,7 @@ type RefractionBsdf() =
     u.Message <- ""
     let c = Utils.readColor(u, DA, 0, "Couldn't read refraction color")
 
-    u.Message <- u.Distribution.ToStringR
+    u.Message <- u.Distribution.ToString
 
     DA.SetData(0, Utils.createColor c) |> ignore
 
@@ -266,22 +268,23 @@ type RefractionBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
-    append_menu Sharp
-    append_menu Beckmann
-    append_menu GGX
+    let appendMenu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true),
+        true, u.Distribution = it) |> ignore
+    appendMenu Sharp
+    appendMenu Beckmann
+    appendMenu GGX
 
   interface ICyclesNode with
     member u.NodeName = "refraction_bsdf"
     member u.GetXml node nickname inputs iteration =
-      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToString)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlassBsdf() =
   inherit GH_Component("Glass BSDF", "glass", "Glass BSDF node for shader graph", "Shader", "BSDF")
 
-  member val Distribution = Sharp with get, set
+  member val Distribution = Multiscatter_GGX with get, set
 
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddColourParameter("Color", "C", "glass color", GH_ParamAccess.item, Color.DarkBlue) |> ignore
@@ -318,22 +321,24 @@ type GlassBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
-    append_menu Sharp
-    append_menu Beckmann
-    append_menu GGX
+    let appendMenu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true),
+        true, u.Distribution = it) |> ignore
+    appendMenu Sharp
+    appendMenu Beckmann
+    appendMenu Multiscatter_GGX
+    appendMenu GGX
 
   interface ICyclesNode with
     member u.NodeName = "glass_bsdf"
     member u.GetXml node nickname inputs iteration =
-      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToString)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type GlossyBsdf() =
   inherit GH_Component("Glossy BSDF", "glossy", "Glossy BSDF node for shader graph", "Shader", "BSDF")
 
-  member val Distribution = Sharp with get, set
+  member val Distribution = Multiscatter_GGX with get, set
 
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddColourParameter("Color", "C", "glossy color", GH_ParamAccess.item, Color.DarkBlue) |> ignore
@@ -369,21 +374,24 @@ type GlossyBsdf() =
     base.Read(reader)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu (it:Distribution) =
-      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true), true, u.Distribution = it) |> ignore
-    append_menu Sharp
-    append_menu Beckmann
-    append_menu GGX
-    append_menu Ashihkmin_Shirley
+    let appendMenu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true),
+        true, u.Distribution = it) |> ignore
+    appendMenu Sharp
+    appendMenu Beckmann
+    appendMenu GGX
+    appendMenu Multiscatter_GGX
+    appendMenu Ashihkmin_Shirley
 
   interface ICyclesNode with
     member u.NodeName = "glossy_bsdf"
     member u.GetXml node nickname inputs iteration =
-      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToStringR)
+      let x = (Utils.GetInputsXml (inputs, iteration)) + String.Format(" distribution=\"{0}\"", u.Distribution.ToString)
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type EmissionBsdf() =
-  inherit GH_Component("Emission BSDF", "emission", "Emission BSDF node for shader graph", "Shader", "BSDF")
+  inherit GH_Component("Emission BSDF", "emission",
+    "Emission BSDF node for shader graph", "Shader", "BSDF")
 
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddColourParameter("Color", "C", "emission color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
@@ -410,7 +418,8 @@ type EmissionBsdf() =
       "<" + (Utils.GetNodeXml node nickname x) + " />"
 
 type SubsurfaceScatteringBsdf() =
-  inherit GH_Component("Subsurface Scattering BSDF", "subsurface scattering", "Subsurface Scattering BSDF node for shader graph", "Shader", "BSDF")
+  inherit GH_Component("Subsurface Scattering BSDF", "subsurface scattering",
+    "Subsurface Scattering BSDF node for shader graph", "Shader", "BSDF")
 
   member val Falloff = Cubic with get, set
 
@@ -440,5 +449,55 @@ type SubsurfaceScatteringBsdf() =
     member u.GetXml node nickname inputs iteration =
       let x = Utils.GetInputsXml (inputs, iteration)
       let ft = String.Format(" falloff=\"{0}\" ", u.Falloff.ToString)
+      "<" + Utils.GetNodeXml node nickname (x + ft) + " />"
+
+type DisneyBsdf() =
+  inherit GH_Component("Disney BSDF", "disney bsdf",
+    "Disney BSDF node for shader graph", "Shader", "BSDF")
+
+  member val Distribution = Multiscatter_GGX with get, set
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddColourParameter("Base Color", "BC", "Color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
+    mgr.AddColourParameter("Subsurface Color", "SC", "Color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
+    mgr.AddNumberParameter("Metallic", "M", "Metallic", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Subsurface", "SS", "Subsurface", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddVectorParameter("Subsurface Radius", "R", "Radius", GH_ParamAccess.item, new Vector3d(1.0, 1.0, 1.0)) |> ignore
+    mgr.AddNumberParameter("Specular", "Spec", "Specular", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Roughness", "Rgh", "Roughness", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Specular Tint", "SpecTint", "Specular Tint", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Anisotropic", "Ani", "Anisotropic", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Sheen", "Sh", "Sheen", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Sheen Tint", "ShT", "Sheen Tint", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Clearcoat", "CC", "Clearcoat", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Clearcoat Gloss", "CC gl", "Clearcoat Gloss", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("IOR", "IOR", "IOR", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Transparency", "Tra", "Transparency", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Refraction Roughness", "Refr Rgh", "Refraction Roughness", GH_ParamAccess.item, 0.0) |> ignore
+    mgr.AddNumberParameter("Anisotropic Rotation", "AniRot", "Anisotropic Rotation", GH_ParamAccess.item, 0.0) |> ignore
+
+    mgr.AddVectorParameter("Normal", "N", "Normal", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+    mgr.AddVectorParameter("Clearcoat Normal", "CN", "Clearcoat Normal", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+    mgr.AddVectorParameter("Tangent", "Tng", "Tangent", GH_ParamAccess.item, Vector3d.Zero) |> ignore
+
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    mgr.AddColourParameter("BSDF", "BSDF", "BSDF", GH_ParamAccess.item) |> ignore
+
+  override u.ComponentGuid = new Guid("1480e1aa-7ad4-42e3-b626-62af011917a9")
+
+  override u.Icon = Icons.Emission
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    u.Message <- ""
+    let c = Utils.readColor(u, DA, 0, "Couldn't read base color")
+
+    DA.SetData(0, Utils.createColor c) |> ignore
+
+  interface ICyclesNode with
+    member u.NodeName = "uber_bsdf"
+    member u.GetXml node nickname inputs iteration =
+      let x = Utils.GetInputsXml (inputs, iteration)
+      let ft = String.Format(" distribution=\"{0}\" ", u.Distribution.ToString)
       "<" + Utils.GetNodeXml node nickname (x + ft) + " />"
 

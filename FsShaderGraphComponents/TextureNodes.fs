@@ -89,15 +89,20 @@ type GradientTextureNode() =
     DA.SetData(1, 0.5) |> ignore
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu (gt:GradientTypes) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Gradient <- gt; u.ExpireSolution true), true, u.Gradient = gt) |> ignore
-    append_menu Linear
-    append_menu Easing
-    append_menu Quadratic
-    append_menu Diagonal
-    append_menu Radial
-    append_menu Quadratic_Sphere
-    append_menu Spherical
+    let appendMenu (gt:GradientTypes) =
+      GH_DocumentObject.Menu_AppendItem(
+        menu,
+        gt.toStringR,
+        (fun _ _ -> u.Gradient <- gt; u.ExpireSolution true),
+        true,
+        u.Gradient = gt) |> ignore
+    appendMenu Linear
+    appendMenu Easing
+    appendMenu Quadratic
+    appendMenu Diagonal
+    appendMenu Radial
+    appendMenu Quadratic_Sphere
+    appendMenu Spherical
 
   interface ICyclesNode with
     member u.NodeName = "gradient_texture"
@@ -157,13 +162,18 @@ type MusgraveTextureNode() =
     DA.SetData(1, 0.5) |> ignore
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu (gt:MusgraveTypes) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Musgrave <- gt; u.ExpireSolution true), true, u.Musgrave = gt) |> ignore
-    append_menu Multifractal
-    append_menu FBM
-    append_menu Hybrid_Multifractal
-    append_menu Ridged_Multifractal
-    append_menu Hetero_Terrain
+    let appendMenu (gt:MusgraveTypes) =
+      GH_DocumentObject.Menu_AppendItem(
+        menu,
+        gt.toStringR,
+        (fun _ _ -> u.Musgrave <- gt; u.ExpireSolution true),
+        true,
+        u.Musgrave = gt) |> ignore
+    appendMenu Multifractal
+    appendMenu FBM
+    appendMenu Hybrid_Multifractal
+    appendMenu Ridged_Multifractal
+    appendMenu Hetero_Terrain
 
   interface ICyclesNode with
     member u.NodeName = "musgrave_texture"
@@ -229,14 +239,28 @@ type ImageTextureNode() =
     DA.SetData(1, 0.5) |> ignore
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_interpolation_menu (gt:Interpolation) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.Interpolation <- gt; u.ExpireSolution true), true, u.Interpolation = gt) |> ignore
-    let append_extension_menu (gt:TextureExtension) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.TextureExtension <- gt; u.ExpireSolution true), true, u.TextureExtension = gt) |> ignore
-    let append_colorspace_menu (gt:ColorSpace) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.ColorSpace <- gt; u.ExpireSolution true), true, u.ColorSpace = gt) |> ignore
-    let append_projection_menu (gt:TextureProjection) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.Projection <- gt; u.ExpireSolution true), true, u.Projection = gt) |> ignore
+    let appendInterpolationMenu (gt:Interpolation) =
+      GH_DocumentObject.Menu_AppendItem(
+        menu,
+        gt.ToStringR,
+        (fun _ _ -> u.Interpolation <- gt; u.ExpireSolution true),
+        true,
+        u.Interpolation = gt) |> ignore
+    let appendExtensionMenu (gt:TextureExtension) =
+      GH_DocumentObject.Menu_AppendItem(
+        menu, gt.ToStringR,
+        (fun _ _ -> u.TextureExtension <- gt; u.ExpireSolution true),
+        true,
+        u.TextureExtension = gt) |> ignore
+    let appendColorspaceMenu (gt:ColorSpace) =
+      GH_DocumentObject.Menu_AppendItem(
+       menu,
+       gt.ToStringR,
+       (fun _ _ -> u.ColorSpace <- gt; u.ExpireSolution true),
+       true, u.ColorSpace = gt) |> ignore
+    let appendProjectionMenu (gt:TextureProjection) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.Projection <- gt; u.ExpireSolution true),
+        true, u.Projection = gt) |> ignore
     let fd = lazy (
       let mutable fdi = new System.Windows.Forms.OpenFileDialog()
       fdi.Filter <- "Image Files(*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|All files (*.*)|*.*"
@@ -245,25 +269,26 @@ type ImageTextureNode() =
       | DialogResult.OK -> fdi.FileName
       | _ -> ""
       )
-    GH_DocumentObject.Menu_AppendItem(menu, "Select Image File...", (fun _ _ -> u.ImageFile <- fd.Force(); u.ExpireSolution(true))) |> ignore
+    GH_DocumentObject.Menu_AppendItem(menu, "Select Image File...",
+      (fun _ _ -> u.ImageFile <- fd.Force(); u.ExpireSolution(true))) |> ignore
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    append_interpolation_menu Interpolation.None
-    append_interpolation_menu Interpolation.Linear
-    append_interpolation_menu Interpolation.Closest
-    append_interpolation_menu Interpolation.Cubic
-    append_interpolation_menu Interpolation.Smart
+    appendInterpolationMenu Interpolation.None
+    appendInterpolationMenu Interpolation.Linear
+    appendInterpolationMenu Interpolation.Closest
+    appendInterpolationMenu Interpolation.Cubic
+    appendInterpolationMenu Interpolation.Smart
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    append_extension_menu TextureExtension.Repeat
-    append_extension_menu TextureExtension.Extend
-    append_extension_menu TextureExtension.Clip
+    appendExtensionMenu TextureExtension.Repeat
+    appendExtensionMenu TextureExtension.Extend
+    appendExtensionMenu TextureExtension.Clip
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    append_colorspace_menu ColorSpace.None
-    append_colorspace_menu ColorSpace.Color
+    appendColorspaceMenu ColorSpace.None
+    appendColorspaceMenu ColorSpace.Color
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    append_projection_menu TextureProjection.Flat
-    append_projection_menu TextureProjection.Box
-    append_projection_menu TextureProjection.Sphere
-    append_projection_menu TextureProjection.Tube
+    appendProjectionMenu TextureProjection.Flat
+    appendProjectionMenu TextureProjection.Box
+    appendProjectionMenu TextureProjection.Sphere
+    appendProjectionMenu TextureProjection.Tube
 
   interface ICyclesNode with
     member u.NodeName = "image_texture"
@@ -327,12 +352,15 @@ type EnvironmentTextureNode() =
     DA.SetData(1, 0.5) |> ignore
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_interpolation_menu (gt:Interpolation) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.Interpolation <- gt; u.ExpireSolution true), true, u.Interpolation = gt) |> ignore
-    let append_colorspace_menu (gt:ColorSpace) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.ColorSpace <- gt; u.ExpireSolution true), true, u.ColorSpace = gt) |> ignore
-    let append_projection_menu (gt:EnvironmentProjection) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.Projection <- gt; u.ExpireSolution true), true, u.Projection = gt) |> ignore
+    let appendInterpolationMenu (gt:Interpolation) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.Interpolation <- gt; u.ExpireSolution true),
+        true, u.Interpolation = gt) |> ignore
+    let appendColorspaceMenu (gt:ColorSpace) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.ColorSpace <- gt; u.ExpireSolution true),
+        true, u.ColorSpace = gt) |> ignore
+    let appendProjectionMenu (gt:EnvironmentProjection) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.ToStringR, (fun _ _ -> u.Projection <- gt; u.ExpireSolution true),
+        true, u.Projection = gt) |> ignore
     let fd = lazy (
       let mutable fdi = new System.Windows.Forms.OpenFileDialog()
       fdi.Filter <- "Image Files(*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png|All files (*.*)|*.*"
@@ -343,18 +371,18 @@ type EnvironmentTextureNode() =
       )
     GH_DocumentObject.Menu_AppendItem(menu, "Select Environment File...", (fun _ _ -> u.EnvironmentFile <- fd.Force(); u.ExpireSolution(true))) |> ignore
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    append_projection_menu EnvironmentProjection.Equirectangular
-    append_projection_menu EnvironmentProjection.Mirror_Ball
-    append_projection_menu EnvironmentProjection.Wallpaper
+    appendProjectionMenu EnvironmentProjection.Equirectangular
+    appendProjectionMenu EnvironmentProjection.Mirror_Ball
+    appendProjectionMenu EnvironmentProjection.Wallpaper
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    append_interpolation_menu Interpolation.None
-    append_interpolation_menu Interpolation.Linear
-    append_interpolation_menu Interpolation.Closest
-    append_interpolation_menu Interpolation.Cubic
-    append_interpolation_menu Interpolation.Smart
+    appendInterpolationMenu Interpolation.None
+    appendInterpolationMenu Interpolation.Linear
+    appendInterpolationMenu Interpolation.Closest
+    appendInterpolationMenu Interpolation.Cubic
+    appendInterpolationMenu Interpolation.Smart
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    append_colorspace_menu ColorSpace.None
-    append_colorspace_menu ColorSpace.Color
+    appendColorspaceMenu ColorSpace.None
+    appendColorspaceMenu ColorSpace.Color
 
   interface ICyclesNode with
     member u.NodeName = "environment_texture"
@@ -423,15 +451,17 @@ type WaveTextureNode() =
     DA.SetData(1, 0.5) |> ignore
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let append_menu (gt:WaveTypes) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Wave <- gt; u.ExpireSolution true), true, u.Wave = gt) |> ignore
-    append_menu Bands
-    append_menu Rings
+    let appendMenu (gt:WaveTypes) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Wave <- gt; u.ExpireSolution true),
+        true, u.Wave = gt) |> ignore
+    appendMenu Bands
+    appendMenu Rings
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
-    let append_profile_menu (gt:WaveProfiles) =
-      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Profile <- gt; u.ExpireSolution true), true, u.Profile = gt) |> ignore
-    append_profile_menu Sine
-    append_profile_menu Saw
+    let appendProfileMenu (gt:WaveProfiles) =
+      GH_DocumentObject.Menu_AppendItem(menu, gt.toStringR, (fun _ _ -> u.Profile <- gt; u.ExpireSolution true),
+        true, u.Profile = gt) |> ignore
+    appendProfileMenu Sine
+    appendProfileMenu Saw
 
   interface ICyclesNode with
     member u.NodeName = "wave_texture"
