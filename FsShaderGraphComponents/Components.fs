@@ -12,6 +12,7 @@ open Grasshopper.Kernel
 open Grasshopper.Kernel.Attributes
 open Grasshopper.Kernel.Types
 open Grasshopper.Kernel.Special
+open Grasshopper.Kernel.Parameters
 
 open RhinoCyclesCore.Materials
 
@@ -159,12 +160,11 @@ module Utils =
         | true -> iteration
         | _ -> inp.VolatileDataCount - 1
       let in1 = inp.VolatileData.StructureProxy.[0].[idx]
-      let intype = in1.GetType()
-      match intype with
-      | intype when intype.IsEquivalentTo(typeof<GH_Colour>) ->
+      match in1 with
+      | :? GH_Colour ->
           let c = castAs<GH_Colour>(in1)
           (inp.Name, ColorXml(c.Value))
-      | intype when intype.IsEquivalentTo(typeof<GH_Vector>) ->
+      | :? GH_Vector ->
           let c = castAs<GH_Vector>(in1)
           (inp.Name, c.Value.ToString().Replace("(", "").Replace(")", "").Replace(",", " "))
       | _ ->
@@ -268,10 +268,9 @@ type OutputNode() =
           | false -> acc
           | true ->
             let s = inp.Sources.[0]
-            let st = s.GetType()
-            match st with
-            | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> acc
-            | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> acc
+            match s with
+            | :? GH_NumberSlider -> acc
+            | :? GH_ColourPickerObject -> acc
             | _ -> 
               let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
               match attrp with
@@ -339,6 +338,19 @@ type OutputNode() =
         String.Format(ccl.Utilities.Instance.NumberFormatInfo,
                       "<value name=\"{0}\" value=\"{1}\" />\n", nn, n.CurrentValue)
 
+    let vectorNodeXml (n:Param_Vector) =
+      let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
+      let nn = n.InstanceGuid.ToString() + "_vector"
+      match dontdoit with
+      | true -> ""
+      | _ ->
+        nd.[n.InstanceGuid] <- true
+        let v = n.VolatileData.StructureProxy.[0].[0]
+        let v' = v :?> GH_Vector
+        let v3d = v'.QC_Vec()
+        String.Format(ccl.Utilities.Instance.NumberFormatInfo,
+                      "<combine_xyz name=\"{0}\" X=\"{1}\" Y=\"{2}\" Z=\"{3}\" />\n", nn, v3d.X, v3d.Y, v3d.Z)
+
     let colorNodeXml (n:GH_ColourPickerObject) =
       let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
       let nn = n.InstanceGuid.ToString()
@@ -357,21 +369,22 @@ type OutputNode() =
         match _n with
         | null -> acc
         | _ ->
-          let ntype = _n.GetType()
-          match ntype with
-          | ntype when ntype.IsEquivalentTo(typeof<GH_NumberSlider>) ->
-            acc + valueNodeXml(_n :?> GH_NumberSlider)
-          | ntype when ntype.IsEquivalentTo(typeof<GH_ColourPickerObject>) ->
-            acc + colorNodeXml(_n :?> GH_ColourPickerObject)
+          match _n with
+          | :? GH_NumberSlider as _n' ->
+            acc + valueNodeXml(_n')
+          | :? Param_Vector as _n' ->
+            acc + vectorNodeXml(_n')
+          | :? GH_ColourPickerObject as _n' ->
+            acc + colorNodeXml(_n')
           | _ ->
-            let n = Utils.castAs<GH_Component>(_n)
-            let compxml = componentToXml(n, iteration)
+            let n' = Utils.castAs<GH_Component>(_n)
+            let compxml = componentToXml(n', iteration)
             let lf =
               match compxml with
               | "" -> ""
               | _ -> "\n"
             let compAttrs = [
-              for inp in n.Params.Input do
+              for inp in n'.Params.Input do
                 let s =
                   match iteration < inp.SourceCount with
                   | true -> inp.Sources.[iteration]
@@ -380,11 +393,11 @@ type OutputNode() =
                   match isNull s with
                   | true -> null
                   | _ ->
-                    let st = s.GetType()
-                    match st with
-                    | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> Utils.castAs<obj>(s)
-                    | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> Utils.castAs<obj>(s)
-                    | st when isNull st -> null
+                    match s with
+                    | :? GH_NumberSlider -> Utils.castAs<obj>(s)
+                    | :? GH_ColourPickerObject -> Utils.castAs<obj>(s)
+                    | :? Param_Vector -> Utils.castAs<obj>(s)
+                    | s when isNull s -> null
                     | _ -> 
                       let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
                       match attrp with
@@ -418,10 +431,9 @@ type OutputNode() =
       /// <param name="from">GH_Component or other connected from</param>
       let connecttag (sinf:SocketsInfo) = //_toinp:obj, tosock:IGH_Param, fromsock:IGH_Param, from:obj) =
         let mapGhToCycles (comp:obj) (sock:IGH_Param) =
-          let t = comp.GetType()
-          match t with
-          | t when t.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> ("color", "color")
-          | t when t.IsEquivalentTo(typeof<GH_NumberSlider>) -> ("value", "value")
+          match comp with
+          | :? GH_ColourPickerObject -> ("color", "color")
+          | :? GH_NumberSlider -> ("value", "value")
           | _ ->
             let n = Utils.castAs<GH_Component>(comp)
             (n.Name, sock.Name.ToLowerInvariant().Replace(" ", "_"))
@@ -440,14 +452,13 @@ type OutputNode() =
             | _ -> toinp.InstanceGuid.ToString()
 
           let fromstr =
-            let t = from.GetType()
-            match t with
-            | t when t.IsEquivalentTo(typeof<GH_ColourPickerObject>) ->
-                                                                      let cp = from :?> GH_ColourPickerObject
-                                                                      cp.InstanceGuid.ToString()
-            | t when t.IsEquivalentTo(typeof<GH_NumberSlider>) ->
-                                                                      let ns = from :?> GH_NumberSlider
-                                                                      ns.InstanceGuid.ToString() + "_" + ns.ImpliedNickName.ToLowerInvariant().Replace(" ", "_")
+            match from  with
+            | :? GH_ColourPickerObject ->
+                                let cp = from :?> GH_ColourPickerObject
+                                cp.InstanceGuid.ToString()
+            | :? GH_NumberSlider ->
+                                let ns = from :?> GH_NumberSlider
+                                ns.InstanceGuid.ToString() + "_" + ns.ImpliedNickName.ToLowerInvariant().Replace(" ", "_")
             | _ -> 
               let c = from :?> GH_Component
               c.InstanceGuid.ToString()
@@ -462,10 +473,9 @@ type OutputNode() =
         match _n with
         | null -> acc
         | _ ->
-          let ntype = _n.GetType()
-          match ntype with
-          | ntype when ntype.IsEquivalentTo(typeof<GH_NumberSlider>) -> acc
-          | ntype when ntype.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> acc
+          match _n with
+          | :? GH_NumberSlider -> acc
+          | :? GH_ColourPickerObject -> acc
           | _ ->
             let n = Utils.castAs<GH_Component>(_n)
 
@@ -479,11 +489,10 @@ type OutputNode() =
                   match isNull s with
                   | true -> null
                   | false ->
-                    let st = s.GetType()
-                    match st with
-                    | st when st.IsEquivalentTo(typeof<GH_NumberSlider>) -> Utils.castAs<obj>(s)
-                    | st when st.IsEquivalentTo(typeof<GH_ColourPickerObject>) -> Utils.castAs<obj>(s)
-                    | st when isNull st-> null
+                    match s with
+                    | :? GH_NumberSlider -> Utils.castAs<obj>(s)
+                    | :? GH_ColourPickerObject -> Utils.castAs<obj>(s)
+                    | s when isNull s -> null
                     | _ -> 
                       let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
                       match attrp with
@@ -534,9 +543,10 @@ type OutputNode() =
       | null ->
         u.Message <- "NO MATERIAL"
       | _ ->
-        Utils.castAs<XmlMaterial>(m).BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
-        Utils.castAs<XmlMaterial>(m).SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
-        Utils.castAs<XmlMaterial>(m).EndChange()
+        let m' = m :?> XmlMaterial
+        m'.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
+        m'.SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
+        m'.EndChange()
         match matId.Count > 1 with
         | true -> u.Message <- "multiple materials set"
         | _ -> u.Message <- m.Name
