@@ -339,7 +339,7 @@ type OutputNode() =
                       "<value name=\"{0}\" value=\"{1}\" />\n", nn, n.CurrentValue)
 
     let vectorNodeXml (n:Param_Vector) =
-      let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
+      let dontdoit = (nd.ContainsKey(n.InstanceGuid) && nd.[n.InstanceGuid]) || n.ComponentGuid=u.ComponentGuid
       let nn = n.InstanceGuid.ToString() + "_vector"
       match dontdoit with
       | true -> ""
