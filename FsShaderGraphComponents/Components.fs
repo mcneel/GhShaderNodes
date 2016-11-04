@@ -433,7 +433,7 @@ type OutputNode() =
       /// <param name="tosock">Socket on toinp connected to</param>
       /// <param name="fromsock">Socket on from connected from</param>
       /// <param name="from">GH_Component or other connected from</param>
-      let connecttag (sinf:SocketsInfo) = //_toinp:obj, tosock:IGH_Param, fromsock:IGH_Param, from:obj) =
+      let connecttag (sinf:SocketsInfo) =
         let mapGhToCycles (comp:obj) (sock:IGH_Param) =
           match comp with
           | :? GH_ColourPickerObject -> ("color", "color")
