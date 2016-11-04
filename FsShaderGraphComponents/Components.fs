@@ -393,16 +393,20 @@ type OutputNode() =
                   match isNull s with
                   | true -> null
                   | _ ->
-                    match s with
-                    | :? GH_NumberSlider -> Utils.castAs<obj>(s)
-                    | :? GH_ColourPickerObject -> Utils.castAs<obj>(s)
-                    | :? Param_Vector -> Utils.castAs<obj>(s)
-                    | s when isNull s -> null
-                    | _ -> 
-                      let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
-                      match attrp with
-                      | null -> null
-                      | _ -> Utils.castAs<obj>(attrp.Owner)
+                    let s' =
+                      match s with
+                      | :? GH_NumberSlider -> s :> obj
+                      | :? GH_ColourPickerObject -> s :> obj
+                      | s when isNull s -> null
+                      | _ -> 
+                        let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
+                        match attrp with
+                        | null ->
+                            match s with
+                            | :? Param_Vector -> s :> obj
+                            | _ -> null
+                        | _ -> attrp.Owner :> obj
+                    s'
                 yield tst]
             let filteredCompAttrs = compAttrs |> List.filter (isNull >> not)
 
