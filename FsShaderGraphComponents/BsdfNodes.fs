@@ -462,7 +462,7 @@ type DisneyBsdf() =
     mgr.AddColourParameter("Subsurface Color", "SC", "Color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
     mgr.AddNumberParameter("Metallic", "M", "Metallic", GH_ParamAccess.item, 0.0) |> ignore
     mgr.AddNumberParameter("Subsurface", "SS", "Subsurface", GH_ParamAccess.item, 0.0) |> ignore
-    mgr.AddVectorParameter("Subsurface Radius", "R", "Radius", GH_ParamAccess.item, new Vector3d(1.0, 1.0, 1.0)) |> ignore
+    mgr.AddVectorParameter("Subsurface Radius", "SSR", "Radius", GH_ParamAccess.item, new Vector3d(1.0, 1.0, 1.0)) |> ignore
     mgr.AddNumberParameter("Specular", "Spec", "Specular", GH_ParamAccess.item, 0.0) |> ignore
     mgr.AddNumberParameter("Roughness", "Rgh", "Roughness", GH_ParamAccess.item, 0.0) |> ignore
     mgr.AddNumberParameter("Specular Tint", "SpecTint", "Specular Tint", GH_ParamAccess.item, 0.0) |> ignore
