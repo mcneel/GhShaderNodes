@@ -459,6 +459,7 @@ type DisneyBsdf() =
 
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     mgr.AddColourParameter("Base Color", "BC", "Color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
+    mgr.AddColourParameter("Specular Color", "SpecC", "Color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
     mgr.AddColourParameter("Subsurface Color", "SC", "Color", GH_ParamAccess.item, Color.NavajoWhite) |> ignore
     mgr.AddNumberParameter("Metallic", "M", "Metallic", GH_ParamAccess.item, 0.0) |> ignore
     mgr.AddNumberParameter("Subsurface", "SS", "Subsurface", GH_ParamAccess.item, 0.0) |> ignore
