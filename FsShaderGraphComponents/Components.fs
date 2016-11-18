@@ -12,7 +12,11 @@ open Grasshopper.Kernel
 open Grasshopper.Kernel.Attributes
 open Grasshopper.Kernel.Types
 open Grasshopper.Kernel.Special
-open Grasshopper.Kernel.Parameters
+
+open ccl.ShaderNodes
+open ccl.Attributes
+
+open Rhino.Geometry
 
 open RhinoCyclesCore.Materials
 
@@ -51,15 +55,6 @@ type Info() =
       "nathan@mcneel.com"
 
 // ---------------------------------------
-
-/// interface that shader nodes need to implement to be able to
-/// participate in shader XML generation.
-type ICyclesNode =
-    /// Get the XML name of the node tag.
-    abstract member NodeName : string
-    /// Get the XML representation of the node. NodeName, NickName, Parameter list, iteration. Returns XML string
-    abstract member GetXml : string -> string -> List<IGH_Param> -> int -> string
-
 /// Simple color representation with ints (R, G, B)
 type IntColor = int * int * int
 /// Socket connection info (tocomponent, tosocket, fromsocket, fromcomponent)
@@ -94,11 +89,6 @@ module Utils =
   /// Give third (B) component of triplet (IntColor)
   let B (_:int, _:int, b:int) = b
 
-  let FromC (x:obj, _:IGH_Param, _:IGH_Param, _:obj) = x
-  let FromS (_:obj, x:IGH_Param, _:IGH_Param, _:obj) = x
-  let ToS (_:obj, _:IGH_Param, x:IGH_Param, _:obj) = x
-  let ToC (_:obj, _:IGH_Param, _:IGH_Param, x:obj) = x
-
   let rnd = new Random()
 
   /// Convert a byte channel to float
@@ -115,17 +105,41 @@ module Utils =
   /// Read color from given component data access at index idx. component
   /// message will be set to msg if reading the data failed.
   /// Returns an IntColor.
-  let readColor(u:GH_Component, da:IGH_DataAccess, idx:int, msg) : IntColor =
+  let readColor(u:GH_Component, da:IGH_DataAccess, idx:int, msg) : Color =
     let mutable c = new GH_Colour()
     let r = da.GetData(idx, &c)
     u.Message <- SetMessage (not r) msg
-    IntColorFromColor(c.Value)
+    c.Value
+
+  let readVector(u:GH_Component, da:IGH_DataAccess, idx:int, msg) : Vector3d =
+    let mutable c = new GH_Vector()
+    let r = da.GetData(idx, &c)
+    u.Message <- SetMessage (not r) msg
+    c.Value
+
+  let float4FromColor (ic:Color) =
+    ccl.float4(RGBChanToFloat(ic.R), RGBChanToFloat(ic.G), RGBChanToFloat(ic.B), 1.0f)
+
+  let float4FromVector (vec:Vector3d) =
+    ccl.float4((float32)vec.X, (float32)vec.Y, (float32)vec.Z, 1.0f)
 
   /// Read float from given component data access at index idx. component
   /// message will be set to msg if reading the data failed.
   /// Returns a float.
   let readFloat(u:GH_Component, da:IGH_DataAccess, idx:int, msg) : float =
     let mutable f = new GH_Number()
+    let r = da.GetData(idx, &f)
+    u.Message <- SetMessage (not r) msg
+    f.Value
+
+  let readInt (u:GH_Component, da:IGH_DataAccess, idx:int, msg) : int =
+    let mutable f = new GH_Number()
+    let r = da.GetData(idx, &f)
+    u.Message <- SetMessage (not r) msg
+    (int)f.Value
+
+  let readString (u:GH_Component, da:IGH_DataAccess, idx:int, msg) : string =
+    let mutable f = new GH_String()
     let r = da.GetData(idx, &f)
     u.Message <- SetMessage (not r) msg
     f.Value
@@ -182,6 +196,180 @@ module Utils =
   let GetNodeXml node name data =
     node + " name=\"" + name + "\" " + data
 
+
+  let cleanName (nn:string) =
+    nn.Replace(" ", "_").Replace("-", "_").ToLowerInvariant()
+
+type CyclesNode(name, nickname, description, category, subcategory, nodetype : Type) =
+  inherit GH_Component (name, nickname, description, category, subcategory)
+
+  let ntype : Type = nodetype
+  let mutable intNode : ShaderNode = null
+  do
+    let p = [ Utils.cleanName (base.InstanceGuid.ToString()+"_"+nickname) ] |> Seq.map (fun x -> x :> obj) |> Seq.toArray
+    let t = Utils.castAs<ShaderNode>( Activator.CreateInstance( ntype, p ) )
+    intNode <- t
+    base.PostConstructor()
+
+  override u.PostConstructor() = u |> ignore; ()
+
+  member u.ShaderNode =  u |> ignore; intNode
+
+  abstract member XmlNodeName : unit -> string
+  default u.XmlNodeName() =
+    u.XmlTag() + "_" + u.InstanceGuid.ToString()
+
+  abstract member XmlTag : unit -> string
+  default u.XmlTag() =
+    let getName (attr:obj) =
+      let a = attr :?> ShaderNodeAttribute
+      a.Name
+    let t = u.ShaderNode.GetType()
+    (t.GetCustomAttributes(typeof<ShaderNodeAttribute>, false) |> Seq.map getName).FirstOrDefault()
+
+  // some empty overrides to silence compiler
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    match u.ShaderNode.inputs with
+    | null -> ()
+    | _ ->
+      for x in u.ShaderNode.inputs.Sockets do
+        match x with
+        | :? ccl.ShaderNodes.Sockets.ClosureSocket as socket ->
+          mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Color.Gray) |> ignore
+        | :? ccl.ShaderNodes.Sockets.FloatSocket as socket ->
+          mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, 0.0) |> ignore
+        | :? ccl.ShaderNodes.Sockets.ColorSocket as socket ->
+          mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Color.Gray) |> ignore
+        | :? ccl.ShaderNodes.Sockets.VectorSocket as socket ->
+          mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Vector3d.Zero) |> ignore
+        | :? ccl.ShaderNodes.Sockets.Float4Socket as socket ->
+          mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Vector3d.Zero) |> ignore
+        | :? ccl.ShaderNodes.Sockets.IntSocket as socket ->
+          mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, 0.0) |> ignore
+        | :? ccl.ShaderNodes.Sockets.StringSocket as socket ->
+          mgr.AddTextParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, "") |> ignore
+        | _ ->
+          failwith "unknown socket type"
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    match u.ShaderNode.outputs with
+    | null -> ()
+    | _ ->
+      for x in u.ShaderNode.outputs.Sockets do
+        match x with
+        | :? ccl.ShaderNodes.Sockets.ClosureSocket as socket ->
+          mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item) |> ignore
+        | :? ccl.ShaderNodes.Sockets.FloatSocket as socket ->
+          mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item) |> ignore
+        | :? ccl.ShaderNodes.Sockets.ColorSocket as socket ->
+          mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item) |> ignore
+        | :? ccl.ShaderNodes.Sockets.VectorSocket as socket ->
+          mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item) |> ignore
+        | :? ccl.ShaderNodes.Sockets.Float4Socket as socket ->
+          mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item) |> ignore
+        | :? ccl.ShaderNodes.Sockets.IntSocket as socket ->
+          mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item) |> ignore
+        | :? ccl.ShaderNodes.Sockets.StringSocket as socket ->
+          mgr.AddTextParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item) |> ignore
+        | _ ->
+          failwith "unknown socket type"
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    let setdata (i:int) (s:ccl.ShaderNodes.Sockets.SocketBase) =
+      match s with
+      | :? ccl.ShaderNodes.Sockets.ClosureSocket ->
+        DA.SetData(i, Color.Gray) |> ignore
+      | :? ccl.ShaderNodes.Sockets.ColorSocket ->
+        DA.SetData(i, Color.Gray) |> ignore
+      | :? ccl.ShaderNodes.Sockets.VectorSocket ->
+        DA.SetData(i, Vector3d.Zero) |> ignore
+      | :? ccl.ShaderNodes.Sockets.FloatSocket ->
+        DA.SetData(i, 0.0) |> ignore
+      | :? ccl.ShaderNodes.Sockets.Float4Socket ->
+        DA.SetData(i, Vector3d.Zero) |> ignore
+      | :? ccl.ShaderNodes.Sockets.IntSocket ->
+        DA.SetData(i, 0.0) |> ignore
+      | :? ccl.ShaderNodes.Sockets.StringSocket ->
+        DA.SetData(i, "-") |> ignore
+      | _ ->
+        failwith "unknown socket type"
+
+    let getdata (i:int) (s:ccl.ShaderNodes.Sockets.SocketBase) =
+      match s with
+      | :? ccl.ShaderNodes.Sockets.ClosureSocket as closure ->
+        let col = Utils.readColor (u, DA, i, "couldn't read closure")
+        closure.Value <- Utils.castAs<obj>(col)
+      | :? ccl.ShaderNodes.Sockets.ColorSocket as color ->
+        let col = Utils.readColor (u, DA, i, "couldn't read color")
+        color.Value <- Utils.float4FromColor col
+      | :? ccl.ShaderNodes.Sockets.VectorSocket as vector ->
+        let vec = Utils.readVector (u, DA, i, "couldn't read vector")
+        vector.Value <- Utils.float4FromVector vec
+      | :? ccl.ShaderNodes.Sockets.FloatSocket as flt->
+        let fl = Utils.readFloat (u, DA, i, "couldn't read float")
+        flt.Value <- (float32)fl
+      | :? ccl.ShaderNodes.Sockets.Float4Socket as float4Vector ->
+        let vec = Utils.readVector (u, DA, i, "couldn't read vector")
+        float4Vector.Value <- Utils.float4FromVector vec
+      | :? ccl.ShaderNodes.Sockets.IntSocket as intsock ->
+        let intval = Utils.readInt (u, DA, i, "couldn't read integer")
+        intsock.Value <- intval
+      | :? ccl.ShaderNodes.Sockets.StringSocket as stringsock ->
+        let strval = Utils.readString (u, DA, i, "couldn't read string")
+        stringsock.Value <- strval
+      | _ ->
+        failwith "unknown socket type"
+
+    let iterSources (idx:int) (item:IGH_Param) =
+      let tosocket = u.ShaderNode.inputs.[idx]
+      tosocket.ClearConnections()
+      match item.SourceCount > 0 with
+      | false -> "not connected"
+      | true ->
+        let is = item.Sources.[0]
+        match is.Attributes.Parent with
+        | null -> ""
+        | _ ->
+          match is.Attributes.Parent.DocObject with
+          | :? CyclesNode as cn -> 
+            let gh = cn :> GH_Component
+            let sidx = gh.Params.Output.FindIndex(fun p -> is.InstanceGuid=p.InstanceGuid)
+            match sidx > -1 with
+            | false -> ""
+            | true ->
+              let fromsock = cn.ShaderNode.outputs.[sidx]
+              fromsock.Connect(tosocket)
+              String.Format("{0}:{1} ({2} {3}.{4})", idx, item.Name, item.SourceCount, cn.ShaderNode.Name, fromsock.Name)
+          | _ -> ""
+    let iterRecipients (idx:int) (item:IGH_Param) =
+      String.Format("{0}:{1} ({2})", idx, item.Name, item.Recipients.Count)
+    let inputs = u.Params.Input |> Seq.mapi iterSources
+    let outputs = u.Params.Output |> Seq.mapi iterRecipients
+
+
+    outputs |> Seq.iter ignore
+    inputs |> Seq.iter ignore
+
+    let inputParameters =
+      u.ShaderNode.inputs.Sockets 
+      |> Seq.cast<ccl.ShaderNodes.Sockets.SocketBase>
+
+    inputParameters
+    |> Seq.mapi getdata
+    |> Seq.iter ignore
+
+    let outputParameters =
+      u.ShaderNode.outputs.Sockets 
+      |> Seq.cast<ccl.ShaderNodes.Sockets.SocketBase>
+
+    outputParameters
+    |> Seq.mapi setdata
+    |> Seq.iter ignore
+
+  override u.ComponentGuid = u |> ignore; Guid.Empty
+  override u.Icon = u|> ignore; Icons.Blend
+
+
 type Interpolation = None | Linear | Closest | Cubic | Smart with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", "-")
@@ -220,18 +408,13 @@ type Falloff = Cubic | Gaussian | Burley with
 /// The output node for the shader system. This node is responsible for
 /// driving the XML generation of a shader graph.
 type OutputNode() =
-  inherit GH_Component("Output", "output", "Output node for shader graph", "Shader", "Output")
+  inherit CyclesNode(
+    "Output", "output",
+    "Output node for shader graph",
+    "Shader", "Output",
+    typeof<ccl.ShaderNodes.OutputNode>)
 
-  let mutable matId = ResizeArray<Guid>() //Collections.Generic.List<Guid>()
-
-  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
-    u |> ignore
-    mgr.AddColourParameter(
-      "Surface", "S", "connect surface shader tree here.", GH_ParamAccess.item, Color.Black) |> ignore
-    mgr.AddColourParameter(
-      "Volume", "V", "connect volume shader nodes here.", GH_ParamAccess.item, Color.GreenYellow) |> ignore
-    mgr.AddNumberParameter(
-      "Displacement", "D", "connect displacement nodes here.", GH_ParamAccess.item, 0.0) |> ignore
+  let mutable matId = ResizeArray<Guid>()
 
   override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
     u |> ignore
@@ -261,8 +444,7 @@ type OutputNode() =
     match u.Params.Input.[0].SourceCount>0 with
     | false -> false
     | true ->
-      let rec hasBgNode (n:GH_Component) (acc:bool) (*: bool list*) =
-        //let s = n.Params.Input.[0].Sources.[0]
+      let rec hasBgNode (n:GH_Component) (acc:bool) =
         [for inp in n.Params.Input ->
           match inp.SourceCount>0 with
           | false -> acc
@@ -285,244 +467,94 @@ type OutputNode() =
 
 
   override u.SolveInstance(da : IGH_DataAccess) =
+    base.SolveInstance(da)
+
     u.Message <- ""
 
     let doc = u.OnPingDocument()
-    // create dictionary of existing nodes and a flag to remember if
-    // we have already handled it when generating XML. The flag
-    // is there to prevent the same tags from appearing more than once
-    let nd = new Dictionary<Guid, bool>()
-    for o in doc.Objects do nd.[o.InstanceGuid] <- false
 
-    /// <summary>
-    /// Generate XML representation for given <c>GH_Component</c>
-    /// </summary>
-    /// <param name="n">GH_Component to generate XML representation of</param>
-    let componentToXml (n:GH_Component, iteration) =
+    let booleanToggle (o:obj) =
+      match o with
+      | :? GH_BooleanToggle as bt -> bt.Value
+      | _ -> false
 
-      /// Get the NodeName from a <c>GH_Component</c>. If <c>GH_Component</c> doesn't
-      /// implement <c>ICyclesNode</c> this will be the empty string "".
-      let nodename (b1 : GH_Component) = match box b1 with :? ICyclesNode as cn -> cn.NodeName | _ -> b1.Name
+    let csharp (o:IGH_DocumentObject) = o.NickName="C#" && booleanToggle o
 
-      /// Get the XML from a <c>GH_Component</c>. If <c>GH_Component</c> doesn't
-      /// implement <c>ICyclesNode</c> this will be the empty string "".
-      let getxml (b1 : GH_Component, nodename, nickname, inps : List<IGH_Param>, iteration) =
-        match box b1 with
-        | :? ICyclesNode as cn -> cn.GetXml nodename nickname inps iteration
-        | _ ->
-          "<" + (Utils.GetNodeXml b1.Name (b1.InstanceGuid.ToString()) "") + " />"
+    let findCsharp = doc.Objects |> Seq.map csharp
+    let doCsharp = findCsharp |> Seq.fold (fun a x -> a || x) false
 
-      let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
-      let nodn = nodename(n)
-      let nn =
-        match n.ComponentGuid.ToString() with
-        | "14df22af-d119-4f69-a536-34a30ddb175e" -> "output"
-        | _ -> n.InstanceGuid.ToString()
+    let getSource i (p:IGH_Param) =
+      match i < p.SourceCount with
+      | true -> p.Sources.[i]
+      | false -> p.Sources.LastOrDefault()
 
-      let xml = getxml(n, nodn, nn, n.Params.Input, iteration)
-      match dontdoit with true -> "" | _ ->
-                                      match nn with
-                                        | "" -> ""
-                                        | "output" -> ""
-                                        | _ ->
-                                          nd.[n.InstanceGuid] <- true
-                                          xml
+    let content l = not (String.IsNullOrEmpty l || String.IsNullOrWhiteSpace l)
+    let cleancontent (l:string) = l.Trim()
 
-    let valueNodeXml (n:GH_NumberSlider) =
-      let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
-      let nn = n.InstanceGuid.ToString() + "_" + n.ImpliedNickName.ToLowerInvariant().Replace(" ", "_")
-      match dontdoit with
-      | true -> ""
-      | _ ->
-        nd.[n.InstanceGuid] <- true
-        String.Format(ccl.Utilities.Instance.NumberFormatInfo,
-                      "<value name=\"{0}\" value=\"{1}\" />\n", nn, n.CurrentValue)
 
-    let vectorNodeXml (n:Param_Vector) =
-      let dontdoit = (nd.ContainsKey(n.InstanceGuid) && nd.[n.InstanceGuid]) || n.ComponentGuid=u.ComponentGuid
-      let nn = n.InstanceGuid.ToString() + "_vector"
-      match dontdoit with
-      | true -> ""
-      | _ ->
-        nd.[n.InstanceGuid] <- true
-        let v = n.VolatileData.StructureProxy.[0].[0]
-        let v' = v :?> GH_Vector
-        let v3d = v'.QC_Vec()
-        String.Format(ccl.Utilities.Instance.NumberFormatInfo,
-                      "<combine_xyz name=\"{0}\" X=\"{1}\" Y=\"{2}\" Z=\"{3}\" />\n", nn, v3d.X, v3d.Y, v3d.Z)
-
-    let colorNodeXml (n:GH_ColourPickerObject) =
-      let dontdoit = nd.[n.InstanceGuid] || n.ComponentGuid=u.ComponentGuid
-      let nn = n.InstanceGuid.ToString()
-      match dontdoit with
-      | true -> ""
-      | _ ->
-        nd.[n.InstanceGuid] <- true
-        String.Format(ccl.Utilities.Instance.NumberFormatInfo,
-                      "<color name=\"{0}\" value=\"{1}\" />\n", nn, Utils.ColorXml(n.Colour))
-
-    /// Get all XML node tags for all the nodes that are connected to the
-    /// given node.
-    let collectNodeTags (n:GH_Component, iteration) =
-      /// tail-recursively generate all tags
-      let rec colnodetags (_n:obj, acc) =
-        match _n with
+    let usedNodes (n:GH_Component) (iteration:int) =
+      let rec colcontags (acc: obj list) (_n:obj) =
+        let n = Utils.castAs<GH_Component>(_n)
+        match n with
         | null -> acc
         | _ ->
-          match _n with
-          | :? GH_NumberSlider as _n' ->
-            acc + valueNodeXml(_n')
-          | :? Param_Vector as _n' ->
-            acc + vectorNodeXml(_n')
-          | :? GH_ColourPickerObject as _n' ->
-            acc + colorNodeXml(_n')
-          | _ ->
-            let n' = Utils.castAs<GH_Component>(_n)
-            let compxml = componentToXml(n', iteration)
-            let lf =
-              match compxml with
-              | "" -> ""
-              | _ -> "\n"
-            let compAttrs = [
-              for inp in n'.Params.Input do
-                let s =
-                  match iteration < inp.SourceCount with
-                  | true -> inp.Sources.[iteration]
-                  | false -> inp.Sources.LastOrDefault()
-                let tst =
-                  match isNull s with
-                  | true -> null
-                  | _ ->
-                    let s' =
-                      match s with
-                      | :? GH_NumberSlider -> s :> obj
-                      | :? GH_ColourPickerObject -> s :> obj
-                      | s when isNull s -> null
-                      | _ -> 
-                        let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
-                        match attrp with
-                        | null ->
-                            match s with
-                            | :? Param_Vector -> s :> obj
-                            | _ -> null
-                        | _ -> attrp.Owner :> obj
-                    s'
-                yield tst]
-            let filteredCompAttrs = compAttrs |> List.filter (isNull >> not)
+          let diveinto (inp:IGH_Param) =
+            let s = getSource iteration inp
+            let tst =
+              match isNull s with
+              | true -> null
+              | false ->
+                match s with
+                | :? GH_NumberSlider -> Utils.castAs<obj>(s)
+                | :? GH_ColourPickerObject -> Utils.castAs<obj>(s)
+                | s when isNull s -> null
+                | _ -> 
+                  let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
+                  match attrp with
+                  | null -> null
+                  | _ -> Utils.castAs<obj>(attrp.Owner)
+            tst
+          let dd = n.Params.Input |> Seq.map diveinto
+          
+          let filteredCompAttrs =
+            dd
+            |> Seq.filter (fun x -> (isNull >> not) x)
 
-            /// generate string for inputs of this component
-            /// this essentially recurses back into colnodetags.
-            /// Tail recursive.
-            let rec compstr lst accum =
-              match lst with
-              | [] -> accum
-              | (x:obj)::xs ->
-                  let nodetags = colnodetags (x, accum)
-                  // recurse
-                  compstr xs nodetags
-            // start iterating over all attributes of attached nodes
-            // given this component XML
-            compstr filteredCompAttrs acc + compxml+lf
+          let deeperCompAttrs =
+            filteredCompAttrs
+            |> Seq.map (fun x -> colcontags [] x)
 
-      colnodetags (n, "")
+          let resCompAttrs =
+            deeperCompAttrs
+            |> Seq.concat
+            |> List.ofSeq
 
-    let collectConnectTags (n:GH_Component, iteration:int) =
-      let doneconns = new Dictionary<SocketsInfo, bool>()
-      /// create <connect> tag
-      /// <param name="toinp">GH_Component connected to</param>
-      /// <param name="tosock">Socket on toinp connected to</param>
-      /// <param name="fromsock">Socket on from connected from</param>
-      /// <param name="from">GH_Component or other connected from</param>
-      let connecttag (sinf:SocketsInfo) =
-        let mapGhToCycles (comp:obj) (sock:IGH_Param) =
-          match comp with
-          | :? GH_ColourPickerObject -> ("color", "color")
-          | :? GH_NumberSlider -> ("value", "value")
-          | _ ->
-            let n = Utils.castAs<GH_Component>(comp)
-            (n.Name, sock.Name.ToLowerInvariant().Replace(" ", "_"))
-        let dontdoit = doneconns.ContainsKey(sinf)
-        match dontdoit with
-        | true -> ""
-        | _ ->
-          doneconns.[sinf] <- true
-          let toinp = (Utils.ToC sinf) :?> GH_Component
-          let from = (Utils.FromC sinf)
-          let fromsock = (Utils.FromS sinf)
-          let tosock = (Utils.ToS sinf)
-          let nn =
-            match toinp.ComponentGuid.ToString() with
-            | "14df22af-d119-4f69-a536-34a30ddb175e" -> "output"
-            | _ -> toinp.InstanceGuid.ToString()
+          filteredCompAttrs |> List.ofSeq |> List.append resCompAttrs |> List.append acc
 
-          let fromstr =
-            match from  with
-            | :? GH_ColourPickerObject ->
-                                let cp = from :?> GH_ColourPickerObject
-                                cp.InstanceGuid.ToString()
-            | :? GH_NumberSlider ->
-                                let ns = from :?> GH_NumberSlider
-                                ns.InstanceGuid.ToString() + "_" + ns.ImpliedNickName.ToLowerInvariant().Replace(" ", "_")
-            | _ -> 
-              let c = from :?> GH_Component
-              c.InstanceGuid.ToString()
-          let (_, fromsockname) = mapGhToCycles from fromsock
-          let (_, tosockname) = mapGhToCycles toinp tosock
+      colcontags [] n
 
-          match fromstr with
-          | "" -> ""
-          | _ -> String.Format("<connect from=\"{0} {1}\" to=\"{2} {3}\" />\n", fromstr, fromsockname, nn, tosockname)
+    let usednodes = usedNodes u da.Iteration |> Seq.distinct |> List.ofSeq
 
-      let rec colcontags (_n:obj, acc) =
-        match _n with
-        | null -> acc
-        | _ ->
-          match _n with
-          | :? GH_NumberSlider -> acc
-          | :? GH_ColourPickerObject -> acc
-          | _ ->
-            let n = Utils.castAs<GH_Component>(_n)
 
-            let compAttrs = [
-              for inp in n.Params.Input do
-                let s =
-                  match iteration < inp.SourceCount with
-                  | true -> inp.Sources.[iteration]
-                  | false -> inp.Sources.LastOrDefault()
-                let tst =
-                  match isNull s with
-                  | true -> null
-                  | false ->
-                    match s with
-                    | :? GH_NumberSlider -> Utils.castAs<obj>(s)
-                    | :? GH_ColourPickerObject -> Utils.castAs<obj>(s)
-                    | s when isNull s -> null
-                    | _ -> 
-                      let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
-                      match attrp with
-                      | null -> null
-                      | _ -> Utils.castAs<obj>(attrp.Owner)
-                yield (tst, s, inp, Utils.castAs<obj>(n))]
+    let getXmlTag(comp:obj) =
+      match comp with
+      | :? CyclesNode as cn -> cn.ShaderNode.CreateXml()
+      | _ -> ""
+      |> cleancontent
 
-            let filteredCompAttrs = compAttrs |> List.filter (fun (x, _, _, _) -> x |> isNull |> not)
+    let getConnectXmlTag(comp:obj) =
+      match comp with
+      | :? CyclesNode as cn -> cn.ShaderNode.CreateConnectXml()
+      | _ -> ""
+      |> cleancontent
+    
+    let comptags = usednodes |> List.map getXmlTag |> List.filter (String.IsNullOrEmpty >> not)
+    let conntags = usednodes |> List.map getConnectXmlTag |> List.filter (String.IsNullOrEmpty >> not)
 
-            let rec conrec lst accum =
-              match lst with
-              | [] -> accum
-              | (x:SocketsInfo)::xs ->
-                  let thistag = connecttag (x)
-                  let contags = colcontags ((Utils.FromC x), accum)
-                  conrec xs contags + thistag
-            conrec filteredCompAttrs acc
-      colcontags (n, "")
+    let nodetagsxml = String.Join("\n", comptags) + "\n<!-- @@@@@@@@@@@ -->\n"
+    let connecttagsxml = String.Join("\n", conntags) + "\n" + u.ShaderNode.CreateConnectXml() + "\n<!-- XXXXXXXX -->\n\n"
 
-    let nodetagsxml = collectNodeTags (u, da.Iteration) + "\n"
-    // reset dictionary flags
-    for o in doc.Objects do nd.[o.InstanceGuid] <- false
-    let connecttagsxml = collectConnectTags (u, da.Iteration)
-
-    // let s = Utils.readColor(u, da, 0, "Couldn't read Surface")
-    // let v = Utils.readColor(u, da, 1, "Couldn't read Volume");
+    let xmlcode = nodetagsxml + connecttagsxml
 
     match u.IsBackground with
     | true ->
@@ -530,7 +562,7 @@ type OutputNode() =
       match env with
       | null -> u.Message <- "NO BG"
       | _ ->
-        env.SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
+        env.SetParameter("xml", xmlcode) |> ignore
         Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
       ()
     | false ->
@@ -549,7 +581,7 @@ type OutputNode() =
       | _ ->
         let m' = m :?> XmlMaterial
         m'.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
-        m'.SetParameter("xml", nodetagsxml + connecttagsxml) |> ignore
+        m'.SetParameter("xml", xmlcode) |> ignore
         m'.EndChange()
         match matId.Count > 1 with
         | true -> u.Message <- "multiple materials set"
@@ -558,15 +590,4 @@ type OutputNode() =
           mm.DiffuseColor <- Utils.randomColor
           mm.CommitChanges() |> ignore
 
-
-    da.SetData(0, nodetagsxml + connecttagsxml) |> ignore
-
-  interface ICyclesNode with
-    member u.NodeName =
-      u |> ignore
-      "output"
-    // the output node doesn't generate XML for the shader representation
-    // so we return just empty string for XML
-    member u.GetXml n nn l i =
-      (u, n, nn, l, i) |> ignore
-      "HAHAHA"
+    da.SetData(0, xmlcode ) |> ignore
