@@ -7,6 +7,7 @@ open System.Collections.Generic
 open System.Linq
 open System.Drawing
 open System.Windows.Forms
+open System.Text.RegularExpressions
 
 open Grasshopper.Kernel
 open Grasshopper.Kernel.Attributes
@@ -346,7 +347,6 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
     let inputs = u.Params.Input |> Seq.mapi iterSources
     let outputs = u.Params.Output |> Seq.mapi iterRecipients
 
-
     outputs |> Seq.iter ignore
     inputs |> Seq.iter ignore
 
@@ -467,6 +467,9 @@ type OutputNode() =
 
 
   override u.SolveInstance(da : IGH_DataAccess) =
+
+    let theshader = new ccl.CodeShader(ccl.Shader.ShaderType.Material)
+
     base.SolveInstance(da)
 
     u.Message <- ""
@@ -490,6 +493,7 @@ type OutputNode() =
 
     let content l = not (String.IsNullOrEmpty l || String.IsNullOrWhiteSpace l)
     let cleancontent (l:string) = l.Trim()
+    let linebreaks (l:string) = l.Replace(";", ";\n")
 
 
     let usedNodes (n:GH_Component) (iteration:int) =
@@ -535,6 +539,16 @@ type OutputNode() =
 
     let usednodes = usedNodes u da.Iteration |> Seq.distinct |> List.ofSeq
 
+    let addtoshader (x:obj) =
+      match x with
+      | :? CyclesNode as cn -> theshader.AddNode(cn.ShaderNode)
+      | _ -> ()
+
+    let rr = usednodes |> List.iter addtoshader
+    rr |> ignore
+    let xx = theshader.FinalizeGraph()
+    xx |> ignore
+
 
     let getXmlTag(comp:obj) =
       match comp with
@@ -547,14 +561,39 @@ type OutputNode() =
       | :? CyclesNode as cn -> cn.ShaderNode.CreateConnectXml()
       | _ -> ""
       |> cleancontent
+
+    let getCodeTag(comp:obj) =
+      match comp with
+      | :? CyclesNode as cn -> cn.ShaderNode.CreateCode()
+      | _ -> ""
+      |> cleancontent
+      |> linebreaks
+
+    let getConnectCodeTag(comp:obj) =
+      match comp with
+      | :? CyclesNode as cn -> cn.ShaderNode.CreateConnectCode()
+      | _ -> ""
+      |> cleancontent
+      |> linebreaks
     
     let comptags = usednodes |> List.map getXmlTag |> List.filter (String.IsNullOrEmpty >> not)
     let conntags = usednodes |> List.map getConnectXmlTag |> List.filter (String.IsNullOrEmpty >> not)
 
+    let compcode = usednodes |> List.map getCodeTag |> List.filter (String.IsNullOrEmpty >> not)
+    let conncode = usednodes |> List.map getConnectCodeTag |> List.filter (String.IsNullOrEmpty >> not)
+
     let nodetagsxml = String.Join("\n", comptags) + "\n<!-- @@@@@@@@@@@ -->\n"
     let connecttagsxml = String.Join("\n", conntags) + "\n" + u.ShaderNode.CreateConnectXml() + "\n<!-- XXXXXXXX -->\n\n"
 
-    let xmlcode = nodetagsxml + connecttagsxml
+    let csharpcode =
+      theshader.Code + u.ShaderNode.CreateConnectCode()
+      |> cleancontent
+      |> linebreaks
+
+    (* let nodetagscode = String.Join("\n", compcode) + "\n/******************/\n"
+    let connecttagscode = String.Join("\n", conncode) + "\n" + u.ShaderNode.CreateConnectCode() + "\n/*************/\n\n" *)
+
+    let xmlcode = nodetagsxml + connecttagsxml + "<!--\n" + csharpcode  + "\n-->"
 
     match u.IsBackground with
     | true ->
