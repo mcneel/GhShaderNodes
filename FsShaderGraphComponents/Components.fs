@@ -325,23 +325,33 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
       let tosocket = u.ShaderNode.inputs.[idx]
       tosocket.ClearConnections()
       match item.SourceCount > 0 with
-      | false -> "not connected"
+      | false -> ()
       | true ->
-        let is = item.Sources.[0]
-        match is.Attributes.Parent with
-        | null -> ""
+        let isource = item.Sources.[0]
+        match isource.Attributes.Parent with
+        | null ->
+          match isource with
+          | ( :? GH_Param<GH_Number> | :? GH_Param<GH_Colour>) as param->
+            if param.NickName.Contains(".") then tosocket.SetValueCode <- param.NickName
+          | _ -> ()
+          ()
         | _ ->
-          match is.Attributes.Parent.DocObject with
+          match isource.Attributes.Parent.DocObject with
           | :? CyclesNode as cn -> 
             let gh = cn :> GH_Component
-            let sidx = gh.Params.Output.FindIndex(fun p -> is.InstanceGuid=p.InstanceGuid)
+            let sidx = gh.Params.Output.FindIndex(fun p -> isource.InstanceGuid=p.InstanceGuid)
             match sidx > -1 with
-            | false -> ""
+            | false -> ()
             | true ->
               let fromsock = cn.ShaderNode.outputs.[sidx]
               fromsock.Connect(tosocket)
-              String.Format("{0}:{1} ({2} {3}.{4})", idx, item.Name, item.SourceCount, cn.ShaderNode.Name, fromsock.Name)
-          | _ -> ""
+          | :? GH_Component as gh ->
+            match gh.NickName.Contains(".") with
+            | true ->
+              tosocket.SetValueCode <- gh.NickName
+            | false -> ()
+          | _ -> ()
+
     let iterRecipients (idx:int) (item:IGH_Param) =
       String.Format("{0}:{1} ({2})", idx, item.Name, item.Recipients.Count)
     let inputs = u.Params.Input |> Seq.mapi iterSources
