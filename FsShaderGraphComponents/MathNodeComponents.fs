@@ -13,8 +13,13 @@ open ShaderGraphResources
 
 
 [<AbstractClass>]
-type MathBaseNode(name, nickname, description, category, subcategory, outputdescription, op, openum) =
-  inherit CyclesNode(name, nickname, description, category, subcategory, typeof<MathNode>)
+type MathBaseNode(openum, category, subcategory, outputdescription, op) =
+  inherit CyclesNode(
+    openum.ToString().Replace('_', ' '),
+    openum.ToString().Replace('_', ' '),
+    openum.ToString().Replace('_', ' '),
+    category, subcategory,
+    typeof<MathNode>)
 
   let opEnum = openum
   let mutable mUseClamp = false
@@ -62,53 +67,81 @@ type MathBaseNode(name, nickname, description, category, subcategory, outputdesc
       "<" + Utils.GetNodeXml node nickname (x + String.Format(" type=\"{0}\"", u.Name)) + " />"*)
 
 type MathAdd() =
-  inherit MathBaseNode("Add", "add", "Add two floats", "Shader", "Math", "Value1+Value2", (+), MathNode.Operations.Add)
+  inherit MathBaseNode(MathNode.Operations.Add, "Shader", "Math", "Value1+Value2", (+))
   override u.ComponentGuid = u |> ignore; new Guid("ec3b4eb3-7cd5-43c8-8ef7-deb2200df882")
   override u.Icon = u |> ignore; Icons.Add
 
 type MathSubtract() =
-  inherit MathBaseNode("Subtract", "subtract", "Subtract two floats", "Shader", "Math", "Value1-Value2", (-), MathNode.Operations.Subtract)
+  inherit MathBaseNode(MathNode.Operations.Subtract, "Shader", "Math", "Value1-Value2", (-))
   override u.ComponentGuid = u |> ignore; new Guid("c2b99ede-3050-483d-ab90-35a1548d2d22")
   override u.Icon = u |> ignore; Icons.Sub
 
 type MathMultiply() =
-  inherit MathBaseNode("Multiply", "multiply", "Multiply two floats", "Shader", "Math", "Value1×Value2", (*), MathNode.Operations.Multiply)
+  inherit MathBaseNode(MathNode.Operations.Multiply, "Shader", "Math", "Value1×Value2", (*))
   override u.ComponentGuid = u |> ignore; new Guid("4a360292-b84b-4808-ad8e-67f2b77b0e15")
   override u.Icon = u |> ignore; Icons.Mult
 
 type MathDivide() =
-  inherit MathBaseNode("Divide", "divide", "Divide two floats", "Shader", "Math", "Value1/Value2", (/), MathNode.Operations.Divide)
+  inherit MathBaseNode(MathNode.Operations.Divide, "Shader", "Math", "Value1/Value2", (/))
   override u.ComponentGuid = u |> ignore; new Guid("623ee461-9576-4981-a85a-7aa4a30e2e98")
   override u.Icon = u |> ignore; Icons.Div
 
 type MathPower() =
-  inherit MathBaseNode("Power", "power", "Power two floats", "Shader", "Math", "Value1**Value2", ( ** ), MathNode.Operations.Power )
+  inherit MathBaseNode(MathNode.Operations.Power, "Shader", "Math", "Value1**Value2", ( ** ))
   override u.ComponentGuid = u |> ignore; new Guid("2e74876b-33f9-4262-9791-cf53466a63e3")
   override u.Icon = u |> ignore; Icons.Pow
 
 type MathLogarithm() =
-  inherit MathBaseNode(
-    "Logarithm", "logarithm", "Logarithm two floats", "Shader", "Math", "log(Value1)/log(Value2)", Utils.Logarithm, MathNode.Operations.Logarithm)
+  inherit MathBaseNode(MathNode.Operations.Logarithm, "Shader", "Math", "log(Value1)/log(Value2)", Utils.Logarithm)
   override u.ComponentGuid = u |> ignore; new Guid("72b96bf7-350e-4408-bdec-d61ea6b4d677")
   override u.Icon = u |> ignore; Icons.Log
 
 type MathMinimum() =
-  inherit MathBaseNode("Minimum", "min", "Minimum two floats", "Shader", "Math", "min(Value1,Value2)", min, MathNode.Operations.Minimum)
+  inherit MathBaseNode(MathNode.Operations.Minimum, "Shader", "Math", "min(Value1,Value2)", min)
   override u.ComponentGuid = u |> ignore; new Guid("825f2014-0e51-4d60-bb2f-8aa40aea7b91")
   override u.Icon = u |> ignore; Icons.Min
 
 type MathMaximum() =
-  inherit MathBaseNode("Maximum", "max", "Maximum two floats", "Shader", "Math", "max(Value1,Value2)", max, MathNode.Operations.Maximum)
+  inherit MathBaseNode(MathNode.Operations.Maximum, "Shader", "Math", "max(Value1,Value2)", max)
   override u.ComponentGuid = u |> ignore; new Guid("1706489e-c7a3-453d-971a-1429a51aa783")
   override u.Icon = u |> ignore; Icons.Max
 
 type MathLessThan() =
-  inherit MathBaseNode("Less Than", "less", "v1 < v2", "Shader", "Math", "Value1 < Value2", Utils.LessThen, MathNode.Operations.Less_Than)
+  inherit MathBaseNode(MathNode.Operations.Less_Than, "Shader", "Math", "Value1 < Value2", Utils.LessThen)
   override u.ComponentGuid = u |> ignore; new Guid("94d49a6f-2520-430d-b2ee-6eda864b568b")
   override u.Icon = u |> ignore; Icons.LessThan
 
 type MathGreaterThan() =
-  inherit MathBaseNode(
-    "Greater Than", "greater", "Value1 > Value2", "Shader", "Math", "Value1 > Value2", Utils.GreaterThan, MathNode.Operations.Greater_Than)
+  inherit MathBaseNode(MathNode.Operations.Greater_Than, "Shader", "Math", "Value1 > Value2", Utils.GreaterThan)
   override u.ComponentGuid = u |> ignore; new Guid("7a833ba4-28f2-4676-8fa0-c746a9dd6b02")
   override u.Icon = u |> ignore; Icons.GreaterThan
+
+type MathSine() =
+  inherit MathBaseNode(MathNode.Operations.Sine, "Shader", "Math", "Sine(Value1)", Utils.Sine)
+  override u.ComponentGuid = u |> ignore; new Guid("63468f25-b71e-4285-91d0-e0505118f738")
+  override u.Icon = u |> ignore; Icons.Add
+
+type MathCosine() =
+  inherit MathBaseNode(MathNode.Operations.Cosine, "Shader", "Math", "Cosine(Value1)", Utils.Cosine)
+  override u.ComponentGuid = u |> ignore; new Guid("a8db0fa4-0bd3-405f-a8ae-1416dd4de632")
+  override u.Icon = u |> ignore; Icons.Add
+
+type MathTangent() =
+  inherit MathBaseNode(MathNode.Operations.Tangent, "Shader", "Math", "Tangent(Value1)", Utils.Tangent)
+  override u.ComponentGuid = u |> ignore; new Guid("e3e72aad-acf4-4965-a5d7-c1c6c3701faf")
+  override u.Icon = u |> ignore; Icons.Add
+
+type MathArcsine() =
+  inherit MathBaseNode(MathNode.Operations.Arcsine, "Shader", "Math", "Arcsine(Value1)", Utils.Arcsine)
+  override u.ComponentGuid = u |> ignore; new Guid("475a3c6c-b047-461e-ba07-ce96c32a5d94")
+  override u.Icon = u |> ignore; Icons.Add
+
+type MathArccosine() =
+  inherit MathBaseNode(MathNode.Operations.Arccosine, "Shader", "Math", "Arccosine(Value1)", Utils.Arccosine)
+  override u.ComponentGuid = u |> ignore; new Guid("07440de9-5786-4265-a328-1acb45188157")
+  override u.Icon = u |> ignore; Icons.Add
+
+type MathArctangent() =
+  inherit MathBaseNode(MathNode.Operations.Arctangent, "Shader", "Math", "Arctangent(Value1)", Utils.Arctangent)
+  override u.ComponentGuid = u |> ignore; new Guid("a01cd7ab-a8aa-427a-bcaf-99e2410f620c")
+  override u.Icon = u |> ignore; Icons.Add

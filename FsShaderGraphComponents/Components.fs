@@ -83,6 +83,13 @@ module Utils =
   let GreaterThan a b = match (>) a b with true -> 1.0 | _ -> 0.0
   let LessThen a b = match (<) a b with true -> 1.0 | _ -> 0.0
 
+  let Sine a b = b |> ignore; sin a
+  let Cosine a b = b|> ignore; cos a
+  let Tangent a b = b|> ignore; tan a
+  let Arcsine a b = b |> ignore; asin a
+  let Arccosine a b = b|> ignore; acos a
+  let Arctangent a b = b|> ignore; atan a
+
   /// Give first (R) component of triplet (IntColor)
   let R (r:int, _:int, _:int) = r
   /// Give second (G) component of triplet (IntColor)
