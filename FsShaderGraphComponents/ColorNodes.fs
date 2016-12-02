@@ -130,34 +130,3 @@ type ColorRampNode() =
           |> Seq.map (fun x -> String.Format("\t<stop color=\"{0}\" position=\"{1}\" />", fst x, snd x))
           |> String.concat "\n"
       "<" + (Utils.GetNodeXml node nickname (x+t)) + ">\n" + stops + "\n</color_ramp>"*)
-
-type ColorToLuminanceNode() =
-  inherit CyclesNode(
-    "Color2Luminance",
-    "color -> luminance",
-    "Convert input color to luminance value", "Shader", "Color", typeof<ccl.ShaderNodes.RgbToLuminanceNode>)
-
-  override u.ComponentGuid = u |> ignore; new Guid("677f0004-2f9a-48da-897e-1deae4552b4f")
-  override u.Icon = u |> ignore; Icons.Blend
-
-  override u.SolveInstance(DA: IGH_DataAccess) =
-    u |> ignore
-    DA.SetData(0, 0.5) |> ignore
-
-type ColorToLuminanceCNode() =
-  inherit CyclesNode(
-    "Color2LuminanceC",
-    "color -> luminance C",
-    "Convert input color to luminance (color)", "Shader", "Color", typeof<ccl.ShaderNodes.RgbToLuminanceNode>)
-
-  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
-    u |> ignore
-    mgr.AddColourParameter("Val", "V", "Luminance Color", GH_ParamAccess.item) |> ignore
-
-  override u.ComponentGuid = u |> ignore; new Guid("8e29a696-bf5e-4604-bfec-d0e504ee541d")
-
-  override u.Icon = u |> ignore; Icons.Blend
-
-  override u.SolveInstance(DA: IGH_DataAccess) =
-    u |> ignore
-    DA.SetData(0, Utils.createColor(128, 128, 128)) |> ignore

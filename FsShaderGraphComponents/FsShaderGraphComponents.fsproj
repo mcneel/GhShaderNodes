@@ -63,12 +63,13 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Components.fs" />
-    <Compile Include="ColorNodes.fs" />
+    <Compile Include="ConvertNodes.fs" />
     <Compile Include="InputNodes.fs" />
     <Compile Include="BsdfNodes.fs" />
     <Compile Include="MathNodeComponents.fs" />
     <Compile Include="TextureNodes.fs" />
     <None Include="Tests.fsx" />
+    <Compile Include="ColorNodes.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="csycles">
