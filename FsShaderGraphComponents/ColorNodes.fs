@@ -9,30 +9,6 @@ open Grasshopper.Kernel
 
 open ShaderGraphResources
 
-type BlendTypes =
-  | Mix
-  | Add
-  | Multiply
-  | Screen
-  | Overlay
-  | Subtract
-  | Divide
-  | Difference
-  | Darken
-  | Lighten
-  | Dodge
-  | Burn
-  | Hue
-  | Saturation
-  | Value
-  | Color
-  | Soft_Light
-  | Linear_Light with
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString).Replace("_", " ")
-  static member fromString s = Utils.fromString<BlendTypes> s
-
-
 type MixRgbNode() =
   inherit CyclesNode(
     "Mix", "mix",
@@ -40,45 +16,54 @@ type MixRgbNode() =
     "Shader", "Color",
     typeof<ccl.ShaderNodes.MixNode>)
 
-  member val Blend = Mix with get, set
+  member val Blend =ccl.ShaderNodes.MixNode.BlendTypes.Mix with get, set
 
   override u.ComponentGuid = u |> ignore; new Guid("c3a397a6-f760-4ea1-9700-5722eee58489")
 
   override u.Icon = u |> ignore; Icons.Blend
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let appendMenu (bt:BlendTypes) =
-      GH_DocumentObject.Menu_AppendItem(menu, bt.toStringR,
-        (fun _ _ -> u.Blend <- bt; u.ExpireSolution true),
+    let appendMenu (bt:ccl.ShaderNodes.MixNode.BlendTypes) =
+      GH_DocumentObject.Menu_AppendItem(menu, bt.ToString().Replace("_", " "),
+        (fun _ _ ->
+          u.Blend <- bt
+          let mn = u.ShaderNode :?> ccl.ShaderNodes.MixNode
+          mn.BlendType <- bt
+          u.ExpireSolution true),
         true, u.Blend = bt) |> ignore
-    appendMenu Mix
-    appendMenu Add
-    appendMenu Multiply
-    appendMenu Screen
-    appendMenu Overlay
-    appendMenu Subtract
-    appendMenu Divide
-    appendMenu Difference
-    appendMenu Darken
-    appendMenu Lighten
-    appendMenu Dodge
-    appendMenu Burn
-    appendMenu Hue
-    appendMenu Saturation
-    appendMenu Value
-    appendMenu Color
-    appendMenu Soft_Light
-    appendMenu Linear_Light
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Mix
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Add
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Multiply
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Screen
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Overlay
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Subtract
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Divide
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Difference
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Darken
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Lighten
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Dodge
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Burn
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Hue
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Saturation
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Value
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Color
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Soft_Light
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Linear_Light
+
+  override u.SolveInstance(DA: IGH_DataAccess) =
+    base.SolveInstance DA
+    u.NickName <- u.Blend.ToString().Replace("_", " ")
+    u.Message <- u.Blend.ToString().Replace("_", " ")
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
-    writer.SetString("Blend", u.Blend.toString) |> ignore
+    writer.SetString("Blend", u.Blend.ToString()) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Blend") then
       u.Blend <-
-        let d = BlendTypes.fromString (reader.GetString "Blend")
-        match d with | Option.None -> Mix | _ -> d.Value
+        let (d, bt) = Enum.TryParse(reader.GetString "Blend")
+        match d with | false -> ccl.ShaderNodes.MixNode.BlendTypes.Mix | _ -> bt
     base.Read(reader)
 
 
