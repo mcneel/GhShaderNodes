@@ -67,8 +67,9 @@
     <Compile Include="InputNodes.fs" />
     <Compile Include="BsdfNodes.fs" />
     <Compile Include="MathNodeComponents.fs" />
-    <Compile Include="TextureNodes.fs" />
+    <Compile Include="VectorNodes.fs" />
     <None Include="Tests.fsx" />
+    <Compile Include="TextureNodes.fs" />
     <Compile Include="ColorNodes.fs" />
   </ItemGroup>
   <ItemGroup>
