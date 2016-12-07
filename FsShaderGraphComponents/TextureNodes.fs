@@ -160,6 +160,7 @@ type ImageTextureNode() =
 
   override u.SolveInstance(DA: IGH_DataAccess) =
     u.Message <- System.IO.Path.GetFileName(u.ImageFile)
+    (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Filename <- u.ImageFile
     base.SolveInstance(DA)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
@@ -194,7 +195,11 @@ type ImageTextureNode() =
       | _ -> ""
       )
     GH_DocumentObject.Menu_AppendItem(menu, "Select Image File...",
-      (fun _ _ -> u.ImageFile <- fd.Force(); u.ExpireSolution(true))) |> ignore
+      (fun _ _ ->
+        u.ImageFile <- fd.Force()
+        (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Filename <- u.ImageFile
+        u.ExpireSolution true)
+      ) |> ignore
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
     appendInterpolationMenu Interpolation.None
     appendInterpolationMenu Interpolation.Linear
@@ -213,18 +218,6 @@ type ImageTextureNode() =
     appendProjectionMenu TextureProjection.Box
     appendProjectionMenu TextureProjection.Sphere
     appendProjectionMenu TextureProjection.Tube
-
-
-  (*interface ICyclesNode with
-    member u.NodeName = "image_texture"
-    member u.GetXml node nickname inputs iteration =
-      let x = Utils.GetInputsXml (inputs, iteration)
-      let t = String.Format(" src=\"{0}\" ", u.ImageFile)
-      let interp = String.Format(" interpolation=\"{0}\" ", u.Interpolation.ToString)
-      let extension = String.Format(" extension=\"{0}\" ", u.TextureExtension.ToString)
-      let projection = String.Format(" projection=\"{0}\" ", u.Projection.ToString)
-      let cs = String.Format(" color_space=\"{0}\" ", u.ColorSpace.ToString)
-      "<" + Utils.GetNodeXml node nickname (x+t+interp+extension+projection+cs) + " />"*)
 
 type EnvironmentTextureNode() =
   inherit CyclesNode(
@@ -269,6 +262,7 @@ type EnvironmentTextureNode() =
 
   override u.SolveInstance(DA: IGH_DataAccess) =
     u.Message <- System.IO.Path.GetFileName(u.EnvironmentFile)
+    (u.ShaderNode :?> ccl.ShaderNodes.EnvironmentTextureNode).Filename <- u.EnvironmentFile
     base.SolveInstance(DA)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
@@ -291,7 +285,11 @@ type EnvironmentTextureNode() =
       )
     GH_DocumentObject.Menu_AppendItem(
       menu,
-      "Select Environment File...", (fun _ _ -> u.EnvironmentFile <- fd.Force(); u.ExpireSolution(true))
+      "Select Environment File...", (
+        fun _ _ ->
+          u.EnvironmentFile <- fd.Force()
+          (u.ShaderNode :?> ccl.ShaderNodes.EnvironmentTextureNode).Filename <- u.EnvironmentFile
+          u.ExpireSolution true)
     ) |> ignore
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
     appendProjectionMenu EnvironmentProjection.Equirectangular
@@ -306,13 +304,6 @@ type EnvironmentTextureNode() =
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
     appendColorspaceMenu ColorSpace.None
     appendColorspaceMenu ColorSpace.Color
-
-  (*interface ICyclesNode with
-    member u.NodeName = "environment_texture"
-    member u.GetXml node nickname inputs iteration =
-      let x = Utils.GetInputsXml (inputs, iteration)
-      let t = String.Format(" src=\"{0}\" ", u.EnvironmentFile)
-      "<" + Utils.GetNodeXml node nickname (x+t) + " />"*)
 
 type WaveTypes =
   | Bands
