@@ -6,6 +6,7 @@ open System
 open System.Windows.Forms
 
 open Grasshopper.Kernel
+open Grasshopper.Kernel.Types
 
 open ShaderGraphResources
 
@@ -23,7 +24,7 @@ type MixRgbNode() =
   override u.Icon = u |> ignore; Icons.Blend
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let appendMenu (bt:ccl.ShaderNodes.MixNode.BlendTypes) =
+    let appendMenu bt =
       GH_DocumentObject.Menu_AppendItem(menu, bt.ToString().Replace("_", " "),
         (fun _ _ ->
           u.Blend <- bt
@@ -66,67 +67,67 @@ type MixRgbNode() =
         match d with | false -> ccl.ShaderNodes.MixNode.BlendTypes.Mix | _ -> bt
     base.Read(reader)
 
-
-type InterpolationTypes =
-  | Constant
-  | Linear
-  | Ease
-  member u.toString = Utils.toString u
-  member u.toStringR = (u.toString)
-  static member fromString s = Utils.fromString<InterpolationTypes> s
-
 type ColorRampNode() =
   inherit CyclesNode(
     "Color Ramp", "color ramp",
     "Convert a float to a color according a gradient specification (RGB only)",
     "Shader", "Color", typeof<ccl.ShaderNodes.ColorRampNode>)
 
-  member val Interpolation = Linear with get, set
+  let cpidx = 1
+  let spidx = 2
+
+  member val Interpolation = ccl.ShaderNodes.ColorBand.Interpolations.Ease with get, set
 
   override u.ComponentGuid = u |> ignore; new Guid("dc8abb5a-5a92-4148-8118-b397929d7bb3")
 
   override u.Icon = u |> ignore; Icons.Blend
 
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    u |> ignore
+    base.RegisterInputParams mgr
+    mgr.AddColourParameter("Stop Colours", "SC", "List of colours", GH_ParamAccess.list) |> ignore
+    mgr.AddNumberParameter("Stop Positions", "SP", "List of stop positions", GH_ParamAccess.list) |> ignore
+
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
-    writer.SetString("Interpolation", u.Interpolation.toString) |> ignore
+    writer.SetString("Interpolation", u.Interpolation.ToString()) |> ignore
     base.Write(writer)
 
   override u.Read(reader:GH_IO.Serialization.GH_IReader) =
     if reader.ItemExists("Interpolation") then
       u.Interpolation <-
-        let d = InterpolationTypes.fromString (reader.GetString "Interpolation")
-        match d with Option.None -> Linear | _ -> d.Value
+        let (d,i) = Enum.TryParse<ccl.ShaderNodes.ColorBand.Interpolations>(reader.GetString "Interpolation")
+        match d with false -> ccl.ShaderNodes.ColorBand.Interpolations.Linear | _ -> i
 
     base.Read(reader)
 
+  override u.SolveInstance(DA:IGH_DataAccess) =
+    base.SolveInstance DA
+    let crn = u.ShaderNode :?> ccl.ShaderNodes.ColorRampNode
+    crn.ColorBand.Interpolation <- u.Interpolation
+    crn.ins.Fac.Value <- Utils.readFloat32(u, DA, 0, "Couldn't read Fac")
+    crn.ColorBand.Stops.Clear()
+    match u.Params.Input.[cpidx].VolatileDataCount = u.Params.Input.[spidx].VolatileDataCount with
+    | false -> ()
+    | true ->
+      let cl = seq[for i in u.Params.Input.[cpidx].VolatileData.Branch(0) do
+                    yield i]
+      let sl = seq[for i in u.Params.Input.[spidx].VolatileData.Branch(0) do
+                    yield i]
+      let addColorStop oc os =
+        let c = Utils.castAs<GH_Colour>(oc)
+        let s = Utils.castAs<GH_Number>(os)
+        let ncs = new ccl.ShaderNodes.ColorStop()
+        ncs.Color <- Utils.float4FromColor(c.Value)
+        ncs.Position <- (float32)s.Value
+        crn.ColorBand.Stops.Add(ncs)
+      Seq.map2 addColorStop cl sl |> Seq.iter ignore
+
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
-    let appendMenu (it:InterpolationTypes) =
+    let appendMenu it =
       GH_DocumentObject.Menu_AppendItem(
-        menu, it.toStringR,
+        menu, it.ToString().Replace("_", " "),
         (fun _ _ -> u.Interpolation <- it; u.ExpireSolution true),
         true, u.Interpolation= it) |> ignore
-    appendMenu Linear
-    appendMenu Ease
-    appendMenu Constant
-
-  (*interface ICyclesNode with
-    member u.NodeName = xmlNodeName + "-" + u.InstanceGuid.ToString()
-
-    member u.GetXml node nickname inputs iteration =
-      let i = inputs.Where(fun x -> x.Name = "Fac").ToList()
-      let x = Utils.GetInputsXml (i, iteration)
-      let t = String.Format(" interpolation=\"{0}\" ", u.Interpolation.toStringR)
-      let stops =
-        match inputs.[0].VolatileDataCount = inputs.[1].VolatileDataCount with
-        | false -> ""
-        | true ->
-          let cl = seq[for i in inputs.[0].VolatileData.Branch(0) do
-                        let c = Utils.castAs<GH_Colour>(i)
-                        yield Utils.ColorXml(c.Value)]
-          let sl = seq[for i in inputs.[1].VolatileData.Branch(0) do
-                        let nr = Utils.castAs<GH_Number>(i)
-                        yield nr.Value]
-          Seq.zip cl sl
-          |> Seq.map (fun x -> String.Format("\t<stop color=\"{0}\" position=\"{1}\" />", fst x, snd x))
-          |> String.concat "\n"
-      "<" + (Utils.GetNodeXml node nickname (x+t)) + ">\n" + stops + "\n</color_ramp>"*)
+    appendMenu ccl.ShaderNodes.ColorBand.Interpolations.Linear
+    appendMenu ccl.ShaderNodes.ColorBand.Interpolations.Ease
+    appendMenu ccl.ShaderNodes.ColorBand.Interpolations.Constant
