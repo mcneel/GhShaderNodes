@@ -140,6 +140,9 @@ module Utils =
     u.Message <- SetMessage (not r) msg
     f.Value
 
+  let readFloat32(u:GH_Component, da:IGH_DataAccess, idx:int, msg) : float32 =
+    (float32)(readFloat(u, da, idx, msg))
+
   let readInt (u:GH_Component, da:IGH_DataAccess, idx:int, msg) : int =
     let mutable f = new GH_Number()
     let r = da.GetData(idx, &f)
@@ -206,23 +209,33 @@ module Utils =
 
 
   let cleanName (nn:string) =
-    nn.Replace(" ", "_").Replace("-", "_").ToLowerInvariant()
+    nn.Replace(" ", "_").Replace("-", "_").Replace(">", "").ToLowerInvariant()
 
 type CyclesNode(name, nickname, description, category, subcategory, nodetype : Type) =
   inherit GH_Component (name, nickname, description, category, subcategory)
 
   let ntype : Type = nodetype
   let mutable intNode : ShaderNode = null
+
+  // our construction section. Create an instance of the nodetype this
+  // CyclesNode instance represents. Here we also create a name for
+  // the new shader node.
   do
     let p = [ Utils.cleanName (base.InstanceGuid.ToString()+"_"+nickname) ] |> Seq.map (fun x -> x :> obj) |> Seq.toArray
     let t = Utils.castAs<ShaderNode>( Activator.CreateInstance( ntype, p ) )
     intNode <- t
     base.PostConstructor()
 
+  // override constructor, because we want to ensure we can
+  // hook into the construction process before it ends.
+  // calling the base PostConstructor in our construction
+  // section
   override u.PostConstructor() = u |> ignore; ()
 
+  /// Shader node instance this CyclesNode encompasses
   member u.ShaderNode =  u |> ignore; intNode
 
+  (*
   abstract member XmlNodeName : unit -> string
   default u.XmlNodeName() =
     u.XmlTag() + "_" + u.InstanceGuid.ToString()
@@ -234,8 +247,9 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
       a.Name
     let t = u.ShaderNode.GetType()
     (t.GetCustomAttributes(typeof<ShaderNodeAttribute>, false) |> Seq.map getName).FirstOrDefault()
+  *)
 
-  // some empty overrides to silence compiler
+  /// Iterate over the ShaderNode inputs and register them with the GH component
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     match u.ShaderNode.inputs with
     | null -> ()
@@ -259,6 +273,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
         | _ ->
           failwith "unknown socket type"
 
+  /// If ShaderNode has outputs register them here
   override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
     match u.ShaderNode.outputs with
     | null -> ()
@@ -282,6 +297,9 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
         | _ ->
           failwith "unknown socket type"
 
+  /// Iterate over inputs and outputs and read / set data.
+  /// For input sockets we find the input nodes and connect
+  /// from the corresponding output sockets on the ShaderNode
   override u.SolveInstance(DA: IGH_DataAccess) =
     let setdata (i:int) (s:ccl.ShaderNodes.Sockets.SocketBase) =
       match s with
@@ -329,35 +347,38 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
         failwith "unknown socket type"
 
     let iterSources (idx:int) (item:IGH_Param) =
-      let tosocket = u.ShaderNode.inputs.[idx]
-      tosocket.ClearConnections()
-      match item.SourceCount > 0 with
+      match idx < u.ShaderNode.inputs.Sockets.Count() with
       | false -> ()
       | true ->
-        let isource = item.Sources.[0]
-        match isource.Attributes.Parent with
-        | null ->
-          match isource with
-          | ( :? GH_Param<GH_Number> | :? GH_Param<GH_Colour>) as param->
-            if param.NickName.Contains(".") then tosocket.SetValueCode <- param.NickName
-          | _ -> ()
-          ()
-        | _ ->
-          match isource.Attributes.Parent.DocObject with
-          | :? CyclesNode as cn -> 
-            let gh = cn :> GH_Component
-            let sidx = gh.Params.Output.FindIndex(fun p -> isource.InstanceGuid=p.InstanceGuid)
-            match sidx > -1 with
-            | false -> ()
-            | true ->
-              let fromsock = cn.ShaderNode.outputs.[sidx]
-              fromsock.Connect(tosocket)
-          | :? GH_Component as gh ->
-            match gh.NickName.Contains(".") with
-            | true ->
-              tosocket.SetValueCode <- gh.NickName
-            | false -> ()
-          | _ -> ()
+        let tosocket = u.ShaderNode.inputs.[idx]
+        tosocket.ClearConnections()
+        match item.SourceCount > 0 with
+        | false -> ()
+        | true ->
+          let isource = item.Sources.[0]
+          match isource.Attributes.Parent with
+          | null ->
+            match isource with
+            | ( :? GH_Param<GH_Number> | :? GH_Param<GH_Colour>) as param->
+              if param.NickName.Contains(".") then tosocket.SetValueCode <- param.NickName
+            | _ -> ()
+            ()
+          | _ ->
+            match isource.Attributes.Parent.DocObject with
+            | :? CyclesNode as cn -> 
+              let gh = cn :> GH_Component
+              let sidx = gh.Params.Output.FindIndex(fun p -> isource.InstanceGuid=p.InstanceGuid)
+              match sidx > -1 with
+              | false -> ()
+              | true ->
+                let fromsock = cn.ShaderNode.outputs.[sidx]
+                fromsock.Connect(tosocket)
+            | :? GH_Component as gh ->
+              match gh.NickName.Contains(".") with
+              | true ->
+                tosocket.SetValueCode <- gh.NickName
+              | false -> ()
+            | _ -> ()
 
     let iterRecipients (idx:int) (item:IGH_Param) =
       String.Format("{0}:{1} ({2})", idx, item.Name, item.Recipients.Count)
@@ -491,24 +512,11 @@ type OutputNode() =
 
     u.Message <- ""
 
-    let doc = u.OnPingDocument()
-
-    let booleanToggle (o:obj) =
-      match o with
-      | :? GH_BooleanToggle as bt -> bt.Value
-      | _ -> false
-
-    let csharp (o:IGH_DocumentObject) = o.NickName="C#" && booleanToggle o
-
-    let findCsharp = doc.Objects |> Seq.map csharp
-    let doCsharp = findCsharp |> Seq.fold (fun a x -> a || x) false
-
     let getSource i (p:IGH_Param) =
       match i < p.SourceCount with
       | true -> p.Sources.[i]
       | false -> p.Sources.LastOrDefault()
 
-    let content l = not (String.IsNullOrEmpty l || String.IsNullOrWhiteSpace l)
     let cleancontent (l:string) = l.Trim()
     let linebreaks (l:string) = l.Replace(";", ";\n")
 
@@ -563,54 +571,16 @@ type OutputNode() =
 
     let rr = usednodes |> List.iter addtoshader
     rr |> ignore
-    let xx = theshader.FinalizeGraph()
-    xx |> ignore
+    theshader.FinalizeGraph() |> ignore
 
-
-    let getXmlTag(comp:obj) =
-      match comp with
-      | :? CyclesNode as cn -> cn.ShaderNode.CreateXml()
-      | _ -> ""
-      |> cleancontent
-
-    let getConnectXmlTag(comp:obj) =
-      match comp with
-      | :? CyclesNode as cn -> cn.ShaderNode.CreateConnectXml()
-      | _ -> ""
-      |> cleancontent
-
-    let getCodeTag(comp:obj) =
-      match comp with
-      | :? CyclesNode as cn -> cn.ShaderNode.CreateCode()
-      | _ -> ""
-      |> cleancontent
-      |> linebreaks
-
-    let getConnectCodeTag(comp:obj) =
-      match comp with
-      | :? CyclesNode as cn -> cn.ShaderNode.CreateConnectCode()
-      | _ -> ""
-      |> cleancontent
-      |> linebreaks
-    
-    let comptags = usednodes |> List.map getXmlTag |> List.filter (String.IsNullOrEmpty >> not)
-    let conntags = usednodes |> List.map getConnectXmlTag |> List.filter (String.IsNullOrEmpty >> not)
-
-    let compcode = usednodes |> List.map getCodeTag |> List.filter (String.IsNullOrEmpty >> not)
-    let conncode = usednodes |> List.map getConnectCodeTag |> List.filter (String.IsNullOrEmpty >> not)
-
-    let nodetagsxml = String.Join("\n", comptags) + "\n<!-- @@@@@@@@@@@ -->\n"
-    let connecttagsxml = String.Join("\n", conntags) + "\n" + u.ShaderNode.CreateConnectXml() + "\n<!-- XXXXXXXX -->\n\n"
-
+    let newxmlcode =
+      theshader.Xml + u.ShaderNode.CreateConnectXml()
     let csharpcode =
       theshader.Code + u.ShaderNode.CreateConnectCode()
       |> cleancontent
       |> linebreaks
 
-    (* let nodetagscode = String.Join("\n", compcode) + "\n/******************/\n"
-    let connecttagscode = String.Join("\n", conncode) + "\n" + u.ShaderNode.CreateConnectCode() + "\n/*************/\n\n" *)
-
-    let xmlcode = nodetagsxml + connecttagsxml + "<!--\n" + csharpcode  + "\n-->"
+    let xmlcode = newxmlcode + "<!--\n" + csharpcode  + "\n-->"
 
     match u.IsBackground with
     | true ->
