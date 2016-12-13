@@ -588,7 +588,7 @@ type OutputNode() =
       match env with
       | null -> u.Message <- "NO BG"
       | _ ->
-        env.SetParameter("xml", xmlcode) |> ignore
+        env.SetParameter("xmlcode", xmlcode) |> ignore
         Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
       ()
     | false ->
@@ -607,7 +607,7 @@ type OutputNode() =
       | _ ->
         let m' = m :?> XmlMaterial
         m'.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
-        m'.SetParameter("xml", xmlcode) |> ignore
+        m'.SetParameter("xmlcode", xmlcode) |> ignore
         m'.EndChange()
         match matId.Count > 1 with
         | true -> u.Message <- "multiple materials set"
