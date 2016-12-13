@@ -576,7 +576,7 @@ type OutputNode() =
     | true ->
       let mutable env = Utils.castAs<XmlEnvironment>(Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground)
       match env with
-      | null -> u.Message <- "NO BG"
+      | null -> u.Message <- "NO BACKGROUND"
       | _ ->
         env.SetParameter("xmlcode", xmlcode) |> ignore
         Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
