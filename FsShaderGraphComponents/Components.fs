@@ -221,7 +221,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
   // CyclesNode instance represents. Here we also create a name for
   // the new shader node.
   do
-    let p = [ Utils.cleanName (base.InstanceGuid.ToString()+"_"+nickname) ] |> Seq.map (fun x -> x :> obj) |> Seq.toArray
+    let p = [ Utils.cleanName nickname ] |> Seq.map (fun x -> x :> obj) |> Seq.toArray
     let t = Utils.castAs<ShaderNode>( Activator.CreateInstance( ntype, p ) )
     intNode <- t
     base.PostConstructor()
@@ -234,20 +234,6 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
 
   /// Shader node instance this CyclesNode encompasses
   member u.ShaderNode =  u |> ignore; intNode
-
-  (*
-  abstract member XmlNodeName : unit -> string
-  default u.XmlNodeName() =
-    u.XmlTag() + "_" + u.InstanceGuid.ToString()
-
-  abstract member XmlTag : unit -> string
-  default u.XmlTag() =
-    let getName (attr:obj) =
-      let a = attr :?> ShaderNodeAttribute
-      a.Name
-    let t = u.ShaderNode.GetType()
-    (t.GetCustomAttributes(typeof<ShaderNodeAttribute>, false) |> Seq.map getName).FirstOrDefault()
-  *)
 
   /// Iterate over the ShaderNode inputs and register them with the GH component
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
@@ -301,6 +287,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
   /// For input sockets we find the input nodes and connect
   /// from the corresponding output sockets on the ShaderNode
   override u.SolveInstance(DA: IGH_DataAccess) =
+    u.ShaderNode.Name <- Utils.cleanName u.NickName
     let setdata (i:int) (s:ccl.ShaderNodes.Sockets.SocketBase) =
       match s with
       | :? ccl.ShaderNodes.Sockets.ClosureSocket ->
@@ -517,8 +504,9 @@ type OutputNode() =
       | true -> p.Sources.[i]
       | false -> p.Sources.LastOrDefault()
 
-    let cleancontent (l:string) = l.Trim()
+    let cleancontent (l:string) = l.Trim().Replace("\n", "")
     let linebreaks (l:string) = l.Replace(";", ";\n")
+    let xmllinebreaks (l:string) = l.Replace(">", ">\n")
 
 
     let usedNodes (n:GH_Component) (iteration:int) =
@@ -575,6 +563,8 @@ type OutputNode() =
 
     let newxmlcode =
       theshader.Xml + u.ShaderNode.CreateConnectXml()
+      |> cleancontent
+      |> xmllinebreaks
     let csharpcode =
       theshader.Code + u.ShaderNode.CreateConnectCode()
       |> cleancontent
