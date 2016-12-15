@@ -41,3 +41,39 @@ type ColorToLuminanceNode() =
 
   override u.ComponentGuid = u |> ignore; new Guid("677f0004-2f9a-48da-897e-1deae4552b4f")
   override u.Icon = u |> ignore; Icons.Blend
+
+type ColorToBwNode() =
+  inherit CyclesNode(
+    "Color2Bw",
+    "color -> bw",
+    "Convert input color to gray scale value", "Shader", "Converter", typeof<ccl.ShaderNodes.RgbToBwNode>)
+
+  override u.ComponentGuid = u |> ignore; new Guid("fb96081c-3353-4215-b182-ec548d96d0fb")
+  override u.Icon = u |> ignore; Icons.Blend
+
+type SeparateRgbNode() =
+  inherit CyclesNode(
+    "Separate RGB",
+    "Separate RGB",
+    "Separate color into its constituent RGB values", "Shader", "Converter", typeof<ccl.ShaderNodes.SeparateRgbNode>)
+
+  override u.ComponentGuid = u |> ignore; new Guid("ac4dadca-1474-4261-9cfb-927a47bd1a4e")
+  override u.Icon = u |> ignore; Icons.Blend
+
+type SeparateXyzNode() =
+  inherit CyclesNode(
+    "Separate XYZ",
+    "Separate XYZ",
+    "Separate color into its constituent XYZ values", "Shader", "Converter", typeof<ccl.ShaderNodes.SeparateXyzNode>)
+
+  override u.ComponentGuid = u |> ignore; new Guid("0b3116da-5dce-47a9-a457-5ac6891b5322")
+  override u.Icon = u |> ignore; Icons.Blend
+
+type SeparateHsvNode() =
+  inherit CyclesNode(
+    "Separate HSV",
+    "Separate HSV",
+    "Separate color into its constituent HSV values", "Shader", "Converter", typeof<ccl.ShaderNodes.SeparateHsvNode>)
+
+  override u.ComponentGuid = u |> ignore; new Guid("b3eafc03-89d4-4797-bf0d-132ec2d43567")
+  override u.Icon = u |> ignore; Icons.Blend
