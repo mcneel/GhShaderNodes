@@ -159,9 +159,9 @@ type ImageTextureNode() =
     base.Read(reader)
 
   override u.SolveInstance(DA: IGH_DataAccess) =
+    base.SolveInstance(DA)
     u.Message <- System.IO.Path.GetFileName(u.ImageFile)
     (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Filename <- u.ImageFile
-    base.SolveInstance(DA)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
     let appendInterpolationMenu (gt:Interpolation) =
@@ -261,9 +261,9 @@ type EnvironmentTextureNode() =
     base.Read(reader)
 
   override u.SolveInstance(DA: IGH_DataAccess) =
+    base.SolveInstance(DA)
     u.Message <- System.IO.Path.GetFileName(u.EnvironmentFile)
     (u.ShaderNode :?> ccl.ShaderNodes.EnvironmentTextureNode).Filename <- u.EnvironmentFile
-    base.SolveInstance(DA)
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
     let appendInterpolationMenu (gt:Interpolation) =
