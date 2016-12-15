@@ -53,7 +53,6 @@ type MixRgbNode() =
 
   override u.SolveInstance(DA: IGH_DataAccess) =
     base.SolveInstance DA
-    u.NickName <- u.Blend.ToString().Replace("_", " ")
     u.Message <- u.Blend.ToString().Replace("_", " ")
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
@@ -65,6 +64,8 @@ type MixRgbNode() =
       u.Blend <-
         let (d, bt) = Enum.TryParse(reader.GetString "Blend")
         match d with | false -> ccl.ShaderNodes.MixNode.BlendTypes.Mix | _ -> bt
+      let mn = u.ShaderNode :?> ccl.ShaderNodes.MixNode
+      mn.BlendType <- u.Blend
     base.Read(reader)
 
 type ColorRampNode() =
