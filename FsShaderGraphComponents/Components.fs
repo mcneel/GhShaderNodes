@@ -561,6 +561,16 @@ type OutputNode() =
     rr |> ignore
     theshader.FinalizeGraph() |> ignore
 
+    let isBackgroundShader =
+      let isBackgroundNode (o:obj) = 
+        match o with
+        | :? CyclesNode as n ->
+          n.ComponentGuid.Equals(new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32"))
+        | _ -> false
+      match List.tryFind isBackgroundNode usednodes with
+      | Option.None -> false
+      | _ -> true
+
     let newxmlcode =
       theshader.Xml + u.ShaderNode.CreateConnectXml()
       |> cleancontent
@@ -572,7 +582,7 @@ type OutputNode() =
 
     let xmlcode = newxmlcode + "<!--\n" + csharpcode  + "\n-->"
 
-    match u.IsBackground with
+    match isBackgroundShader with
     | true ->
       let mutable env = Utils.castAs<XmlEnvironment>(Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground)
       match env with
