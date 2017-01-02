@@ -162,6 +162,38 @@ type ImageTextureNode() =
     base.SolveInstance(DA)
     u.Message <- System.IO.Path.GetFileName(u.ImageFile)
     (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Filename <- u.ImageFile
+    match u.TextureExtension with
+    | TextureExtension.Clip ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Extension <- ccl.ShaderNodes.TextureNode.TextureExtension.Clip
+    | TextureExtension.Repeat ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Extension <- ccl.ShaderNodes.TextureNode.TextureExtension.Repeat
+    | TextureExtension.Extend ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Extension <- ccl.ShaderNodes.TextureNode.TextureExtension.Extend
+    match u.ColorSpace with
+    | ColorSpace.Color ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).ColorSpace <- ccl.ShaderNodes.TextureNode.TextureColorSpace.Color
+    | ColorSpace.None ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).ColorSpace <- ccl.ShaderNodes.TextureNode.TextureColorSpace.None
+    match u.Interpolation with
+    | Interpolation.Closest ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Interpolation <- ccl.InterpolationType.Closest
+    | Interpolation.Cubic ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Interpolation <- ccl.InterpolationType.Cubic
+    | Interpolation.Linear ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Interpolation <- ccl.InterpolationType.Linear
+    | Interpolation.None ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Interpolation <- ccl.InterpolationType.None
+    | Interpolation.Smart ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Interpolation <- ccl.InterpolationType.Smart
+    match u.Projection with
+    | TextureProjection.Box ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Projection <- ccl.ShaderNodes.TextureNode.TextureProjection.Box
+    | TextureProjection.Flat ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Projection <- ccl.ShaderNodes.TextureNode.TextureProjection.Flat
+    | TextureProjection.Tube ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Projection <- ccl.ShaderNodes.TextureNode.TextureProjection.Tube
+    | TextureProjection.Sphere ->
+      (u.ShaderNode :?> ccl.ShaderNodes.ImageTextureNode).Projection <- ccl.ShaderNodes.TextureNode.TextureProjection.Sphere
 
   override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
     let appendInterpolationMenu (gt:Interpolation) =
