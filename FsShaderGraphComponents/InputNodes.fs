@@ -59,3 +59,12 @@ type FresnelNode() =
     typeof<ccl.ShaderNodes.FresnelNode>)
   override u.ComponentGuid = u |> ignore; new Guid("b9cca29d-2c77-42cd-a99d-70eb880c02ac")
   override u.Icon = u |> ignore; Icons.Emission
+
+type CameraDataNode() =
+  inherit CyclesNode(
+    "Camera Data", "camera info",
+    "Camera Data",
+    "Shader", "Input",
+    typeof<ccl.ShaderNodes.CameraDataNode>)
+  override u.ComponentGuid = u |> ignore; new Guid("8b3ea49e-6d18-4f8d-ab41-65bd0cfd94b9")
+  override u.Icon = u |> ignore; Icons.Emission
