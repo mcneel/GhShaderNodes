@@ -288,7 +288,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
   /// from the corresponding output sockets on the ShaderNode
   override u.SolveInstance(DA: IGH_DataAccess) =
     u.ShaderNode.Name <- Utils.cleanName u.NickName
-    let setdata (i:int) (s:ccl.ShaderNodes.Sockets.SocketBase) =
+    let setdata (i:int) (s:ccl.ShaderNodes.Sockets.ISocket) =
       match s with
       | :? ccl.ShaderNodes.Sockets.ClosureSocket ->
         DA.SetData(i, Color.Gray) |> ignore
@@ -307,7 +307,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
       | _ ->
         failwith "unknown socket type"
 
-    let getdata (i:int) (s:ccl.ShaderNodes.Sockets.SocketBase) =
+    let getdata (i:int) (s:ccl.ShaderNodes.Sockets.ISocket) =
       match s with
       | :? ccl.ShaderNodes.Sockets.ClosureSocket as closure ->
         let col = Utils.readColor (u, DA, i, "couldn't read closure")
@@ -377,7 +377,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
 
     let inputParameters =
       u.ShaderNode.inputs.Sockets 
-      |> Seq.cast<ccl.ShaderNodes.Sockets.SocketBase>
+      |> Seq.cast<ccl.ShaderNodes.Sockets.ISocket>
 
     inputParameters
     |> Seq.mapi getdata
@@ -385,7 +385,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
 
     let outputParameters =
       u.ShaderNode.outputs.Sockets 
-      |> Seq.cast<ccl.ShaderNodes.Sockets.SocketBase>
+      |> Seq.cast<ccl.ShaderNodes.Sockets.ISocket>
 
     outputParameters
     |> Seq.mapi setdata
