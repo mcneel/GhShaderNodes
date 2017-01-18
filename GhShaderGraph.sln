@@ -12,19 +12,31 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		DebugRhinoWIP|Any CPU = DebugRhinoWIP|Any CPU
 		Release|Any CPU = Release|Any CPU
+		ReleaseRhinoWIP|Any CPU = ReleaseRhinoWIP|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C98C53E7-E900-49CE-B730-C70495BCB18D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C98C53E7-E900-49CE-B730-C70495BCB18D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C98C53E7-E900-49CE-B730-C70495BCB18D}.DebugRhinoWIP|Any CPU.ActiveCfg = DebugRhinoWIP|Any CPU
+		{C98C53E7-E900-49CE-B730-C70495BCB18D}.DebugRhinoWIP|Any CPU.Build.0 = DebugRhinoWIP|Any CPU
 		{C98C53E7-E900-49CE-B730-C70495BCB18D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C98C53E7-E900-49CE-B730-C70495BCB18D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C98C53E7-E900-49CE-B730-C70495BCB18D}.ReleaseRhinoWIP|Any CPU.ActiveCfg = ReleaseRhinoWIP|Any CPU
+		{C98C53E7-E900-49CE-B730-C70495BCB18D}.ReleaseRhinoWIP|Any CPU.Build.0 = ReleaseRhinoWIP|Any CPU
 		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.DebugRhinoWIP|Any CPU.ActiveCfg = DebugRhinoWIP|Any CPU
+		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.DebugRhinoWIP|Any CPU.Build.0 = DebugRhinoWIP|Any CPU
 		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.ReleaseRhinoWIP|Any CPU.ActiveCfg = ReleaseRhinoWIP|Any CPU
+		{620E9896-6AA5-48AC-BC99-5312F52DC3EC}.ReleaseRhinoWIP|Any CPU.Build.0 = ReleaseRhinoWIP|Any CPU
 		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.DebugRhinoWIP|Any CPU.ActiveCfg = DebugRhinoWIP|Any CPU
 		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{351AF81F-39A5-4BD1-B0F7-BD915623A91B}.ReleaseRhinoWIP|Any CPU.ActiveCfg = ReleaseRhinoWIP|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

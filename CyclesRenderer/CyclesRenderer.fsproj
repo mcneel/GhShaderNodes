@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <OutputPath>..\..\Rhino\rhino\src4\bin\Release\Plug-ins\Grasshopper\Components\</OutputPath>
     <Name>CyclesRenderer</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,31 +35,56 @@
     <DocumentationFile>bin\Release\CyclesRenderer.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="csycles">
-      <HintPath>..\..\Rhino\rhino\src4\bin\Release\Plug-ins\csycles.dll</HintPath>
-    </Reference>
-    <Reference Include="GH_IO">
-      <HintPath>..\..\Rhino\rhino\src4\bin\Release\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="csycles">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\csycles.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="GH_Util">
-      <HintPath>..\..\Rhino\rhino\src4\bin\Release\Plug-ins\Grasshopper\GH_Util.dll</HintPath>
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' " Include="csycles">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\csycles.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Grasshopper">
-      <HintPath>..\..\Rhino\rhino\src4\bin\Release\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="GH_IO">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' " Include="GH_IO">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\Grasshopper\GH_IO.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="GH_Util">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\Grasshopper\GH_Util.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' " Include="GH_Util">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\Grasshopper\GH_Util.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="Grasshopper">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' " Include="Grasshopper">
+      <HintPath>C:\Program Files\Rhino WIP\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rhino.UI">
-      <HintPath>..\..\Rhino\rhino\src4\bin\Release\Rhino.UI.dll</HintPath>
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="Rhino.UI">
+      <HintPath>C:\Program Files\Rhino WIP\System\Rhino.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RhinoCommon">
-      <HintPath>..\..\Rhino\rhino\src4\bin\Release\RhinoCommon.dll</HintPath>
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' " Include="Rhino.UI">
+      <HintPath>C:\Program Files\Rhino WIP\System\Rhino.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' "  Include="RhinoCommon">
+      <HintPath>C:\Program Files\Rhino WIP\System\RhinoCommon.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' "  Include="RhinoCommon">
+      <HintPath>C:\Program Files\Rhino WIP\System\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -97,6 +123,24 @@
   <Import Project="$(FSharpTargetsPath)" />
   <PropertyGroup>
     <PostBuildEvent>move /y $(TargetPath) $(TargetDir)$(TargetName).gha</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'ReleaseRhinoWIP|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\Release\CyclesRenderer.XML</DocumentationFile>
+    <OutputPath>bin\ReleaseRhinoWIP\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugRhinoWIP|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\Release\CyclesRenderer.XML</DocumentationFile>
+    <OutputPath>bin\DebugRhinoWIP\</OutputPath>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
