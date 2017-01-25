@@ -60,12 +60,6 @@ type MathBaseNode(openum, category, subcategory, outputdescription, op) =
     let handler _ _ = u.UseClamp <- not u.UseClamp; u.ExpireSolution true
     GH_DocumentObject.Menu_AppendItem(menu, "Use Clamp", handler, true, u.UseClamp) |> ignore
 
-  (*interface ICyclesNode with
-    member u.NodeName = "math"
-    member u.GetXml node nickname inputs iteration =
-      let x = Utils.GetInputsXml (inputs, iteration)
-      "<" + Utils.GetNodeXml node nickname (x + String.Format(" type=\"{0}\"", u.Name)) + " />"*)
-
 type MathAdd() =
   inherit MathBaseNode(MathNode.Operations.Add, "Shader", "Math", "Value1+Value2", (+))
   override u.ComponentGuid = u |> ignore; new Guid("ec3b4eb3-7cd5-43c8-8ef7-deb2200df882")
