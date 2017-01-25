@@ -104,6 +104,13 @@ type RefractionBsdf() =
   override u.Icon = u |> ignore; Icons.Glossy
   override u.SolveInstance(DA: IGH_DataAccess) =
     u.Message <- u.Distribution.ToString
+    match u.Distribution with
+    | Distribution.Sharp -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.RefractionBsdfNode).Distribution <- ccl.ShaderNodes.RefractionBsdfNode.RefractionDistribution.Sharp
+    | Distribution.Beckmann -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.RefractionBsdfNode).Distribution <- ccl.ShaderNodes.RefractionBsdfNode.RefractionDistribution.Beckmann
+    | _ -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.RefractionBsdfNode).Distribution <- ccl.ShaderNodes.RefractionBsdfNode.RefractionDistribution.GGX
     base.SolveInstance(DA)
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
     writer.SetString("Distribution", u.Distribution.ToString) |> ignore
@@ -132,6 +139,15 @@ type GlassBsdf() =
   override u.ComponentGuid = u |> ignore; new Guid("4db00f7b-fa70-4130-813d-a9f7cd193795")
   override u.Icon = u |> ignore; Icons.Glossy
   override u.SolveInstance(DA: IGH_DataAccess) =
+    match u.Distribution with
+    | Distribution.Sharp -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.GlassBsdfNode).Distribution <- ccl.ShaderNodes.GlassBsdfNode.GlassDistribution.Sharp
+    | Distribution.Beckmann -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.GlassBsdfNode).Distribution <- ccl.ShaderNodes.GlassBsdfNode.GlassDistribution.Beckmann
+    | Distribution.GGX -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.GlassBsdfNode).Distribution <- ccl.ShaderNodes.GlassBsdfNode.GlassDistribution.GGX
+    | _ ->
+      (u.ShaderNode :?> ccl.ShaderNodes.GlassBsdfNode).Distribution <- ccl.ShaderNodes.GlassBsdfNode.GlassDistribution.Multiscatter_GGX
     u.Message <- u.Distribution.ToStringR
     base.SolveInstance(DA)
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
@@ -164,6 +180,17 @@ type GlossyBsdf() =
   override u.Icon = u |> ignore; Icons.Glossy
   override u.SolveInstance(DA: IGH_DataAccess) =
     u.Message <- u.Distribution.ToStringR
+    match u.Distribution with
+    | Distribution.Sharp -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.GlossyBsdfNode).Distribution <- ccl.ShaderNodes.GlossyBsdfNode.GlossyDistribution.Sharp
+    | Distribution.Beckmann -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.GlossyBsdfNode).Distribution <- ccl.ShaderNodes.GlossyBsdfNode.GlossyDistribution.Beckmann
+    | Distribution.GGX -> 
+      (u.ShaderNode :?> ccl.ShaderNodes.GlossyBsdfNode).Distribution <- ccl.ShaderNodes.GlossyBsdfNode.GlossyDistribution.GGX
+    | Distribution.Multiscatter_GGX ->
+      (u.ShaderNode :?> ccl.ShaderNodes.GlossyBsdfNode).Distribution <- ccl.ShaderNodes.GlossyBsdfNode.GlossyDistribution.Multiscatter_GGX
+    | Distribution.Ashihkmin_Shirley ->
+      (u.ShaderNode :?> ccl.ShaderNodes.GlossyBsdfNode).Distribution <- ccl.ShaderNodes.GlossyBsdfNode.GlossyDistribution.Asihkmin_Shirley
     base.SolveInstance(DA)
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
     writer.SetString("Distribution", u.Distribution.ToString) |> ignore
