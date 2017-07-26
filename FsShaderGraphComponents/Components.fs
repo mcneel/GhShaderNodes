@@ -588,7 +588,9 @@ type OutputNode() =
       match env with
       | null -> u.Message <- "NO BACKGROUND"
       | _ ->
+        env.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
         env.SetParameter("xmlcode", xmlcode) |> ignore
+        env.EndChange()
         Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
       ()
     | false ->
