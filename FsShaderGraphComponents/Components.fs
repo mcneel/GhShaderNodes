@@ -439,7 +439,7 @@ type OutputNode() =
     "Shader", "Output",
     typeof<ccl.ShaderNodes.OutputNode>)
 
-  let mutable matId = ResizeArray<Guid>()
+  let matId = ResizeArray<Guid>()
 
   override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
     u |> ignore
@@ -584,7 +584,7 @@ type OutputNode() =
 
     match isBackgroundShader with
     | true ->
-      let mutable env = Utils.castAs<XmlEnvironment>(Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground)
+      let env = Utils.castAs<XmlEnvironment>(Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground)
       match env with
       | null -> u.Message <- "NO BACKGROUND"
       | _ ->
@@ -594,7 +594,7 @@ type OutputNode() =
         Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
       ()
     | false ->
-      let mutable m = 
+      let m = 
         match matId.Count with
         | 0 -> null
         | _ ->
