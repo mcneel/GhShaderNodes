@@ -3,7 +3,6 @@
 open FsShaderGraphComponents
 
 open System
-open System.Windows.Forms
 
 open Grasshopper.Kernel
 

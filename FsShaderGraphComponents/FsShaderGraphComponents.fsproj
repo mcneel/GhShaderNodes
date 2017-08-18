@@ -130,6 +130,7 @@
       <HintPath>C:\Program Files\Rhino WIP\Plug-ins\Grasshopper\Grasshopper.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
@@ -142,19 +143,19 @@
       <HintPath>C:\Program Files\Rhino WIP\System\Rhino.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' "  Include="RhinoCommon">
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="RhinoCommon">
       <HintPath>D:\Dev\Rhino\rhino\src4\bin\Release\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' "  Include="RhinoCommon">
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' " Include="RhinoCommon">
       <HintPath>C:\Program Files\Rhino WIP\System\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' "  Include="RhinoCyclesCore">
+    <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="RhinoCyclesCore">
       <HintPath>D:\Dev\Rhino\rhino\src4\bin\Release\Plug-ins\RhinoCyclesCore.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' "  Include="RhinoCyclesCore">
+    <Reference Condition=" '$(Configuration)' == 'ReleaseRhinoWIP' Or  '$(Configuration)' == 'DebugRhinoWIP' " Include="RhinoCyclesCore">
       <HintPath>C:\Program Files\Rhino WIP\Plug-ins\RhinoCyclesCore.dll</HintPath>
       <Private>False</Private>
     </Reference>

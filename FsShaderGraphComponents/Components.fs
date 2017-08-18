@@ -3,19 +3,20 @@
 open Microsoft.FSharp.Reflection
 
 open System
+open System.CodeDom
 open System.Collections.Generic
 open System.Linq
 open System.Drawing
 open System.Windows.Forms
 open System.Text.RegularExpressions
 
+open Grasshopper
 open Grasshopper.Kernel
 open Grasshopper.Kernel.Attributes
 open Grasshopper.Kernel.Types
 open Grasshopper.Kernel.Special
 
 open ccl.ShaderNodes
-open ccl.Attributes
 
 open Rhino.Geometry
 
@@ -23,37 +24,6 @@ open RhinoCyclesCore.Materials
 
 open ShaderGraphResources
 open RhinoCyclesCore.Environments
-
-/// type that signals Grasshopper to continue loading. Here we
-/// do necessary initialisation
-type Priority() = 
-    inherit GH_AssemblyPriority()
-    override u.PriorityLoad() =
-      u |> ignore
-      GH_LoadingInstruction.Proceed
-
-/// Grasshopper plug-in assembly information.
-type Info() =
-    inherit GH_AssemblyInfo()
-
-    override u.Name =
-      u |> ignore
-      "Shader Nodes"
-    override u.Description =
-      u |> ignore
-      "Create shader graphs for Cycles for Rhino"
-    override u.Id =
-      u |> ignore
-      new Guid("6a051e83-3727-465e-b5ef-74d027a6f73b")
-    override u.Icon =
-      u |> ignore
-      Icons.ShaderGraph
-    override u.AuthorName =
-      u |> ignore
-      "Nathan 'jesterKing' Letwory"
-    override u.AuthorContact = 
-      u |> ignore
-      "nathan@mcneel.com"
 
 // ---------------------------------------
 /// Simple color representation with ints (R, G, B)
@@ -89,6 +59,9 @@ module Utils =
   let Arcsine a b = b |> ignore; asin a
   let Arccosine a b = b|> ignore; acos a
   let Arctangent a b = b|> ignore; atan a
+  let Round a b = b|> ignore; round a
+  let Modulo a b = b |> ignore; a
+  let Absolute a b = b |> ignore; if a < 0.0 then -a else a
 
   /// Give first (R) component of triplet (IntColor)
   let R (r:int, _:int, _:int) = r
@@ -210,8 +183,68 @@ module Utils =
 
   let cleanName (nn:string) =
     nn.Replace(" ", "_").Replace("-", "_").Replace(">", "").ToLowerInvariant()
+  
+  let node_componentmapping = new Dictionary<Type, Guid>()
 
-type CyclesNode(name, nickname, description, category, subcategory, nodetype : Type) =
+/// type that signals Grasshopper to continue loading. Here we
+/// do necessary initialisation
+type Priority() = 
+    inherit GH_AssemblyPriority()
+    override u.PriorityLoad() =
+      u |> ignore
+      GH_LoadingInstruction.Proceed
+
+/// Grasshopper plug-in assembly information.
+and Info() as it =
+    inherit GH_AssemblyInfo()
+    let loaded = Instances.ComponentServer.GHAFileLoaded
+
+    let cb (x:GH_GHALoadingEventArgs) =
+      if x.Id.Equals(it.Id) then
+        printfn "Match: %A %A" System.DateTime.Now x
+        printfn "%A" x.FileName
+        x.Assembly.ExportedTypes
+        |> Seq.filter (
+            fun et ->
+                try
+                  let i = Activator.CreateInstance(et) :?> CyclesNode
+                  true
+                with
+                  | x -> false
+          )
+        |> Seq.map (fun t ->
+                      
+                      let i = Activator.CreateInstance(t) :?> CyclesNode
+                      i.ShaderNode.GetType(), i.ComponentGuid
+                    )
+        |> Seq.iter (fun (k, v) ->
+                      Utils.node_componentmapping.Add(k, v)
+                      printfn "mapped n %A guid %A" k v)
+
+    do
+      loaded |> Observable.subscribe cb |> ignore
+
+    override u.Name =
+      u |> ignore
+      "Shader Nodes"
+    override u.Description =
+      u |> ignore
+      "Create shader graphs for Cycles for Rhino"
+    override u.Id =
+      u |> ignore
+      new Guid("6a051e83-3727-465e-b5ef-74d027a6f73b")
+    override u.Icon =
+      u |> ignore
+      Icons.ShaderGraph
+    override u.AuthorName =
+      u |> ignore
+      "Nathan 'jesterKing' Letwory"
+    override u.AuthorContact = 
+      u |> ignore
+      "nathan@mcneel.com"
+
+
+and CyclesNode(name, nickname, description, category, subcategory, nodetype : Type) =
   inherit GH_Component (name, nickname, description, category, subcategory)
 
   let ntype : Type = nodetype
@@ -233,7 +266,7 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
   override u.PostConstructor() = u |> ignore; ()
 
   /// Shader node instance this CyclesNode encompasses
-  member u.ShaderNode =  u |> ignore; intNode
+  member u.ShaderNode : ShaderNode =  u |> ignore; intNode
 
   /// Iterate over the ShaderNode inputs and register them with the GH component
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
@@ -395,44 +428,44 @@ type CyclesNode(name, nickname, description, category, subcategory, nodetype : T
   override u.Icon = u|> ignore; Icons.Blend
 
 
-type Interpolation = None | Linear | Closest | Cubic | Smart with
+and Interpolation = None | Linear | Closest | Cubic | Smart with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", "-")
   static member FromString s = Utils.fromString<Interpolation> s
 
-type EnvironmentProjection = Equirectangular | Mirror_Ball | Wallpaper with
+and EnvironmentProjection = Equirectangular | Mirror_Ball | Wallpaper with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", " ")
   static member FromString s = Utils.fromString<EnvironmentProjection> ((s:string).Replace(" ", "_"))
 
-type TextureProjection = Flat | Box | Sphere | Tube with
+and TextureProjection = Flat | Box | Sphere | Tube with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", "-")
   static member FromString s = Utils.fromString<TextureProjection> s
 
-type TextureExtension = Repeat | Extend | Clip with
+and TextureExtension = Repeat | Extend | Clip with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", "-")
   static member FromString s = Utils.fromString<TextureExtension> s
 
-type ColorSpace = None | Color with
+and ColorSpace = None | Color with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", "-")
   static member FromString s = Utils.fromString<ColorSpace> s
 
 /// Distributions used in several nodes: Glass, Glossy, Refraction
-type Distribution = Sharp | Beckmann | GGX | Ashihkmin_Shirley | Multiscatter_GGX with
+and Distribution = Sharp | Beckmann | GGX | Ashihkmin_Shirley | Multiscatter_GGX with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", "-")
   static member FromString s = Utils.fromString<Distribution> s
 
-type Falloff = Cubic | Gaussian | Burley with
+and Falloff = Cubic | Gaussian | Burley with
   member u.ToString = Utils.toString u
   static member FromString s = Utils.fromString<Falloff> s
 
 /// The output node for the shader system. This node is responsible for
 /// driving the XML generation of a shader graph.
-type OutputNode() =
+and OutputNode() =
   inherit CyclesNode(
     "Output", "output",
     "Output node for shader graph",
@@ -619,3 +652,148 @@ type OutputNode() =
           mm.CommitChanges() |> ignore
 
     da.SetData(0, xmlcode ) |> ignore
+
+and ReverseGraph() =
+  inherit GH_Component("Reverser", "reverser", "Create graph from shader", "Shader", "Utilities")
+
+  override u.ComponentGuid =
+    u |> ignore
+    new Guid("c832908b-1742-4d61-afb1-51d3467ab3c0")
+
+  override u.Icon =
+    u |> ignore
+    Icons.Output
+
+  override u.RegisterOutputParams(mgr : GH_Component.GH_OutputParamManager) =
+    u |> ignore
+
+  override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
+    mgr.AddTextParameter("Source", "source", "Source code C#", GH_ParamAccess.item, "") |> ignore
+    mgr.AddBooleanParameter("Generate", "generate", "set to true to generate shader tree", GH_ParamAccess.item, false) |> ignore
+    u |> ignore
+  
+
+
+  override u.SolveInstance(da : IGH_DataAccess) =
+    u |> ignore
+
+    let sicb =
+      fun (doc:GH_Document) ->
+        let mutable txt = new GH_String("")
+        let ran = System.Random(13)
+        let r2 = da.GetData(0, &txt)
+        if r2 then printfn "%A" txt.Value
+        let cyclesshader = new RhinoCyclesCore.CyclesShader((uint32)0)
+        cyclesshader.SetupShaderShim()
+        let codesh = new ccl.CodeShader(ccl.Shader.ShaderType.Material)
+        let rfn = new RhinoCyclesCore.Shaders.RhinoFullNxt(null, cyclesshader, codesh)
+        let sh = rfn.GetShader() :?> ccl.CodeShader
+        let vectornodes =
+          sh.Nodes
+          |> Seq.filter (fun n -> n.GetType()=typeof<ccl.ShaderNodes.VectorMathNode>)
+          |> Seq.map ( fun n -> n :?> ccl.ShaderNodes.VectorMathNode )
+          |> Seq.map ( fun vmn ->
+                        vmn :> ShaderNode, match vmn.Operation with
+                                               | VectorMathNode.Operations.Add -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.VectorAdd>]
+                                               | VectorMathNode.Operations.Subtract -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.VectorSubtract>]
+                                               | VectorMathNode.Operations.Average -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.VectorAverage>]
+                                               | VectorMathNode.Operations.Cross_Product -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.VectorCross_Product>]
+                                               | VectorMathNode.Operations.Dot_Product -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.VectorDot_Product>]
+                                               | VectorMathNode.Operations.Normalize -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.VectorNormalize>]
+                                               | _ -> failwith "unknown vector math operation"
+                     )
+        let othernodes =
+          sh.Nodes
+          |> Seq.filter (fun n -> n.GetType()=typeof<ccl.ShaderNodes.MathNode>)
+          |> Seq.map ( fun n -> n :?> ccl.ShaderNodes.MathNode )
+          |> Seq.map ( fun mn ->
+                          mn :> ShaderNode , match mn.Operation with
+                                                | MathNode.Operations.Add -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathAdd>]
+                                                | MathNode.Operations.Subtract -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathSubtract>]
+                                                | MathNode.Operations.Multiply -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathMultiply>]
+                                                | MathNode.Operations.Divide -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathDivide>]
+                                                | MathNode.Operations.Sine -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathSine>]
+                                                | MathNode.Operations.Cosine -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathCosine>]
+                                                | MathNode.Operations.Tangent -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathTangent>]
+                                                | MathNode.Operations.Arcsine -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathArcsine>]
+                                                | MathNode.Operations.Arccosine -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathArccosine>]
+                                                | MathNode.Operations.Arctangent -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathArctangent>]
+                                                | MathNode.Operations.Power -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathPower>]
+                                                | MathNode.Operations.Logarithm -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathLogarithm>]
+                                                | MathNode.Operations.Minimum -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathMinimum>]
+                                                | MathNode.Operations.Maximum -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathMaximum>]
+                                                | MathNode.Operations.Round -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathRound>]
+                                                | MathNode.Operations.Modulo -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathModulo>]
+                                                | MathNode.Operations.Less_Than -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathLess_Than>]
+                                                | MathNode.Operations.Greater_Than -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathGreater_Than>]
+                                                | MathNode.Operations.Absolute -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.MathAbsolute>]
+                                                | _ -> failwith "uknown math operation"
+                      )
+
+        let simplenodes = 
+          sh.Nodes
+          |> Seq.filter (fun n -> Utils.node_componentmapping.ContainsKey(n.GetType()))
+          |> Seq.map (fun n ->
+                        printfn "%A" n
+                        n, Utils.node_componentmapping.[n.GetType()]
+                      )
+        
+        let allnodes = othernodes.Concat(simplenodes).Concat(vectornodes)
+
+        let instances = 
+          allnodes
+          |> Seq.map (fun n ->
+                        printfn "%A" n
+                        fst n, Instances.ComponentServer.EmitObject(snd n)
+                      )
+          |> Seq.toList
+
+        let addedinstances =
+          instances
+          |> List.map (
+                        fun n ->
+                          (snd n).CreateAttributes()
+                          (snd n).Name <- (fst n).Name
+                          (snd n).NickName <- (fst n).Name
+                          (snd n).Attributes.Pivot <- new PointF(float32(ran.NextDouble() * 800.0), float32(ran.NextDouble() * 800.0))
+                          doc.AddObject((snd n), false, Int32.MaxValue), fst n, snd n
+                          //Instances.ActiveCanvas.Document.AddObject((snd n), false, Int32.MaxValue), fst n, snd n
+                      )
+        
+        /// helper function to test if a socket is connected to
+        let connected (sock:Sockets.ISocket) = 
+          not (sock.ConnectionFrom = null)
+
+        addedinstances
+          |> List.iter (
+                        fun (b, sn, ghn) ->
+                          sn.inputs.Sockets
+                          |> Seq.iteri (
+                            fun i inps ->
+                              printfn "%b socket %i %A of component %A" b i inps sn
+                              match connected inps with
+                              | true ->
+                                let b, fromsn, fromgh = addedinstances |> List.find (fun (_, j,_) -> inps.ConnectionFrom.Parent = j)
+                                let conn =
+                                  fromsn.outputs.Sockets
+                                  |> Seq.find (fun tst -> tst = inps.ConnectionFrom)
+                                let conni =
+                                  fromsn.outputs.Sockets
+                                  |> Seq.findIndex (fun tst -> tst = inps.ConnectionFrom)
+                                let fromc = fromgh :?> IGH_Component
+                                let toc = ghn :?> IGH_Component
+                                let tocinp = toc.Params.Input.[i]
+                                let fromcoutp = fromc.Params.Output.[conni]
+                                printfn "%A making connection from %A %A to %A %A" b fromc tocinp toc tocinp
+                                tocinp.AddSource(fromcoutp)
+                              | _ -> ()
+                          ) 
+                          ()
+                      )
+    Utils.node_componentmapping :> seq<_> |> Seq.map (|KeyValue|) |> Seq.iter (fun (k,v) -> printfn "n %A c %A" k v)
+    let mutable bool = new GH_Boolean()
+    let r = da.GetData(1, &bool)
+    match bool.Value with
+    | false -> ()
+    | _ ->
+      Instances.ActiveCanvas.Document.ScheduleSolution(500, new GH_Document.GH_ScheduleDelegate(sicb))
