@@ -808,10 +808,9 @@ and ReverseGraph() =
     let mutable bool = new GH_Boolean()
     let r = da.GetData(1, &bool)
 
-    // if we are to give a solution instead of directly calculating one
-    // we schedule one. This is to ensure the graph doesn't get confused
-    // with indexing and all. The scheduling ensures the wiring up goes
-    // correct.
+    // we can't directly calculate a solution here, so we need to schedule the actual
+    // calculation. If we don't do that the wiring up of the solution goes completely
+    // wrong.
     match bool.Value with
     | false -> ()
     | _ ->
