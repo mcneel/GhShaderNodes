@@ -679,6 +679,9 @@ and ReverseGraph() =
 
     let sicb =
       fun (doc:GH_Document) ->
+        // get the source input on Source
+        // note that this isn't used yet. For now
+        // we work only with RhinoFullNxt
         let mutable txt = new GH_String("")
         let ran = System.Random(13)
         let r2 = da.GetData(0, &txt)
@@ -688,6 +691,8 @@ and ReverseGraph() =
         let codesh = new ccl.CodeShader(ccl.Shader.ShaderType.Material)
         let rfn = new RhinoCyclesCore.Shaders.RhinoFullNxt(null, cyclesshader, codesh)
         let sh = rfn.GetShader() :?> ccl.CodeShader
+        // get vector nodes from shader. These need to be retrieved separately, as they have a different
+        // base class
         let vectornodes =
           sh.Nodes
           |> Seq.filter (fun n -> n.GetType()=typeof<ccl.ShaderNodes.VectorMathNode>)
@@ -702,6 +707,8 @@ and ReverseGraph() =
                                                | VectorMathNode.Operations.Normalize -> Utils.node_componentmapping.[typeof<ccl.ShaderNodes.VectorNormalize>]
                                                | _ -> failwith "unknown vector math operation"
                      )
+        // get math nodes from shader. These need to be retrieved separately, as they have a different
+        // base class
         let othernodes =
           sh.Nodes
           |> Seq.filter (fun n -> n.GetType()=typeof<ccl.ShaderNodes.MathNode>)
@@ -730,6 +737,7 @@ and ReverseGraph() =
                                                 | _ -> failwith "uknown math operation"
                       )
 
+        // Get nodes nodes from shader
         let simplenodes = 
           sh.Nodes
           |> Seq.filter (fun n -> Utils.node_componentmapping.ContainsKey(n.GetType()))
@@ -738,61 +746,72 @@ and ReverseGraph() =
                         n, Utils.node_componentmapping.[n.GetType()]
                       )
         
+        // concatenate al sequences
         let allnodes = othernodes.Concat(simplenodes).Concat(vectornodes)
 
+        // map all shader nodes to instances of corresponding GH nodes
         let instances = 
           allnodes
-          |> Seq.map (fun n ->
-                        printfn "%A" n
-                        fst n, Instances.ComponentServer.EmitObject(snd n)
+          |> Seq.map (fun (node, guid) ->
+                        printfn "%A" (node, guid) 
+                        node, Instances.ComponentServer.EmitObject(guid)
                       )
           |> Seq.toList
 
+
+        // Add all GH instances to the object through mapping the instances list
+        // to the success and original tuple
         let addedinstances =
           instances
           |> List.map (
-                        fun n ->
-                          (snd n).CreateAttributes()
-                          (snd n).Name <- (fst n).Name
-                          (snd n).NickName <- (fst n).Name
-                          (snd n).Attributes.Pivot <- new PointF(float32(ran.NextDouble() * 800.0), float32(ran.NextDouble() * 800.0))
-                          doc.AddObject((snd n), false, Int32.MaxValue), fst n, snd n
-                          //Instances.ActiveCanvas.Document.AddObject((snd n), false, Int32.MaxValue), fst n, snd n
+                        fun (node, ghobj) ->
+                          ghobj.CreateAttributes()
+                          ghobj.Name <- node.Name
+                          ghobj.NickName <- node.Name
+                          ghobj.Attributes.Pivot <- new PointF(float32(ran.NextDouble() * 800.0), float32(ran.NextDouble() * 800.0))
+                          doc.AddObject((ghobj), false, Int32.MaxValue), node, ghobj
                       )
         
         /// helper function to test if a socket is connected to
         let connected (sock:Sockets.ISocket) = 
           not (sock.ConnectionFrom = null)
+        
 
+        // Now iterate over all added instances and wire the ump.
         addedinstances
           |> List.iter (
-                        fun (b, sn, ghn) ->
-                          sn.inputs.Sockets
+                        fun (addedsuccessfully, shadernode, grasshoppernode) ->
+                          shadernode.inputs.Sockets
                           |> Seq.iteri (
-                            fun i inps ->
-                              printfn "%b socket %i %A of component %A" b i inps sn
-                              match connected inps with
+                            fun inputindex inputsocket ->
+                              printfn "%b socket %i %A of component %A" addedsuccessfully inputindex inputsocket shadernode
+                              match connected inputsocket with
                               | true ->
-                                let b, fromsn, fromgh = addedinstances |> List.find (fun (_, j,_) -> inps.ConnectionFrom.Parent = j)
-                                let conn =
-                                  fromsn.outputs.Sockets
-                                  |> Seq.find (fun tst -> tst = inps.ConnectionFrom)
-                                let conni =
-                                  fromsn.outputs.Sockets
-                                  |> Seq.findIndex (fun tst -> tst = inps.ConnectionFrom)
-                                let fromc = fromgh :?> IGH_Component
-                                let toc = ghn :?> IGH_Component
-                                let tocinp = toc.Params.Input.[i]
-                                let fromcoutp = fromc.Params.Output.[conni]
-                                printfn "%A making connection from %A %A to %A %A" b fromc tocinp toc tocinp
+                                let addsuccess, fromshadernode, fromgrasshoppernode = addedinstances |> List.find (fun (_, j,_) -> inputsocket.ConnectionFrom.Parent = j)
+                                let connectionindex =
+                                  fromshadernode.outputs.Sockets
+                                  |> Seq.findIndex (fun tst -> tst = inputsocket.ConnectionFrom)
+                                let fromc = fromgrasshoppernode :?> IGH_Component
+                                let toc = grasshoppernode :?> IGH_Component
+                                let tocinp = toc.Params.Input.[inputindex]
+                                let fromcoutp = fromc.Params.Output.[connectionindex]
+                                printfn "%A making connection from %A %A to %A %A" addsuccess fromc tocinp toc tocinp
                                 tocinp.AddSource(fromcoutp)
                               | _ -> ()
                           ) 
                           ()
                       )
+
     Utils.node_componentmapping :> seq<_> |> Seq.map (|KeyValue|) |> Seq.iter (fun (k,v) -> printfn "n %A c %A" k v)
+
+    // get the bool input on Generate
     let mutable bool = new GH_Boolean()
     let r = da.GetData(1, &bool)
+
+    // if we are to give a solution instead of directly calculating one
+    // we schedule one. This is to ensure the graph doesn't get confused
+    // with indexing and all. The scheduling ensures the wiring up goes
+    // correct.
     match bool.Value with
     | false -> ()
     | _ ->
