@@ -621,10 +621,10 @@ and OutputNode() =
       match env with
       | null -> u.Message <- "NO BACKGROUND"
       | _ ->
-        env.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
+        env.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Program)
         env.SetParameter("xmlcode", xmlcode) |> ignore
         env.EndChange()
-        Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
+        //Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
       ()
     | false ->
       let m = 
@@ -641,7 +641,7 @@ and OutputNode() =
         u.Message <- "NO MATERIAL"
       | _ ->
         let m' = m :?> XmlMaterial
-        m'.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Ignore)
+        m'.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Program)
         m'.SetParameter("xmlcode", xmlcode) |> ignore
         m'.EndChange()
         match matId.Count > 1 with
