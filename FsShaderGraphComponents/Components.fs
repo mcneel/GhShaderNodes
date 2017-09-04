@@ -24,6 +24,7 @@ open RhinoCyclesCore.Materials
 
 open ShaderGraphResources
 open RhinoCyclesCore.Environments
+open Rhino.DocObjects
 
 // ---------------------------------------
 /// Simple color representation with ints (R, G, B)
@@ -462,6 +463,10 @@ and Distribution = Sharp | Beckmann | GGX | Ashihkmin_Shirley | Multiscatter_GGX
 and Falloff = Cubic | Gaussian | Burley with
   member u.ToString = Utils.toString u
   static member FromString s = Utils.fromString<Falloff> s
+
+and MappingType = Point | Texture | Vector | Normal with
+  member u.ToString = Utils.toString u
+  static member FromString s = Utils.fromString<MappingType> s
 
 /// The output node for the shader system. This node is responsible for
 /// driving the XML generation of a shader graph.

@@ -3,6 +3,7 @@
 open FsShaderGraphComponents
 
 open System
+open System.Windows.Forms
 
 open ccl.ShaderNodes
 
@@ -78,3 +79,18 @@ type VectorMathNormalize() =
   inherit VectorMathBaseNode(typeof<ccl.ShaderNodes.VectorNormalize>, VectorMathNode.Operations.Normalize, "Shader", "Vector", "NormLen(Vector1)", (+))
   override u.ComponentGuid = u |> ignore; new Guid("b0972558-a3d6-441f-8b8a-4f557872ad9f")
   override u.Icon = u |> ignore; Icons.Add
+
+type MappingNode() =
+  inherit CyclesNode("Mapping node", "mapping",
+    "Mapping node node for shader graph", "Shader", "Vector", typeof<ccl.ShaderNodes.MappingNode>)
+  member val Mapping = Texture with get, set
+  override u.ComponentGuid = u |> ignore; new Guid("12411bcd-1de4-43a9-8431-89fc1980b58b")
+  override u.Icon = u |> ignore; Icons.Add
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let appendMenu (it:MappingType) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToString, (fun _ _ -> u.Mapping <- it; u.ExpireSolution true),
+        true, u.Mapping = it) |> ignore
+    appendMenu Point
+    appendMenu Texture
+    appendMenu Vector 
+    appendMenu Normal
