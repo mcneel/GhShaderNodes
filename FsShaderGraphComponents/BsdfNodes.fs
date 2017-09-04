@@ -231,9 +231,15 @@ type SubsurfaceScatteringBsdf() =
   override u.Icon = u |> ignore; Icons.Emission
 
 
-type DisneyBsdf() =
-  inherit CyclesNode("Disney BSDF", "disney",
-    "Disney BSDF node for shader graph", "Shader", "BSDF", typeof<ccl.ShaderNodes.UberBsdfNode>)
-  member val Distribution = Multiscatter_GGX with get, set
+type PrincipledBsdf() =
+  inherit CyclesNode("Principled BSDF", "principled",
+    "Principled BSDF node for shader graph", "Shader", "BSDF", typeof<ccl.ShaderNodes.PrincipledBsdfNode>)
+  member val Distribution = GGX with get, set
   override u.ComponentGuid = u |> ignore; new Guid("1480e1aa-7ad4-42e3-b626-62af011917a9")
   override u.Icon = u |> ignore; Icons.Emission
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let appendMenu (it:Distribution) =
+      GH_DocumentObject.Menu_AppendItem(menu, it.ToStringR, (fun _ _ -> u.Distribution <- it; u.ExpireSolution true),
+        true, u.Distribution = it) |> ignore
+    appendMenu GGX
+    appendMenu Multiscatter_GGX
