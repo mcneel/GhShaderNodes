@@ -74,8 +74,8 @@ type ColorRampNode() =
     "Convert a float to a color according a gradient specification (RGB only)",
     "Shader", "Color", typeof<ccl.ShaderNodes.ColorRampNode>)
 
-  let cpidx = 1
-  let spidx = 2
+  let mutable cpidx = 1
+  let mutable spidx = 2
 
   member val Interpolation = ccl.ShaderNodes.ColorBand.Interpolations.Ease with get, set
 
@@ -86,8 +86,8 @@ type ColorRampNode() =
   override u.RegisterInputParams(mgr : GH_Component.GH_InputParamManager) =
     u |> ignore
     base.RegisterInputParams mgr
-    mgr.AddColourParameter("Stop Colours", "SC", "List of colours", GH_ParamAccess.list) |> ignore
-    mgr.AddNumberParameter("Stop Positions", "SP", "List of stop positions", GH_ParamAccess.list) |> ignore
+    cpidx <- mgr.AddColourParameter("Stop Colours", "SC", "List of colours", GH_ParamAccess.list)
+    spidx <- mgr.AddNumberParameter("Stop Positions", "SP", "List of stop positions", GH_ParamAccess.list)
 
   override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
     writer.SetString("Interpolation", u.Interpolation.ToString()) |> ignore
