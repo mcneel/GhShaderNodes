@@ -17,7 +17,7 @@ type MixRgbNode() =
     "Shader", "Color",
     typeof<ccl.ShaderNodes.MixNode>)
 
-  member val Blend =ccl.ShaderNodes.MixNode.BlendTypes.Mix with get, set
+  member val Blend =ccl.ShaderNodes.MixNode.BlendTypes.Blend with get, set
 
   override u.ComponentGuid = u |> ignore; new Guid("c3a397a6-f760-4ea1-9700-5722eee58489")
 
@@ -32,7 +32,7 @@ type MixRgbNode() =
           mn.BlendType <- bt
           u.ExpireSolution true),
         true, u.Blend = bt) |> ignore
-    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Mix
+    appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Blend
     appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Add
     appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Multiply
     appendMenu ccl.ShaderNodes.MixNode.BlendTypes.Screen
@@ -63,7 +63,7 @@ type MixRgbNode() =
     if reader.ItemExists("Blend") then
       u.Blend <-
         let (d, bt) = Enum.TryParse(reader.GetString "Blend")
-        match d with | false -> ccl.ShaderNodes.MixNode.BlendTypes.Mix | _ -> bt
+        match d with | false -> ccl.ShaderNodes.MixNode.BlendTypes.Blend | _ -> bt
       let mn = u.ShaderNode :?> ccl.ShaderNodes.MixNode
       mn.BlendType <- u.Blend
     base.Read(reader)

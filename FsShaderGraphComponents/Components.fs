@@ -434,7 +434,7 @@ and Interpolation = None | Linear | Closest | Cubic | Smart with
   member u.ToStringR = (u.ToString).Replace("_", "-")
   static member FromString s = Utils.fromString<Interpolation> s
 
-and EnvironmentProjection = Equirectangular | Mirror_Ball | Wallpaper with
+and EnvironmentProjection = Equirectangular | Mirror_Ball | Wallpaper | Use_TexCo with
   member u.ToString = Utils.toString u
   member u.ToStringR = (u.ToString).Replace("_", " ")
   static member FromString s = Utils.fromString<EnvironmentProjection> ((s:string).Replace(" ", "_"))

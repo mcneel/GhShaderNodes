@@ -327,6 +327,7 @@ type EnvironmentTextureNode() =
     appendProjectionMenu EnvironmentProjection.Equirectangular
     appendProjectionMenu EnvironmentProjection.Mirror_Ball
     appendProjectionMenu EnvironmentProjection.Wallpaper
+    appendProjectionMenu EnvironmentProjection.Use_TexCo
     GH_DocumentObject.Menu_AppendSeparator(menu) |> ignore
     appendInterpolationMenu Interpolation.None
     appendInterpolationMenu Interpolation.Linear
