@@ -7,6 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>620e9896-6aa5-48ac-bc99-5312f52dc3ec</ProjectGuid>
     <OutputType>Library</OutputType>
+		<TargetExt>.gha</TargetExt>
     <RootNamespace>FsShaderGraphComponents</RootNamespace>
     <AssemblyName>FsShaderGraphComponents</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
@@ -179,7 +180,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <PropertyGroup>
-    <PostBuildEvent>copy /y $(TargetPath) $(TargetDir)$(TargetName).gha</PostBuildEvent>
-  </PropertyGroup>
 </Project>

@@ -5,6 +5,7 @@ open System
 open FsShaderGraphComponents
 
 open ShaderGraphResources
+open FsShaderGraphComponents.Utils
 
 type TextureCoordinate() =
   inherit CyclesNode(
@@ -68,3 +69,17 @@ type CameraDataNode() =
     typeof<ccl.ShaderNodes.CameraDataNode>)
   override u.ComponentGuid = u |> ignore; new Guid("8b3ea49e-6d18-4f8d-ab41-65bd0cfd94b9")
   override u.Icon = u |> ignore; Icons.Emission
+
+type AttributeNode() =
+  inherit CyclesNode(
+    "VertexColor Attribute", "vertexcolor",
+    "VertexColor Attribute",
+    "Shader", "Input",
+    typeof<ccl.ShaderNodes.AttributeNode>)
+  override u.ComponentGuid = u |> ignore; new Guid("1afc9157-59fe-48e0-8506-c5bcf2f1a375")
+  override u.Icon = u |> ignore; Icons.TC
+
+  override u.SolveInstance(DA : Grasshopper.Kernel.IGH_DataAccess) =
+    let mn = u.ShaderNode :?> ccl.ShaderNodes.AttributeNode
+    mn.Attribute <- "vertexcolor"
+    base.SolveInstance(DA)

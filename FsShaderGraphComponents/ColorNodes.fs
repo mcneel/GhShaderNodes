@@ -10,6 +10,49 @@ open Grasshopper.Kernel.Types
 
 open ShaderGraphResources
 
+type WireframeNode() =
+  inherit CyclesNode(
+    "Wireframe",
+    "Wireframe",
+    "Wireframe shader",
+    "Shader", "Input",
+    typeof<ccl.ShaderNodes.WireframeNode>)
+
+  let mutable mUsePixelSize = false
+
+  override u.ComponentGuid = u |> ignore; new Guid("2aeb616a-649f-4fc9-afcd-c9f2087a5955")
+
+  override u.Icon = u |> ignore; Icons.Blend
+
+  member u.UsePixelSize
+    with get() = u |> ignore; mUsePixelSize
+    and set(value) = mUsePixelSize <- value
+
+  override u.SolveInstance(DA : IGH_DataAccess) =
+    base.SolveInstance(DA)
+    let v1 = Utils.readFloat(u, DA, 0, "Couldn't read Value1")
+
+    let r =
+      match u.UsePixelSize with
+      | true -> u.Message <- "UsePixelSize = true"; 0.01 
+      | _ -> u.Message <- "UsePixelSize = false"; 0.01 
+
+    DA.SetData(0, r) |> ignore
+
+  override u.Write(writer:GH_IO.Serialization.GH_IWriter) =
+    writer.SetBoolean("UsePixelSize", u.UsePixelSize)
+    base.Write(writer)
+
+  override u.Read(reader:GH_IO.Serialization.GH_IReader) =
+    if reader.ItemExists("UsePixelSize") then
+      u.UsePixelSize <- reader.GetBoolean("UsePixelSize")
+
+    base.Read(reader)
+
+  override u.AppendAdditionalComponentMenuItems(menu:ToolStripDropDown) =
+    let handler _ _ = u.UsePixelSize <- not u.UsePixelSize; u.ExpireSolution true
+    GH_DocumentObject.Menu_AppendItem(menu, "Use PixelSize", handler, true, u.UsePixelSize) |> ignore
+
 type MixRgbNode() =
   inherit CyclesNode(
     "Mix", "mix",
