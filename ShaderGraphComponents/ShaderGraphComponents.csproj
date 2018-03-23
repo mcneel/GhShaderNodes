@@ -192,6 +192,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Compile Include="BSDF\BsdfNodes.cs" />
+    <Compile Include="InputNodes.cs" />
     <Compile Include="OutputNode.cs" />
     <Compile Include="Utils.cs" />
     <None Include="App.config" />

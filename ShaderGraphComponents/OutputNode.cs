@@ -85,9 +85,7 @@ namespace ShaderGraphComponents
 				var midx = da.Iteration < matId.Count ? da.Iteration : matId.Count - 1;
 				if (Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(i => i.Id.Equals(matId[midx])).FirstOrDefault() is XmlMaterial m)
 				{
-
 					m.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Program);
-
 					m.SetParameter("xmlcode", xmlcode);
 					m.EndChange();
 					if (matId.Count() > 1)
