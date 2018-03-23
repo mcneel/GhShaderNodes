@@ -6,3 +6,4 @@ obj/
 *.user
 *.FSharpLint
 *.VC.db
+packages/
