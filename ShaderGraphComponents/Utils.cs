@@ -66,6 +66,12 @@ namespace ShaderGraphComponents
 			if (Enum.TryParse(d, out Distribution r)) { return r; }
 			return Distribution.GGX;
 		}
+
+		public static MappingType MappingFromString(string m)
+		{
+			if (Enum.TryParse(m, out MappingType r)) { return r; }
+			return MappingType.Texture;
+		}
 	}
 
 	public enum Distribution
@@ -75,5 +81,13 @@ namespace ShaderGraphComponents
 		GGX,
 		Asihkmin_Shirley,
 		Multiscatter_GGX
+	};
+
+	public enum MappingType
+	{
+		Point,
+		Texture,
+		Vector,
+		Normal
 	};
 }
