@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CE8FB3B3-BEBC-4EB3-9252-B98DEDD4D786}</ProjectGuid>
     <OutputType>Library</OutputType>
-		<TargetExt>.gha</TargetExt>
+    <TargetExt>.gha</TargetExt>
     <RootNamespace>ShaderGraphComponents</RootNamespace>
     <AssemblyName>ShaderGraphComponents</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -70,10 +70,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <StartAction>Program</StartAction>
-    <StartProgram>D:\Dev\Rhino\rhino\src4\bin\Release\Rhino.exe</StartProgram>
+    <StartProgram>C:\Program Files\Rhino 6\System\Rhino.exe</StartProgram>
     <StartArguments>/nosplash</StartArguments>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <OutputPath>bin\ReleaseRhino6\</OutputPath>
+    <OutputPath>C:\Users\Nathan\AppData\Roaming\Grasshopper\Libraries</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugRhino6|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -83,10 +83,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <StartAction>Program</StartAction>
-    <StartProgram>D:\Dev\Rhino\rhino\src4\bin\Debug\Rhino.exe</StartProgram>
+    <StartProgram>C:\Program Files\Rhino 6\System\Rhino.exe</StartProgram>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <StartArguments>/nosplash</StartArguments>
-    <OutputPath>bin\DebugRhino6\</OutputPath>
+    <OutputPath>C:\Users\Nathan\AppData\Roaming\Grasshopper\Libraries</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="csycles">
@@ -182,7 +182,22 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GhShaderGraph\ShaderGraphResources.csproj">
+      <Name>ShaderGraphResources</Name>
+      <Project>{c98c53e7-e900-49ce-b730-c70495bcb18d}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <Compile Include="BSDF\DiffuseBsdf.cs" />
+    <Compile Include="OutputNode.cs" />
+    <Compile Include="Utils.cs" />
     <None Include="App.config" />
+    <Compile Include="CyclesNode.cs" />
+    <Compile Include="Info.cs" />
+    <Compile Include="Priority.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
