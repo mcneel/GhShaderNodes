@@ -59,5 +59,21 @@ namespace ShaderGraphComponents
 			u.Message = !r ? msg : "";
 			return c.Value;
 		}
+		public static string DistributionToStringR(Distribution d) => d.ToString().Replace("_", "-");
+		// default GGX
+		public static Distribution DistributionFromString(string d)
+		{
+			if (Enum.TryParse(d, out Distribution r)) { return r; }
+			return Distribution.GGX;
+		}
 	}
+
+	public enum Distribution
+	{
+		Sharp,
+		Beckmann,
+		GGX,
+		Asihkmin_Shirley,
+		Multiscatter_GGX
+	};
 }

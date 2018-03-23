@@ -191,7 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <Compile Include="BSDF\DiffuseBsdf.cs" />
+    <Compile Include="BSDF\BsdfNodes.cs" />
     <Compile Include="OutputNode.cs" />
     <Compile Include="Utils.cs" />
     <None Include="App.config" />

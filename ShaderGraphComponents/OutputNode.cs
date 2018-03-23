@@ -44,7 +44,7 @@ namespace ShaderGraphComponents
 			var rms = Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(x => x is XmlMaterial).Select(i => (i.Name, i.Id)).Distinct();
 			foreach(var rm in rms)
 			{
-				GH_DocumentObject.Menu_AppendItem(
+				Menu_AppendItem(
 					menu,
 					rm.Item1,
 					(_, __) => { if (matId.Contains(rm.Item2)) matId.Remove(rm.Item2); else matId.Add(rm.Item2); },
@@ -52,32 +52,6 @@ namespace ShaderGraphComponents
 					matId.Contains(rm.Item2));
 			}
 		}
-		/*
-			member u.IsBackground =
-				match u.Params.Input.[0].SourceCount>0 with
-				| false -> false
-				| true ->
-					let rec hasBgNode (n:GH_Component) (acc:bool) =
-						[for inp in n.Params.Input ->
-							match inp.SourceCount>0 with
-							| false -> acc
-							| true ->
-								let s = inp.Sources.[0]
-								match s with
-								| :? GH_NumberSlider -> acc
-								| :? GH_ColourPickerObject -> acc
-								| _ -> 
-									let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
-									match attrp with
-									| null -> acc
-									| _ ->
-										match attrp.Owner.ComponentGuid = new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32") with
-										| true -> acc
-										| false -> hasBgNode (Utils.castAs<GH_Component>(attrp.Owner)) acc
-						].Any(fun x -> x)
-
-					hasBgNode u false
-					*/
 
 		protected override void SolveInstance(IGH_DataAccess da)
 		{
@@ -90,10 +64,13 @@ namespace ShaderGraphComponents
 			// determine all nodes used for this shader
 			var usednodes = UsedNodes(this, da.Iteration);
 
+			bool isBg = false;
+
 			// add all nodes to the shader
 			foreach (var n in usednodes)
 			{
 				if (n is CyclesNode cn) {
+					isBg |= (cn is BSDF.BackgroundNode);
 					theshader.AddNode(cn.ShaderNode);
 				}
 			}
@@ -101,6 +78,34 @@ namespace ShaderGraphComponents
 			// finalize the shader
 			theshader.FinalizeGraph();
 			var xmlcode = theshader.Xml + ShaderNode.CreateConnectXml() + "<!-- " + theshader.Code + ShaderNode.CreateConnectCode() + " -->";
+
+			// Update XmlMaterial with shader.
+			if(matId.Count()>0)
+			{
+				var midx = da.Iteration < matId.Count ? da.Iteration : matId.Count - 1;
+				if (Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(i => i.Id.Equals(matId[midx])).FirstOrDefault() is XmlMaterial m)
+				{
+
+					m.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Program);
+
+					m.SetParameter("xmlcode", xmlcode);
+					m.EndChange();
+					if (matId.Count() > 1)
+					{
+						Message = "multiple materials set";
+					}
+					else
+					{
+
+						Message = m.Name;
+					}
+				}
+				else
+				{
+					Message = "NO MATERIAL";
+				}
+			}
+
 			da.SetData(0, xmlcode);
 		}
 
