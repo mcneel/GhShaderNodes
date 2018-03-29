@@ -190,6 +190,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TextureNodes.cs" />
     <Compile Include="VectorNodes.cs" />
     <None Include="packages.config" />
     <Compile Include="BSDF\BsdfNodes.cs" />

@@ -72,7 +72,115 @@ namespace ShaderGraphComponents
 			if (Enum.TryParse(m, out MappingType r)) { return r; }
 			return MappingType.Texture;
 		}
+		public static string GradientToStringR(GradientTypes u) => u.ToString().Replace("_", " ");
+		public static GradientTypes GradientFromString(string g)
+		{
+			if (Enum.TryParse(g, out GradientTypes r)) { return r; }
+			return GradientTypes.Easing;
+
+		}
+		public static string MusgraveToStringR(MusgraveTypes u) => u.ToString().Replace("FB", "fB").Replace("_", " ");
+		public static MusgraveTypes MusgraveFromString(string g)
+		{
+			if (Enum.TryParse(g, out MusgraveTypes r)) { return r; }
+			return MusgraveTypes.FBM;
+
+		}
+		public static Interpolation InterpolationFromString(string g)
+		{
+			if (Enum.TryParse(g, out Interpolation r)) { return r; }
+			return Interpolation.None;
+
+		}
+		public static string EnvironmentProjectionToStringR(EnvironmentProjection d) => d.ToString().Replace("_", " ");
+		// default GGX
+		public static EnvironmentProjection EnvironmentProjectionFromString(string d)
+		{
+			if (Enum.TryParse(d, out EnvironmentProjection r)) { return r; }
+			return EnvironmentProjection.Equirectangular;
+		}
+		public static string TextureProjectionToStringR(TextureProjection d) => d.ToString().Replace("_", " ");
+		// default GGX
+		public static TextureProjection TextureProjectionFromString(string d)
+		{
+			if (Enum.TryParse(d, out TextureProjection r)) { return r; }
+			return TextureProjection.Flat;
+		}
+		public static string TextureExtensionToStringR(TextureExtension d) => d.ToString().Replace("_", " ");
+		// default GGX
+		public static TextureExtension TextureExtensionFromString(string d)
+		{
+			if (Enum.TryParse(d, out TextureExtension r)) { return r; }
+			return TextureExtension.Repeat;
+		}
+		public static string ColorSpaceToStringR(ColorSpace d) => d.ToString().Replace("_", " ");
+		// default GGX
+		public static ColorSpace ColorSpaceFromString(string d)
+		{
+			if (Enum.TryParse(d, out ColorSpace r)) { return r; }
+			return ColorSpace.None;
+		}
+		public static string WaveTypesToStringR(WaveTypes d) => d.ToString().Replace("_", " ");
+		// default GGX
+		public static WaveTypes WaveTypesFromString(string d)
+		{
+			if (Enum.TryParse(d, out WaveTypes r)) { return r; }
+			return WaveTypes.Bands;
+		}
+		public static string WaveProfilesToStringR(WaveProfiles d) => d.ToString().Replace("_", " ");
+		// default GGX
+		public static WaveProfiles WaveProfilesFromString(string d)
+		{
+			if (Enum.TryParse(d, out WaveProfiles r)) { return r; }
+			return WaveProfiles.Sine;
+		}
 	}
+
+	public enum Interpolation {
+		None,
+		Linear,
+		Closest,
+		Cubic,
+		Smart
+	};
+
+	public enum EnvironmentProjection
+	{
+		Equirectangular,
+		Mirror_Ball,
+		Wallpaper,
+		Use_TexCo
+	};
+
+	public enum TextureProjection
+	{
+		Flat,
+		Box,
+		Sphere,
+		Tube
+	};
+
+	public enum TextureExtension
+	{
+		Repeat,
+		Extend,
+		Clip
+	};
+
+	public enum ColorSpace
+	{
+		None,
+		Color
+	};
+
+	public enum MusgraveTypes {
+  Multifractal,
+  FBM,
+  Hybrid_Multifractal,
+  Ridged_Multifractal,
+  Hetero_Terrain
+	};
+
 
 	public enum Distribution
 	{
@@ -90,4 +198,22 @@ namespace ShaderGraphComponents
 		Vector,
 		Normal
 	};
+	public enum GradientTypes {
+  Linear,
+  Quadratic,
+  Easing,
+  Diagonal,
+  Radial,
+  Quadratic_Sphere,
+  Spherical
+	};
+	public enum WaveTypes {
+  Bands,
+	Rings
+	};
+	public enum WaveProfiles {
+		Sine,
+		Saw
+	};
+
 }
