@@ -191,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ColorNodes.cs" />
+    <Compile Include="MathNodes.cs" />
     <Compile Include="TextureNodes.cs" />
     <Compile Include="VectorNodes.cs" />
     <None Include="packages.config" />
