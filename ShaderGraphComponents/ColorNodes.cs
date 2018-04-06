@@ -26,7 +26,7 @@ namespace ShaderGraphComponents
 		bool UsePixelSize { get; set; } = false;
 
 		public override Guid ComponentGuid => new Guid("2aeb616a-649f-4fc9-afcd-c9f2087a5955");
-		protected override Bitmap Icon => Icons.Blend;
+		protected override Bitmap Icon => Icons.Wireframe;
 
 		protected override void SolveInstance(IGH_DataAccess DA)
 		{
@@ -66,7 +66,7 @@ namespace ShaderGraphComponents
 		ccl.ShaderNodes.MixNode.BlendTypes Blend { get; set; } = ccl.ShaderNodes.MixNode.BlendTypes.Blend;
 
 		public override Guid ComponentGuid => new Guid("c3a397a6-f760-4ea1-9700-5722eee58489");
-		protected override Bitmap Icon => Icons.Blend;
+		protected override Bitmap Icon => Icons.MixRgb;
 
 		public void appendMenu(ccl.ShaderNodes.MixNode.BlendTypes it, ToolStripDropDown menu)
 		{
@@ -155,7 +155,7 @@ namespace ShaderGraphComponents
 
 		public override Guid ComponentGuid => new Guid("dc8abb5a-5a92-4148-8118-b397929d7bb3");
 
-		protected override Bitmap Icon => Icons.Blend;
+		protected override Bitmap Icon => Icons.ColorRamp;
 
 		protected override void RegisterInputParams(GH_InputParamManager mgr)
 		{

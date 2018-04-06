@@ -92,57 +92,32 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Resources\Glossy.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Diffuse.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Blend.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\ShaderGraph.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Output.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Emission.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Add.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Sub.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Mult.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Div.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Log.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Pow.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Min.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Max.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\LessThan.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\GreaterThan.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\TC.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Cycles.png" />
+    <None Include="Resources\ColorRamp.png" />
+    <None Include="Resources\EnvironmentTexture.png" />
+    <None Include="Resources\GradientTexture.png" />
+    <None Include="Resources\ImageTexture.png" />
+    <None Include="Resources\MixRgb.png" />
+    <None Include="Resources\MusgraveTexture.png" />
+    <None Include="Resources\NoiseTexture.png" />
+    <None Include="Resources\WaveTexture.png" />
+    <None Include="Resources\Wireframe.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

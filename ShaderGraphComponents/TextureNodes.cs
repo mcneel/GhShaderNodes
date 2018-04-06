@@ -1,6 +1,5 @@
 ﻿using GH_IO.Serialization;
 using Grasshopper.Kernel;
-using ShaderGraphResources;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,7 +14,7 @@ namespace ShaderGraphComponents
 	{
 		public NoiseTextureNode() : base("Noise", "noise", "Noise", "Shader", "Texture", typeof(ccl.ShaderNodes.NoiseTexture)) { }
 		public override Guid ComponentGuid => new Guid("c3632808-8f29-48bd-afc2-0b85ad5763c0");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => ShaderGraphResources.Icons.NoiseTexture;
 	}
 
 	public class GradientTextureNode : CyclesNode
@@ -24,7 +23,7 @@ namespace ShaderGraphComponents
 
 		public GradientTypes Gradient { get; set; } = GradientTypes.Easing;
 		public override Guid ComponentGuid => new Guid("e9d63595-4a09-4351-93f4-acd2a0248a9b");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => ShaderGraphResources.Icons.GradientTexture;
 		public void appendMenu(GradientTypes it, ToolStripDropDown menu)
 		{
 			var u = this;
@@ -69,7 +68,7 @@ namespace ShaderGraphComponents
 		public MusgraveTextureNode() : base("Musgrave", "musgrave", "Musgrave", "Shader", "Texture", typeof(ccl.ShaderNodes.MusgraveTexture)) { }
 		MusgraveTypes Musgrave { get; set; } = MusgraveTypes.FBM;
 		public override Guid ComponentGuid => new Guid("3ed2f77b-373c-4eb8-b6fb-253dff125065");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => ShaderGraphResources.Icons.MusgraveTexture;
 		public void appendMenu(MusgraveTypes it, ToolStripDropDown menu)
 		{
 			var u = this;
@@ -120,7 +119,7 @@ namespace ShaderGraphComponents
 
 		public override Guid ComponentGuid => new Guid("078f4865-e362-4ed1-818d-94fd9432ac77");
 
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => ShaderGraphResources.Icons.ImageTexture;
 
 		public override bool Write(GH_IWriter writer)
 		{
@@ -335,7 +334,7 @@ namespace ShaderGraphComponents
 
 		public override Guid ComponentGuid => new Guid("07e09721-e982-4ea4-8358-1dfc4d26cda4");
 
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => ShaderGraphResources.Icons.EnvironmentTexture;
 		public override bool Write(GH_IWriter writer)
 		{
 			writer.SetString("Environment", EnvironmentFile);
@@ -459,7 +458,7 @@ namespace ShaderGraphComponents
 
 		public override Guid ComponentGuid => new Guid("89660e7d-cf92-4fed-b61c-0231edd76504");
 
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => ShaderGraphResources.Icons.WaveTexture;
 		public override bool Write(GH_IWriter writer)
 		{
 			writer.SetString("Wave", Wave.ToString());
