@@ -73,7 +73,7 @@
     <StartProgram>C:\Program Files\Rhino 6\System\Rhino.exe</StartProgram>
     <StartArguments>/nosplash</StartArguments>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <OutputPath>C:\Users\Nathan\AppData\Roaming\Grasshopper\Libraries</OutputPath>
+    <OutputPath>C:\Users\Nathan\AppData\Roaming\Grasshopper\6\Libraries</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'DebugRhino6|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -86,7 +86,7 @@
     <StartProgram>C:\Program Files\Rhino 6\System\Rhino.exe</StartProgram>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <StartArguments>/nosplash</StartArguments>
-    <OutputPath>C:\Users\Nathan\AppData\Roaming\Grasshopper\Libraries</OutputPath>
+    <OutputPath>C:\Users\Nathan\AppData\Roaming\Grasshopper\6\Libraries</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Condition=" '$(Configuration)' == 'Release' Or  '$(Configuration)' == 'Debug' " Include="csycles">
@@ -182,7 +182,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GhShaderGraph\ShaderGraphResources.csproj">
+    <ProjectReference Include="..\ShaderGraphResources\ShaderGraphResources.csproj">
       <Name>ShaderGraphResources</Name>
       <Project>{c98c53e7-e900-49ce-b730-c70495bcb18d}</Project>
       <Private>True</Private>

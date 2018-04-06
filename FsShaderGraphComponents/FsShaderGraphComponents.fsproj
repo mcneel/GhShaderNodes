@@ -194,7 +194,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GhShaderGraph\ShaderGraphResources.csproj">
+    <ProjectReference Include="..\ShaderGraphResources\ShaderGraphResources.csproj">
       <Name>ShaderGraphResources</Name>
       <Project>{c98c53e7-e900-49ce-b730-c70495bcb18d}</Project>
       <Private>True</Private>

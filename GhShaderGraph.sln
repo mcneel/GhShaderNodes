@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderGraphResources", "GhShaderGraph\ShaderGraphResources.csproj", "{C98C53E7-E900-49CE-B730-C70495BCB18D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShaderGraphResources", "ShaderGraphResources\ShaderGraphResources.csproj", "{C98C53E7-E900-49CE-B730-C70495BCB18D}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FsShaderGraphComponents", "FsShaderGraphComponents\FsShaderGraphComponents.fsproj", "{620E9896-6AA5-48AC-BC99-5312F52DC3EC}"
 EndProject
