@@ -98,13 +98,22 @@
     <None Include="Resources\Output.png" />
     <None Include="Resources\Emission.png" />
     <None Include="Resources\Add.png" />
+    <None Include="Resources\Abs.png" />
     <None Include="Resources\Sub.png" />
     <None Include="Resources\Mult.png" />
     <None Include="Resources\Div.png" />
     <None Include="Resources\Log.png" />
     <None Include="Resources\Pow.png" />
+    <None Include="Resources\Module.png" />
+    <None Include="Resources\Round.png" />
     <None Include="Resources\Min.png" />
     <None Include="Resources\Max.png" />
+    <None Include="Resources\Sin.png" />
+    <None Include="Resources\Cos.png" />
+    <None Include="Resources\Tan.png" />
+    <None Include="Resources\Arcsin.png" />
+    <None Include="Resources\Arccos.png" />
+    <None Include="Resources\Arctan.png" />
     <None Include="Resources\LessThan.png" />
     <None Include="Resources\GreaterThan.png" />
     <None Include="Resources\TC.png" />
@@ -130,6 +139,9 @@
     <None Include="Resources\RefractionBSDF.png" />
     <None Include="Resources\TransparentBSDF.png" />
     <None Include="Resources\GlassBSDF.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Modulo.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

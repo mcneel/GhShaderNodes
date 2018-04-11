@@ -18,5 +18,6 @@ namespace ShaderGraphComponents
 		public override string AuthorName => "Nathan 'jesterKing' Letwory";
 		public override string AuthorContact => "nathan@mcneel.com";
 		public override Bitmap Icon => Icons.ShaderGraph;
+		public override string AssemblyVersion => "0.1.5";
 	}
 }

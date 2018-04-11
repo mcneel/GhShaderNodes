@@ -131,55 +131,55 @@ namespace ShaderGraphComponents
 	public class MathSine : MathBaseNode {
 		public MathSine() : base(typeof(ccl.ShaderNodes.MathSine), MathNode.Operations.Sine, "Shader", "Math", "Sine(Value1)", (a, b) => (float)Math.Sin(a)) { }
 		public override Guid ComponentGuid => new Guid("63468f25-b71e-4285-91d0-e0505118f738");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Sin;
 	}
 
 	public class MathCosine : MathBaseNode {
 		public MathCosine() : base(typeof(ccl.ShaderNodes.MathCosine), MathNode.Operations.Cosine, "Shader", "Math", "Cosine(Value1)", (a, b) => (float)Math.Cos(a)) { }
 		public override Guid ComponentGuid => new Guid("a8db0fa4-0bd3-405f-a8ae-1416dd4de632");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Cos;
 	}
 
 	public class MathTangent : MathBaseNode {
 		public MathTangent() : base(typeof(ccl.ShaderNodes.MathTangent), MathNode.Operations.Tangent, "Shader", "Math", "Tangent(Value1)", (a, b) => (float)Math.Tan(a)) { }
 		public override Guid ComponentGuid => new Guid("e3e72aad-acf4-4965-a5d7-c1c6c3701faf");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Tan;
 	}
 
 	public class MathArcsine : MathBaseNode {
 		public MathArcsine() : base(typeof(ccl.ShaderNodes.MathArcsine), MathNode.Operations.Arcsine, "Shader", "Math", "Arcsine(Value1)", (a, b) => (float)Math.Asin(a)) { }
 		public override Guid ComponentGuid => new Guid("475a3c6c-b047-461e-ba07-ce96c32a5d94");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Arcsin;
 	}
 
 	public class MathArccosine : MathBaseNode {
 		public MathArccosine() : base(typeof(ccl.ShaderNodes.MathArccosine), MathNode.Operations.Arccosine, "Shader", "Math", "Arccosine(Value1)", (a, b) => (float)Math.Acos(a)) { }
 		public override Guid ComponentGuid => new Guid("07440de9-5786-4265-a328-1acb45188157");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Arccos;
 	}
 
 	public class MathArctangent : MathBaseNode {
 		public MathArctangent() : base(typeof(ccl.ShaderNodes.MathArctangent), MathNode.Operations.Arctangent, "Shader", "Math", "Arctangent(Value1)", (a, b) => (float)Math.Atan(a)) { }
 		public override Guid ComponentGuid => new Guid("a01cd7ab-a8aa-427a-bcaf-99e2410f620c");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Arctan;
 	}
 
 	public class MathRound : MathBaseNode {
 		public MathRound() : base(typeof(ccl.ShaderNodes.MathRound), MathNode.Operations.Round, "Shader", "Math", "Round(Value1)", (a, b) => (float)Math.Round(a)) { }
 		public override Guid ComponentGuid => new Guid("08e29380-e762-4411-88e0-3d9a8b3523cb");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Round;
 	}
 
 	public class MathModulo : MathBaseNode {
 		public MathModulo() : base(typeof(ccl.ShaderNodes.MathModulo), MathNode.Operations.Modulo, "Shader", "Math", "Modulo(Value1, Value2)", (a, b) => a % b) { }
 		public override Guid ComponentGuid => new Guid("589244da-f040-41d8-85d6-13f478a6a327");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Modulo;
 	}
 
 	public class MathAbsolute : MathBaseNode
 	{
 		public MathAbsolute() : base(typeof(ccl.ShaderNodes.MathAbsolute), MathNode.Operations.Absolute, "Shader", "Math", "Absolute(Value1)", (a,b)=>Math.Abs(a)) { }
 		public override Guid ComponentGuid => new Guid("0789f738-a1d9-4b5c-8b2b-e9b38256dfec");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Abs;
 	}
 }
