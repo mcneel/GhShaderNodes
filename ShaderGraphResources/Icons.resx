@@ -121,6 +121,15 @@
   <data name="Add" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="AddClosures" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\AddClosures.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="AnisotropicBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\AnisotropicBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Background" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Background.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Blend" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Blend.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -133,17 +142,29 @@
   <data name="Diffuse" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Diffuse.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="DiffuseBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\DiffuseBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Div" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Div.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Emission" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Emission.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="EmissionBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\EmissionBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="EnvironmentTexture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\EnvironmentTexture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="GlassBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\GlassBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Glossy" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Glossy.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GlossyBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\GlossyBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="GradientTexture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\GradientTexture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -184,14 +205,29 @@
   <data name="Pow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Pow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PrincipledBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\PrincipledBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RefractionBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\RefractionBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ShaderGraph" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\ShaderGraph.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SSSBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SSSBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Sub" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Sub.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="TC" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\TC.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TransparentBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\TransparentBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VelvetBSDF" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\VelvetBSDF.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="WaveTexture" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\WaveTexture.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

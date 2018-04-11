@@ -67,7 +67,7 @@ namespace ShaderGraphComponents.BSDF
 			{
 			}
 		public override Guid ComponentGuid => new Guid("e79bd4ac-1aa0-450d-aa4a-495cfeb8cb13");
-		protected override Bitmap Icon => Icons.Diffuse;
+		protected override Bitmap Icon => Icons.DiffuseBSDF;
 	}
 
 	public class BackgroundNode : CyclesNode
@@ -81,7 +81,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32");
 
-		protected override Bitmap Icon => Icons.Output;
+		protected override Bitmap Icon => Icons.Background;
 	}
 
 	public class AddClosureNode : CyclesNode
@@ -95,7 +95,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("f7929217-6fbb-4bd5-b74f-9763816dc38c");
 
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.AddClosures;
 	}
 
 	public class TransparentBsdf : CyclesNode
@@ -109,7 +109,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("15f77ebf-ae59-4c49-80b1-362a7168f85f");
 
-		protected override Bitmap Icon => Icons.Diffuse;
+		protected override Bitmap Icon => Icons.TransparentBSDF;
 	}
 
 	public class VelvetBsdf : CyclesNode
@@ -123,7 +123,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("d85aeb1d-e42f-43b6-86d6-ddf9cae5a633");
 
-		protected override Bitmap Icon => Icons.Diffuse;
+		protected override Bitmap Icon => Icons.VelvetBSDF;
 	}
 
 	public class AnisotropicBsdf : WithDistribution
@@ -139,7 +139,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("bab1082a-4c74-4d07-9c63-d3f40a178c6a");
 
-		protected override Bitmap Icon => Icons.Glossy;
+		protected override Bitmap Icon => Icons.AnisotropicBSDF;
 		protected override void SolveInstance(IGH_DataAccess DA)
 		{
 			base.SolveInstance(DA);
@@ -167,7 +167,7 @@ namespace ShaderGraphComponents.BSDF
 		}
 
 		public override Guid ComponentGuid => new Guid("e32dffe3-e31a-45a6-9d13-4fb0eefe4ff5");
-		protected override Bitmap Icon => Icons.Glossy;
+		protected override Bitmap Icon => Icons.RefractionBSDF;
 
 		protected override void SolveInstance(IGH_DataAccess DA)
 		{
@@ -210,7 +210,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("4db00f7b-fa70-4130-813d-a9f7cd193795");
 
-		protected override Bitmap Icon => Icons.Glossy;
+		protected override Bitmap Icon => Icons.GlassBSDF;
 		protected override void SolveInstance(IGH_DataAccess DA)
 		{
 			if (ShaderNode is ccl.ShaderNodes.GlassBsdfNode sn)
@@ -257,7 +257,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("84e014b7-a76a-4b4f-8d37-25696cbebc04");
 
-		protected override Bitmap Icon => Icons.Glossy;
+		protected override Bitmap Icon => Icons.GlossyBSDF;
 		protected override void SolveInstance(IGH_DataAccess DA)
 		{
 
@@ -305,7 +305,7 @@ namespace ShaderGraphComponents.BSDF
 		typeof(ccl.ShaderNodes.EmissionNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("aa365407-8e36-4400-b1a7-46cde5b21de6");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.EmissionBSDF;
 	}
 
 	public class SubsurfaceScatteringBsdf : CyclesNode
@@ -320,7 +320,7 @@ namespace ShaderGraphComponents.BSDF
 		//member val Falloff = Cubic with get, set
 		public override Guid ComponentGuid => new Guid("8b3abb10-4593-4f34-b96f-cb4ed0f64ae7");
 
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.SSSBSDF;
 	}
 
 
@@ -333,7 +333,7 @@ namespace ShaderGraphComponents.BSDF
 
 		public override Guid ComponentGuid => new Guid("1480e1aa-7ad4-42e3-b626-62af011917a9");
 
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.PrincipledBSDF;
 		protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)
 		{
 			appendMenu(Distribution.GGX, menu);

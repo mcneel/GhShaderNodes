@@ -118,6 +118,18 @@
     <None Include="Resources\NoiseTexture.png" />
     <None Include="Resources\WaveTexture.png" />
     <None Include="Resources\Wireframe.png" />
+    <None Include="Resources\AddClosures.png" />
+    <None Include="Resources\Background.png" />
+    <None Include="Resources\SSSBSDF.png" />
+    <None Include="Resources\AnisotropicBSDF.png" />
+    <None Include="Resources\EmissionBSDF.png" />
+    <None Include="Resources\GlossyBSDF.png" />
+    <None Include="Resources\VelvetBSDF.png" />
+    <None Include="Resources\PrincipledBSDF.png" />
+    <None Include="Resources\DiffuseBSDF.png" />
+    <None Include="Resources\RefractionBSDF.png" />
+    <None Include="Resources\TransparentBSDF.png" />
+    <None Include="Resources\GlassBSDF.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

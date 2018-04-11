@@ -73,6 +73,36 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap AddClosures {
+            get {
+                object obj = ResourceManager.GetObject("AddClosures", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap AnisotropicBSDF {
+            get {
+                object obj = ResourceManager.GetObject("AnisotropicBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Background {
+            get {
+                object obj = ResourceManager.GetObject("Background", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Blend {
             get {
                 object obj = ResourceManager.GetObject("Blend", resourceCulture);
@@ -113,6 +143,16 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap DiffuseBSDF {
+            get {
+                object obj = ResourceManager.GetObject("DiffuseBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Div {
             get {
                 object obj = ResourceManager.GetObject("Div", resourceCulture);
@@ -133,6 +173,16 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap EmissionBSDF {
+            get {
+                object obj = ResourceManager.GetObject("EmissionBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap EnvironmentTexture {
             get {
                 object obj = ResourceManager.GetObject("EnvironmentTexture", resourceCulture);
@@ -143,9 +193,29 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap GlassBSDF {
+            get {
+                object obj = ResourceManager.GetObject("GlassBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Glossy {
             get {
                 object obj = ResourceManager.GetObject("Glossy", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap GlossyBSDF {
+            get {
+                object obj = ResourceManager.GetObject("GlossyBSDF", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -283,9 +353,39 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap PrincipledBSDF {
+            get {
+                object obj = ResourceManager.GetObject("PrincipledBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap RefractionBSDF {
+            get {
+                object obj = ResourceManager.GetObject("RefractionBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap ShaderGraph {
             get {
                 object obj = ResourceManager.GetObject("ShaderGraph", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap SSSBSDF {
+            get {
+                object obj = ResourceManager.GetObject("SSSBSDF", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -306,6 +406,26 @@ namespace ShaderGraphResources {
         public static System.Drawing.Bitmap TC {
             get {
                 object obj = ResourceManager.GetObject("TC", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap TransparentBSDF {
+            get {
+                object obj = ResourceManager.GetObject("TransparentBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap VelvetBSDF {
+            get {
+                object obj = ResourceManager.GetObject("VelvetBSDF", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
