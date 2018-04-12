@@ -163,6 +163,56 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap ColorToBw {
+            get {
+                object obj = ResourceManager.GetObject("ColorToBw", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap ColorToLuminance {
+            get {
+                object obj = ResourceManager.GetObject("ColorToLuminance", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap CombineHSV {
+            get {
+                object obj = ResourceManager.GetObject("CombineHSV", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap CombineRGB {
+            get {
+                object obj = ResourceManager.GetObject("CombineRGB", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap CombineXYZ {
+            get {
+                object obj = ResourceManager.GetObject("CombineXYZ", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Cos {
             get {
                 object obj = ResourceManager.GetObject("Cos", resourceCulture);
@@ -436,6 +486,36 @@ namespace ShaderGraphResources {
         public static System.Drawing.Bitmap Round {
             get {
                 object obj = ResourceManager.GetObject("Round", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap SeparateHSV {
+            get {
+                object obj = ResourceManager.GetObject("SeparateHSV", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap SeparateRGB {
+            get {
+                object obj = ResourceManager.GetObject("SeparateRGB", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap SeparateXYZ {
+            get {
+                object obj = ResourceManager.GetObject("SeparateXYZ", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

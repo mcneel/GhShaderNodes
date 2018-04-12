@@ -104,7 +104,6 @@
     <None Include="Resources\Div.png" />
     <None Include="Resources\Log.png" />
     <None Include="Resources\Pow.png" />
-    <None Include="Resources\Module.png" />
     <None Include="Resources\Round.png" />
     <None Include="Resources\Min.png" />
     <None Include="Resources\Max.png" />
@@ -139,9 +138,15 @@
     <None Include="Resources\RefractionBSDF.png" />
     <None Include="Resources\TransparentBSDF.png" />
     <None Include="Resources\GlassBSDF.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\Modulo.png" />
+    <None Include="Resources\CombineRGB.png" />
+    <None Include="Resources\CombineXYZ.png" />
+    <None Include="Resources\CombineHSV.png" />
+    <None Include="Resources\SeparateRGB.png" />
+    <None Include="Resources\SeparateXYZ.png" />
+    <None Include="Resources\SeparateHSV.png" />
+    <None Include="Resources\ColorToLuminance.png" />
+    <None Include="Resources\ColorToBw.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

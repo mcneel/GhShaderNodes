@@ -262,4 +262,28 @@
   <data name="Tan" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Tan.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ColorToBw" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\ColorToBw.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ColorToLuminance" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\ColorToLuminance.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CombineHSV" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\CombineHSV.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CombineRGB" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\CombineRGB.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CombineXYZ" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\CombineXYZ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SeparateHSV" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SeparateHSV.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SeparateRGB" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SeparateRGB.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SeparateXYZ" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\SeparateXYZ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
