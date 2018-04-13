@@ -73,7 +73,9 @@ namespace ShaderGraphComponents
 					isBg |= (cn is BSDF.BackgroundNode);
 					theshader.AddNode(cn.ShaderNode);
 				}
+
 			}
+			
 
 			// finalize the shader
 			theshader.FinalizeGraph();
@@ -129,6 +131,18 @@ namespace ShaderGraphComponents
 			var numsls = (from inp in dd where (inp is GH_NumberSlider) select (object)inp);
 			var cols = (from inp in dd where (inp is GH_ColourPickerObject) select (object)inp);
 			var others = (from inp in dd let attrp = inp.Attributes.Parent as GH_ComponentAttributes where !(attrp is null) select (object)attrp.Owner);
+			var clus = (from inp in dd let clattr =inp.Attributes.Parent as GH_ClusterAttributes where !(clattr is null) select clattr.Owner as GH_Cluster);
+			foreach(var cls in clus)
+			{
+				var pl = cls.ProtectionLevel;
+				if(pl == GH_ClusterProtection.Unprotected)
+				{
+					var cldoc = cls.Document("");
+					var clouts = (from outp in cls.Params.Output select outp);
+					var clauth = cldoc.AttributeCount;
+				}
+				var plstr = pl.ToString();
+			}
 
 			var filtered = numsls.Concat(cols).Concat(others);
 
@@ -150,117 +164,5 @@ namespace ShaderGraphComponents
 			return ns;
 
 		}
-/*      let rec colcontags (acc: obj list) (_n:obj) =
-        let n = Utils.castAs<GH_Component>(_n)
-        match n with
-        | null -> acc
-        | _ ->
-          let diveinto (inp:IGH_Param) =
-            let s = getSource iteration inp
-            let tst =
-              match isNull s with
-              | true -> null
-              | false ->
-                match s with
-                | :? GH_NumberSlider -> Utils.castAs<obj>(s)
-                | :? GH_ColourPickerObject -> Utils.castAs<obj>(s)
-                | s when isNull s -> null
-                | _ -> 
-                  let attrp = Utils.castAs<GH_ComponentAttributes>(s.Attributes.Parent)
-                  match attrp with
-                  | null -> null
-                  | _ -> Utils.castAs<obj>(attrp.Owner)
-            tst
-          let dd = n.Params.Input |> Seq.map diveinto
-          
-          let filteredCompAttrs =
-            dd
-            |> Seq.filter (fun x -> (isNull >> not) x)
-
-          let deeperCompAttrs =
-            filteredCompAttrs
-            |> Seq.map (fun x -> colcontags [] x)
-
-          let resCompAttrs =
-            deeperCompAttrs
-            |> Seq.concat
-            |> List.ofSeq
-
-          filteredCompAttrs |> List.ofSeq |> List.append resCompAttrs |> List.append acc
-
-      colcontags [] n
-			*/
-		
-/*
-    let usednodes = usedNodes u da.Iteration |> Seq.distinct |> List.ofSeq
-
-    let addtoshader (x:obj) =
-      match x with
-      | :? CyclesNode as cn -> theshader.AddNode(cn.ShaderNode)
-      | _ -> ()
-
-    let rr = usednodes |> List.iter addtoshader
-    rr |> ignore
-    theshader.FinalizeGraph() |> ignore
-
-    let isBackgroundShader =
-      let isBackgroundNode (o:obj) = 
-        match o with
-        | :? CyclesNode as n ->
-          n.ComponentGuid.Equals(new Guid("dd68810b-0a0e-4c54-b08e-f46b41e79f32"))
-        | _ -> false
-      match List.tryFind isBackgroundNode usednodes with
-      | Option.None -> false
-      | _ -> true
-
-    let newxmlcode =
-      theshader.Xml + u.ShaderNode.CreateConnectXml()
-      |> cleancontent
-      |> xmllinebreaks
-    let csharpcode =
-      theshader.Code + u.ShaderNode.CreateConnectCode()
-      |> cleancontent
-      |> linebreaks
-
-    let xmlcode = newxmlcode + "<!--\n" + csharpcode  + "\n-->"
-
-    match isBackgroundShader with
-    | true ->
-      let env = Utils.castAs<XmlEnvironment>(Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground)
-      match env with
-      | null -> u.Message <- "NO BACKGROUND"
-      | _ ->
-        env.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Program)
-        env.SetParameter("xmlcode", xmlcode) |> ignore
-        env.EndChange()
-        //Rhino.RhinoDoc.ActiveDoc.CurrentEnvironment.ForBackground <- env
-      ()
-    | false ->
-      let m = 
-        match matId.Count with
-        | 0 -> null
-        | _ ->
-          let midx =
-            match da.Iteration < matId.Count with
-            | true -> da.Iteration
-            | false -> matId.Count - 1
-          Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(fun m -> m.Id = matId.[midx]).FirstOrDefault()
-      match m with
-      | null ->
-        u.Message <- "NO MATERIAL"
-      | _ ->
-        let m' = m :?> XmlMaterial
-        m'.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Program)
-        m'.SetParameter("xmlcode", xmlcode) |> ignore
-        m'.EndChange()
-        match matId.Count > 1 with
-        | true -> u.Message <- "multiple materials set"
-        | _ -> u.Message <- m.Name
-        for mm in Rhino.RhinoDoc.ActiveDoc.Materials.Where(fun x -> x.RenderMaterialInstanceId = m.Id) do
-          mm.DiffuseColor <- Utils.randomColor
-          mm.CommitChanges() |> ignore
-
-    da.SetData(0, xmlcode ) |> ignore
-		*/
 	}
 }

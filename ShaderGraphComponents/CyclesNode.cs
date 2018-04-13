@@ -11,6 +11,7 @@ using Grasshopper.Kernel.Types;
 using ccl;
 using ccl.ShaderNodes;
 using System.Drawing;
+using Grasshopper.Kernel.Special;
 
 namespace ShaderGraphComponents
 {
@@ -209,6 +210,8 @@ namespace ShaderGraphComponents
 									var fromsock = cn.ShaderNode.outputs[sidx];
 									fromsock.Connect(tosocket);
 								}
+								break;
+							case GH_Cluster cl:
 								break;
 							case GH_Component gh:
 								{

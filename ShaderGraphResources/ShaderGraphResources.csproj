@@ -147,6 +147,13 @@
     <None Include="Resources\SeparateHSV.png" />
     <None Include="Resources\ColorToLuminance.png" />
     <None Include="Resources\ColorToBw.png" />
+    <None Include="Resources\Geometry.png" />
+    <None Include="Resources\LightFalloff.png" />
+    <None Include="Resources\CameraData.png" />
+    <None Include="Resources\Fresnel.png" />
+    <None Include="Resources\LayerWeight.png" />
+    <None Include="Resources\LightPath.png" />
+    <None Include="Resources\Attribute.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

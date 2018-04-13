@@ -133,6 +133,16 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Attribute {
+            get {
+                object obj = ResourceManager.GetObject("Attribute", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Background {
             get {
                 object obj = ResourceManager.GetObject("Background", resourceCulture);
@@ -146,6 +156,16 @@ namespace ShaderGraphResources {
         public static System.Drawing.Bitmap Blend {
             get {
                 object obj = ResourceManager.GetObject("Blend", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap CameraData {
+            get {
+                object obj = ResourceManager.GetObject("CameraData", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -293,6 +313,26 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Fresnel {
+            get {
+                object obj = ResourceManager.GetObject("Fresnel", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap Geometry {
+            get {
+                object obj = ResourceManager.GetObject("Geometry", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap GlassBSDF {
             get {
                 object obj = ResourceManager.GetObject("GlassBSDF", resourceCulture);
@@ -353,9 +393,39 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap LayerWeight {
+            get {
+                object obj = ResourceManager.GetObject("LayerWeight", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap LessThan {
             get {
                 object obj = ResourceManager.GetObject("LessThan", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap LightFalloff {
+            get {
+                object obj = ResourceManager.GetObject("LightFalloff", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap LightPath {
+            get {
+                object obj = ResourceManager.GetObject("LightPath", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

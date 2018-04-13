@@ -31,7 +31,7 @@ namespace ShaderGraphComponents
 			typeof(ccl.ShaderNodes.GeometryInfoNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("1268d35e-8912-45c1-9642-0b29ec4f1ff9");
-		protected override Bitmap Icon => Icons.TC;
+		protected override Bitmap Icon => Icons.Geometry;
 
 	}
 
@@ -44,7 +44,7 @@ namespace ShaderGraphComponents
 		 typeof(ccl.ShaderNodes.LayerWeightNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("5576ff9f-99f7-4611-aa42-dcc4b6c621ac");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.LayerWeight;
 
 	}
 
@@ -57,7 +57,7 @@ namespace ShaderGraphComponents
 			typeof(ccl.ShaderNodes.LightPathNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("9ba94ea6-d977-47ba-807c-b4b68fa9dea8");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.LightPath;
 
 	}
 
@@ -70,7 +70,7 @@ namespace ShaderGraphComponents
 			typeof(ccl.ShaderNodes.LightFalloffNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("5232b3d2-80ac-44f2-bc9e-b6c066d2c6ac");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.LightFalloff;
 
 	}
 
@@ -83,7 +83,7 @@ namespace ShaderGraphComponents
 			typeof(ccl.ShaderNodes.FresnelNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("b9cca29d-2c77-42cd-a99d-70eb880c02ac");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.Fresnel;
 
 	}
 
@@ -96,7 +96,7 @@ namespace ShaderGraphComponents
 			typeof(ccl.ShaderNodes.CameraDataNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("8b3ea49e-6d18-4f8d-ab41-65bd0cfd94b9");
-		protected override Bitmap Icon => Icons.Emission;
+		protected override Bitmap Icon => Icons.CameraData;
 
 	}
 
@@ -109,7 +109,7 @@ namespace ShaderGraphComponents
 			typeof(ccl.ShaderNodes.AttributeNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("1afc9157-59fe-48e0-8506-c5bcf2f1a375");
-		protected override Bitmap Icon => Icons.TC;
+		protected override Bitmap Icon => Icons.Attribute;
 
 		protected override void SolveInstance(IGH_DataAccess DA)
 		{

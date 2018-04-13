@@ -286,4 +286,25 @@
   <data name="SeparateXYZ" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\SeparateXYZ.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="Attribute" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Attribute.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CameraData" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\CameraData.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Fresnel" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Fresnel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Geometry" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Geometry.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LayerWeight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\LayerWeight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LightFalloff" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\LightFalloff.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LightPath" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\LightPath.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>
