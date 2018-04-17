@@ -159,9 +159,19 @@ namespace ShaderGraphComponents
 
 		protected override void RegisterInputParams(GH_InputParamManager mgr)
 		{
+			List<Color> defcol = new List<Color>
+			{
+				Color.Black,
+				Color.White
+			};
+			List<double> defstop = new List<double>
+			{
+				0.0,
+				1.0
+			};
 			base.RegisterInputParams(mgr);
-			cpidx = mgr.AddColourParameter("Stop Colours", "SC", "List of colours", GH_ParamAccess.list);
-			spidx = mgr.AddNumberParameter("Stop Positions", "SP", "List of stop positions", GH_ParamAccess.list);
+			cpidx = mgr.AddColourParameter("Stop Colours", "SC", "List of colours", GH_ParamAccess.list, defcol);
+			spidx = mgr.AddNumberParameter("Stop Positions", "SP", "List of stop positions", GH_ParamAccess.list, defstop);
 		}
 
 		public override bool Write(GH_IWriter writer)

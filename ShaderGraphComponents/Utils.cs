@@ -26,38 +26,38 @@ namespace ShaderGraphComponents
 
 		static public Color readColor(GH_Component u, IGH_DataAccess da, int idx, string msg)
 		{
-			var c = new GH_Colour();
+			IGH_QuickCast c = null;
 			var r = da.GetData(idx, ref c);
 			u.Message = !r ? msg : "";
-			return c.Value;
+			return c?.QC_Col() ?? Color.Gray;
 		}
 		static public Vector3d readVector(GH_Component u, IGH_DataAccess da, int idx, string msg)
 		{
-			var c = new GH_Vector();
+			IGH_QuickCast c = null;
 			var r = da.GetData(idx, ref c);
 			u.Message = !r ? msg : "";
-			return c.Value;
+			return c?.QC_Vec() ?? Vector3d.Zero;
 		}
 		static public float readFloat(GH_Component u, IGH_DataAccess da, int idx, string msg)
 		{
-			var c = new GH_Number();
+			IGH_QuickCast c = null;
 			var r = da.GetData(idx, ref c);
 			u.Message = !r ? msg : "";
-			return (float)c.Value;
+			return (float)(c?.QC_Num() ?? 0.0);
 		}
 		static public int readInt(GH_Component u, IGH_DataAccess da, int idx, string msg)
 		{
-			var c = new GH_Number();
+			IGH_QuickCast c = null;
 			var r = da.GetData(idx, ref c);
 			u.Message = !r ? msg : "";
-			return (int)c.Value;
+			return c?.QC_Int() ?? 0;
 		}
 		static public string readString(GH_Component u, IGH_DataAccess da, int idx, string msg)
 		{
-			var c = new GH_String();
+			IGH_QuickCast c = null;
 			var r = da.GetData(idx, ref c);
 			u.Message = !r ? msg : "";
-			return c.Value;
+			return c?.QC_Text() ?? "";
 		}
 		public static string DistributionToStringR(Distribution d) => d.ToString().Replace("_", "-");
 		// default GGX

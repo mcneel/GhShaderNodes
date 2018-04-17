@@ -73,13 +73,13 @@ namespace ShaderGraphComponents
 					isBg |= (cn is BSDF.BackgroundNode);
 					theshader.AddNode(cn.ShaderNode);
 				}
-
 			}
-			
 
 			// finalize the shader
 			theshader.FinalizeGraph();
-			var xmlcode = theshader.Xml + ShaderNode.CreateConnectXml() + "<!-- " + theshader.Code + ShaderNode.CreateConnectCode() + " -->";
+			var xmlgraph = theshader.Xml.Trim().Replace("\n","").Replace(">",">\n") + ShaderNode.CreateConnectXml().Trim().Replace("\n", "").Replace(">",">\n");
+			var codegraph = theshader.Code.Trim().Replace("\n","").Replace(";",";\n") + ShaderNode.CreateConnectCode().Trim().Replace("\n", "").Replace(";",";\n");
+			var xmlcode = xmlgraph + "<!--\n" + codegraph + "\n-->";
 
 			// Update XmlMaterial with shader.
 			if(matId.Count()>0)
@@ -88,7 +88,7 @@ namespace ShaderGraphComponents
 				if (Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(i => i.Id.Equals(matId[midx])).FirstOrDefault() is XmlMaterial m)
 				{
 					m.BeginChange(Rhino.Render.RenderContent.ChangeContexts.Program);
-					m.SetParameter("xmlcode", xmlcode);
+					m.SetParameter("xmlcode", xmlgraph);
 					m.EndChange();
 					if (matId.Count() > 1)
 					{
@@ -112,14 +112,6 @@ namespace ShaderGraphComponents
 		private IGH_Param GetSource(int i, IGH_Param p) {
 			return i < p.SourceCount ? p.Sources[i] : p.Sources.LastOrDefault();
 		}
-
-		/*
-    let cleancontent (l:string) = l.Trim().Replace("\n", "")
-    let linebreaks (l:string) = l.Replace(";", ";\n")
-    let xmllinebreaks (l:string) = l.Replace(">", ">\n")
-		*/
-
-		
 
 		private void ColConTags(List<object> acc, object _n, int iteration)
 		{

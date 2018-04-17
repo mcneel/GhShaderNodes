@@ -38,35 +38,11 @@ namespace ShaderGraphComponents
 		protected override void RegisterInputParams(GH_InputParamManager mgr)
 		{
 			if (ShaderNode.inputs is null) return;
-			foreach(var x in ShaderNode.inputs.Sockets)
+			foreach(var socket in ShaderNode.inputs.Sockets)
 			{
-				switch(x)
-				{
-					case ccl.ShaderNodes.Sockets.ClosureSocket socket:
-						mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Color.Gray);
-						break;
-					case ccl.ShaderNodes.Sockets.FloatSocket socket:
-						mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, 0.0);
-						break;
-					case ccl.ShaderNodes.Sockets.ColorSocket socket:
-						mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Color.Gray);
-						break;
-					case ccl.ShaderNodes.Sockets.VectorSocket socket:
-						mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Vector3d.Zero);
-						break;
-					case ccl.ShaderNodes.Sockets.Float4Socket socket:
-						mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, Vector3d.Zero);
-						break;
-					case ccl.ShaderNodes.Sockets.IntSocket socket:
-						mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, 0.0);
-						break;
-					case ccl.ShaderNodes.Sockets.StringSocket socket:
-						mgr.AddTextParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item, "");
-						break;
-					default:
-						throw new InvalidCastException("unknown socket type");
-				}
+				mgr.AddGenericParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
 			}
+			ParameterSetup();
 		}
 
 		/// If ShaderNode has outputs register them here
@@ -74,36 +50,23 @@ namespace ShaderGraphComponents
 		{
 			if (ShaderNode.outputs is null) return;
 
-			foreach (var x in ShaderNode.outputs.Sockets)
+			foreach (var socket in ShaderNode.outputs.Sockets)
 			{
-				switch (x)
-				{
-					case ccl.ShaderNodes.Sockets.ClosureSocket socket:
-						mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
-						break;
-					case ccl.ShaderNodes.Sockets.FloatSocket socket:
-						mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
-						break;
-					case ccl.ShaderNodes.Sockets.ColorSocket socket:
-						mgr.AddColourParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
-						break;
-					case ccl.ShaderNodes.Sockets.VectorSocket socket:
-						mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
-						break;
-					case ccl.ShaderNodes.Sockets.Float4Socket socket:
-						mgr.AddVectorParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
-						break;
-					case ccl.ShaderNodes.Sockets.IntSocket socket:
-						mgr.AddNumberParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
-						break;
-					case ccl.ShaderNodes.Sockets.StringSocket socket:
-						mgr.AddTextParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
-						break;
-					default:
-						throw new InvalidCastException("unknown socket type");
-				}
+				mgr.AddGenericParameter(socket.Name, socket.Name, socket.Name, GH_ParamAccess.item);
 			}
 		}
+
+		/// <summary>
+		/// Set all input parameters to optional.
+		/// </summary>
+		protected void ParameterSetup()
+		{
+			foreach(var p in Params.Input)
+			{
+				p.Optional = true;
+			}
+		}
+
 
 		public override Guid ComponentGuid => Guid.Empty;
 		protected override Bitmap Icon => base.Icon;
