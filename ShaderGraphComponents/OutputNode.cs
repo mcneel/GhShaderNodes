@@ -82,7 +82,7 @@ namespace ShaderGraphComponents
 			var xmlcode = xmlgraph + "<!--\n" + codegraph + "\n-->";
 
 			// Update XmlMaterial with shader.
-			if(matId.Count()>0)
+			if (matId.Count() > 0 && xmlgraph.Length > 0)
 			{
 				var midx = da.Iteration < matId.Count ? da.Iteration : matId.Count - 1;
 				if (Rhino.RhinoDoc.ActiveDoc.RenderMaterials.Where(i => i.Id.Equals(matId[midx])).FirstOrDefault() is XmlMaterial m)

@@ -194,6 +194,7 @@
     <Compile Include="MathNodes.cs" />
     <Compile Include="TextureNodes.cs" />
     <Compile Include="VectorNodes.cs" />
+    <None Include="manifest.yml" />
     <None Include="packages.config" />
     <Compile Include="BSDF\BsdfNodes.cs" />
     <Compile Include="ConvertNodes.cs" />
