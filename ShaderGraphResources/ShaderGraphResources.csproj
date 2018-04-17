@@ -154,6 +154,14 @@
     <None Include="Resources\LayerWeight.png" />
     <None Include="Resources\LightPath.png" />
     <None Include="Resources\Attribute.png" />
+    <None Include="Resources\VectorAdd.png" />
+    <None Include="Resources\VectorAverage.png" />
+    <None Include="Resources\VectorCross.png" />
+    <None Include="Resources\VectorDot.png" />
+    <None Include="Resources\VectorNormalize.png" />
+    <None Include="Resources\VectorSubtract.png" />
+    <None Include="Resources\Mapping.png" />
+    <None Include="Resources\Bump.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

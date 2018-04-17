@@ -57,41 +57,42 @@ namespace ShaderGraphComponents
 			typeof(ccl.ShaderNodes.BumpNode))
 		{ }
 		public override Guid ComponentGuid => new Guid("02f39fc2-757a-4ec0-91f6-1822ca48663d");
+		protected override Bitmap Icon => Icons.Bump;
 	}
 	public class VectorMathAdd : VectorMathBaseNode {
 		public VectorMathAdd() : base(typeof(ccl.ShaderNodes.VectorAdd), ccl.ShaderNodes.VectorMathNode.Operations.Add, "Shader", "Vector", "Vector1+Vector2") { }
 		public override Guid ComponentGuid => new Guid("297632e9-77ec-47b3-9726-78f855b17796");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.VectorAdd;
 	}
 
 	public class VectorMathSubtract : VectorMathBaseNode {
 		public VectorMathSubtract() : base(typeof(ccl.ShaderNodes.VectorSubtract), ccl.ShaderNodes.VectorMathNode.Operations.Subtract, "Shader", "Vector", "Vector1-Vector2") { }
 		public override Guid ComponentGuid => new Guid("473800e8-a584-4238-a9c4-d5474481a424");
-		protected override Bitmap Icon => Icons.Sub;
+		protected override Bitmap Icon => Icons.VectorSubtract;
 	}
 
 	public class VectorMathAverage : VectorMathBaseNode {
 		public VectorMathAverage() : base(typeof(ccl.ShaderNodes.VectorAverage), ccl.ShaderNodes.VectorMathNode.Operations.Average, "Shader", "Vector", "NormLen(Vector1+Vector2)") { }
 		public override Guid ComponentGuid => new Guid("000d564f-85c7-409f-b4fc-ae0c1152a19e");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.VectorAverage;
 	}
 
 	public class VectorMathDot : VectorMathBaseNode {
 		public VectorMathDot() : base(typeof(ccl.ShaderNodes.VectorDot_Product), ccl.ShaderNodes.VectorMathNode.Operations.Dot_Product, "Shader", "Vector", "Fac = Dot(Vector1,Vector2)") { }
 		public override Guid ComponentGuid => new Guid("f63a2c72-5f84-4e58-a80c-73a5fb72e145");
-		protected override Bitmap Icon => Icons.Mult;
+		protected override Bitmap Icon => Icons.VectorDot;
 	}
 
 	public class VectorMathCross : VectorMathBaseNode {
 		public VectorMathCross() : base(typeof(ccl.ShaderNodes.VectorCross_Product), ccl.ShaderNodes.VectorMathNode.Operations.Cross_Product, "Shader", "Vector", "NormLen(Cross(Vector1,Vector2))") { }
 		public override Guid ComponentGuid => new Guid("35c5f912-4d8b-4a37-ad5b-1e0384a45d7e");
-		protected override Bitmap Icon => Icons.Mult;
+		protected override Bitmap Icon => Icons.VectorCross;
 	}
 
 	public class VectorMathNormalize : VectorMathBaseNode {
 		public VectorMathNormalize() : base(typeof(ccl.ShaderNodes.VectorNormalize), ccl.ShaderNodes.VectorMathNode.Operations.Normalize, "Shader", "Vector", "NormLen(Vector1)") { }
 		public override Guid ComponentGuid => new Guid("b0972558-a3d6-441f-8b8a-4f557872ad9f");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.VectorNormalize;
 	}
 
 	public class MappingNode : CyclesNode
@@ -102,7 +103,7 @@ namespace ShaderGraphComponents
 		MappingType Mapping { get; set; } = MappingType.Texture;
 
 		public override Guid ComponentGuid => new Guid("12411bcd-1de4-43a9-8431-89fc1980b58b");
-		protected override Bitmap Icon => Icons.Add;
+		protected override Bitmap Icon => Icons.Mapping;
 
 		public void appendMenu(MappingType it, ToolStripDropDown menu)
 		{

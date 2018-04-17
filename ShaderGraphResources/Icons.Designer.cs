@@ -163,6 +163,16 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Bump {
+            get {
+                object obj = ResourceManager.GetObject("Bump", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap CameraData {
             get {
                 object obj = ResourceManager.GetObject("CameraData", resourceCulture);
@@ -443,6 +453,16 @@ namespace ShaderGraphResources {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap Mapping {
+            get {
+                object obj = ResourceManager.GetObject("Mapping", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap Max {
             get {
                 object obj = ResourceManager.GetObject("Max", resourceCulture);
@@ -656,6 +676,66 @@ namespace ShaderGraphResources {
         public static System.Drawing.Bitmap TransparentBSDF {
             get {
                 object obj = ResourceManager.GetObject("TransparentBSDF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap VectorAdd {
+            get {
+                object obj = ResourceManager.GetObject("VectorAdd", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap VectorAverage {
+            get {
+                object obj = ResourceManager.GetObject("VectorAverage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap VectorCross {
+            get {
+                object obj = ResourceManager.GetObject("VectorCross", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap VectorDot {
+            get {
+                object obj = ResourceManager.GetObject("VectorDot", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap VectorNormalize {
+            get {
+                object obj = ResourceManager.GetObject("VectorNormalize", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap VectorSubtract {
+            get {
+                object obj = ResourceManager.GetObject("VectorSubtract", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
