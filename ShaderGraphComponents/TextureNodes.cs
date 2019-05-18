@@ -21,16 +21,16 @@ namespace ShaderGraphComponents
 	{
 		public GradientTextureNode() : base("Gradient", "gradient", "Gradient", "Shader", "Texture", typeof(ccl.ShaderNodes.GradientTextureNode)) { }
 
-		public GradientTypes Gradient { get; set; } = GradientTypes.Easing;
+		public ccl.ShaderNodes.GradientTextureNode.GradientType Gradient { get; set; } = ccl.ShaderNodes.GradientTextureNode.GradientType.Easing;
 		public override Guid ComponentGuid => new Guid("e9d63595-4a09-4351-93f4-acd2a0248a9b");
 		protected override Bitmap Icon => ShaderGraphResources.Icons.GradientTexture;
-		public void appendMenu(GradientTypes it, ToolStripDropDown menu)
+		public void appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType it, ToolStripDropDown menu)
 		{
 			var u = this;
 			Menu_AppendItem(
 				menu,
 				Utils.GradientToStringR(it),
-				((_, __) => { u.Gradient = it; u.ExpireSolution(true); }),
+				((_, __) => { u.Gradient = it; ((ccl.ShaderNodes.GradientTextureNode)u.ShaderNode).Gradient = it; u.ExpireSolution(true); }),
 				true, u.Gradient == it);
 		}
 		public override bool Write(GH_IWriter writer)
@@ -53,23 +53,23 @@ namespace ShaderGraphComponents
 
 		protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)
 		{
-			appendMenu(GradientTypes.Linear, menu);
-			appendMenu(GradientTypes.Easing, menu);
-			appendMenu(GradientTypes.Quadratic, menu);
-			appendMenu(GradientTypes.Diagonal, menu);
-			appendMenu(GradientTypes.Radial, menu);
-			appendMenu(GradientTypes.Quadratic_Sphere, menu);
-			appendMenu(GradientTypes.Spherical, menu);
+			appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType.Linear, menu);
+			appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType.Easing, menu);
+			appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType.Quadratic, menu);
+			appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType.Diagonal, menu);
+			appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType.Radial, menu);
+			appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType.Quadratic_Sphere, menu);
+			appendMenu(ccl.ShaderNodes.GradientTextureNode.GradientType.Spherical, menu);
 		}
 	}
 
 	public class MusgraveTextureNode : CyclesNode
 	{
 		public MusgraveTextureNode() : base("Musgrave", "musgrave", "Musgrave", "Shader", "Texture", typeof(ccl.ShaderNodes.MusgraveTexture)) { }
-		MusgraveTypes Musgrave { get; set; } = MusgraveTypes.FBM;
+		ccl.ShaderNodes.MusgraveTexture.MusgraveTypes Musgrave { get; set; } = ccl.ShaderNodes.MusgraveTexture.MusgraveTypes.fBM;
 		public override Guid ComponentGuid => new Guid("3ed2f77b-373c-4eb8-b6fb-253dff125065");
 		protected override Bitmap Icon => ShaderGraphResources.Icons.MusgraveTexture;
-		public void appendMenu(MusgraveTypes it, ToolStripDropDown menu)
+		public void appendMenu(ccl.ShaderNodes.MusgraveTexture.MusgraveTypes it, ToolStripDropDown menu)
 		{
 			var u = this;
 			Menu_AppendItem(
@@ -77,7 +77,7 @@ namespace ShaderGraphComponents
 				Utils.MusgraveToStringR(it),
 				((_, __) =>
 				{
-					u.Musgrave = it; u.ExpireSolution(true);
+					u.Musgrave = it; ((ccl.ShaderNodes.MusgraveTexture)u.ShaderNode).MusgraveType = it; u.ExpireSolution(true);
 				}),
 				true, u.Musgrave == it);
 		}
@@ -99,11 +99,101 @@ namespace ShaderGraphComponents
 
 		protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)
 		{
-			appendMenu(MusgraveTypes.Multifractal, menu);
-			appendMenu(MusgraveTypes.FBM, menu);
-			appendMenu(MusgraveTypes.Hybrid_Multifractal, menu);
-			appendMenu(MusgraveTypes.Ridged_Multifractal, menu);
-			appendMenu(MusgraveTypes.Hetero_Terrain, menu);
+			appendMenu(ccl.ShaderNodes.MusgraveTexture.MusgraveTypes.Multifractal, menu);
+			appendMenu(ccl.ShaderNodes.MusgraveTexture.MusgraveTypes.fBM, menu);
+			appendMenu(ccl.ShaderNodes.MusgraveTexture.MusgraveTypes.Hybrid_Multifractal, menu);
+			appendMenu(ccl.ShaderNodes.MusgraveTexture.MusgraveTypes.Ridged_Multifractal, menu);
+			appendMenu(ccl.ShaderNodes.MusgraveTexture.MusgraveTypes.Hetero_Terrain, menu);
+		}
+	}
+
+	public class VoronoiTextureNode : CyclesNode
+	{
+		public VoronoiTextureNode() : base("Voronoi", "voronoi", "Voronoi", "Shader", "Texture", typeof(ccl.ShaderNodes.VoronoiTexture)) { }
+		ccl.ShaderNodes.VoronoiTexture.ColoringTypes Coloring { get; set; } = ccl.ShaderNodes.VoronoiTexture.ColoringTypes.Intensity;
+		ccl.ShaderNodes.VoronoiTexture.Metrics Metric { get; set; } =  ccl.ShaderNodes.VoronoiTexture.Metrics.Distance;
+		ccl.ShaderNodes.VoronoiTexture.Features Feature { get; set; } = ccl.ShaderNodes.VoronoiTexture.Features.F1;
+		public override Guid ComponentGuid => new Guid("9f212363-a1fb-498f-bbf2-73b0cf9e3551");
+		protected override Bitmap Icon => ShaderGraphResources.Icons.NoiseTexture;
+		public void appendColoringMenu(ccl.ShaderNodes.VoronoiTexture.ColoringTypes it, ToolStripDropDown menu)
+		{
+			var u = this;
+			Menu_AppendItem(
+				menu,
+				it.ToString(),
+				((_, __) =>
+				{
+					u.Coloring = it; ((ccl.ShaderNodes.VoronoiTexture)u.ShaderNode).Coloring = it ; u.ExpireSolution(true);
+				}),
+				true, u.Coloring == it);
+		}
+		public void appendMetricMenu(ccl.ShaderNodes.VoronoiTexture.Metrics it, ToolStripDropDown menu)
+		{
+			var u = this;
+			Menu_AppendItem(
+				menu,
+				it.ToString(),
+				((_, __) =>
+				{
+					u.Metric = it; ((ccl.ShaderNodes.VoronoiTexture)u.ShaderNode).Metric = it ; u.ExpireSolution(true);
+				}),
+				true, u.Metric == it);
+		}
+		public void appendFeatureMenu(ccl.ShaderNodes.VoronoiTexture.Features it, ToolStripDropDown menu)
+		{
+			var u = this;
+			Menu_AppendItem(
+				menu,
+				it.ToString(),
+				((_, __) =>
+				{
+					u.Feature = it; ((ccl.ShaderNodes.VoronoiTexture)u.ShaderNode).Feature = it ; u.ExpireSolution(true);
+				}),
+				true, u.Feature == it);
+		}
+		public override bool Write(GH_IWriter writer)
+		{
+			writer.SetString("Coloring", Coloring.ToString());
+			writer.SetString("Metric", Metric.ToString());
+			writer.SetString("Feature", Feature.ToString());
+			return base.Write(writer);
+		}
+
+		public override bool Read(GH_IReader reader)
+		{
+			if (reader.ItemExists("Coloring"))
+			{
+				var dist = reader.GetString("Coloring");
+				Coloring = Utils.VoronoiColoringFromString(dist);
+			}
+			if (reader.ItemExists("Metric"))
+			{
+				var dist = reader.GetString("Metric");
+				Metric = Utils.VoronoiMetricFromString(dist);
+			}
+			if (reader.ItemExists("Feature"))
+			{
+				var dist = reader.GetString("Feature");
+				Feature = Utils.VoronoiFeatureFromString(dist);
+			}
+			return base.Read(reader);
+		}
+
+		protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)
+		{
+			appendColoringMenu(ccl.ShaderNodes.VoronoiTexture.ColoringTypes.Intensity, menu);
+			appendColoringMenu(ccl.ShaderNodes.VoronoiTexture.ColoringTypes.Cells, menu);
+			Menu_AppendSeparator(menu);
+			appendMetricMenu(ccl.ShaderNodes.VoronoiTexture.Metrics.Distance, menu);
+			appendMetricMenu(ccl.ShaderNodes.VoronoiTexture.Metrics.Manhattan, menu);
+			appendMetricMenu(ccl.ShaderNodes.VoronoiTexture.Metrics.Chebychev, menu);
+			appendMetricMenu(ccl.ShaderNodes.VoronoiTexture.Metrics.Minkowski, menu);
+			Menu_AppendSeparator(menu);
+			appendFeatureMenu(ccl.ShaderNodes.VoronoiTexture.Features.F1, menu);
+			appendFeatureMenu(ccl.ShaderNodes.VoronoiTexture.Features.F2, menu);
+			appendFeatureMenu(ccl.ShaderNodes.VoronoiTexture.Features.F3, menu);
+			appendFeatureMenu(ccl.ShaderNodes.VoronoiTexture.Features.F4, menu);
+			appendFeatureMenu(ccl.ShaderNodes.VoronoiTexture.Features.F2F1, menu);
 		}
 	}
 
@@ -453,8 +543,8 @@ namespace ShaderGraphComponents
 	{
 		public WaveTextureNode() : base("Wave", "wave", "Wave", "Shader", "Texture", typeof(ccl.ShaderNodes.WaveTexture)) { }
 
-		public WaveTypes Wave { get; set; } = WaveTypes.Bands;
-		public WaveProfiles Profile { get; set; } = WaveProfiles.Sine;
+		public ccl.ShaderNodes.WaveTexture.WaveTypes Wave { get; set; } = ccl.ShaderNodes.WaveTexture.WaveTypes.Bands;
+		public ccl.ShaderNodes.WaveTexture.WaveProfiles Profile { get; set; } = ccl.ShaderNodes.WaveTexture.WaveProfiles.Sine;
 
 		public override Guid ComponentGuid => new Guid("89660e7d-cf92-4fed-b61c-0231edd76504");
 
@@ -486,7 +576,7 @@ namespace ShaderGraphComponents
 			Message = Wave.ToString();
 		}
 
-		public void appendWaveTypesMenu(WaveTypes it, ToolStripDropDown menu)
+		public void appendWaveTypesMenu(ccl.ShaderNodes.WaveTexture.WaveTypes it, ToolStripDropDown menu)
 		{
 			var u = this;
 			Menu_AppendItem(
@@ -494,11 +584,11 @@ namespace ShaderGraphComponents
 				Utils.WaveTypesToStringR(it),
 				((_, __) =>
 				{
-					u.Wave = it; u.ExpireSolution(true);
+					u.Wave = it; ((ccl.ShaderNodes.WaveTexture)u.ShaderNode).WaveType = it; u.ExpireSolution(true);
 				}),
 				true, u.Wave == it);
 		}
-		public void appendWaveProfilesMenu(WaveProfiles it, ToolStripDropDown menu)
+		public void appendWaveProfilesMenu(ccl.ShaderNodes.WaveTexture.WaveProfiles it, ToolStripDropDown menu)
 		{
 			var u = this;
 			Menu_AppendItem(
@@ -506,18 +596,18 @@ namespace ShaderGraphComponents
 				Utils.WaveProfilesToStringR(it),
 				((_, __) =>
 				{
-					u.Profile = it; u.ExpireSolution(true);
+					u.Profile = it; ((ccl.ShaderNodes.WaveTexture)u.ShaderNode).WaveProfile = it; u.ExpireSolution(true);
 				}),
 				true, u.Profile == it);
 		}
 
 		protected override void AppendAdditionalComponentMenuItems(ToolStripDropDown menu)
 		{
-			appendWaveTypesMenu(WaveTypes.Bands, menu);
-			appendWaveTypesMenu(WaveTypes.Rings, menu);
+			appendWaveTypesMenu(ccl.ShaderNodes.WaveTexture.WaveTypes.Bands, menu);
+			appendWaveTypesMenu(ccl.ShaderNodes.WaveTexture.WaveTypes.Rings, menu);
 			Menu_AppendSeparator(menu);
-			appendWaveProfilesMenu(WaveProfiles.Sine, menu);
-			appendWaveProfilesMenu(WaveProfiles.Saw, menu);
+			appendWaveProfilesMenu(ccl.ShaderNodes.WaveTexture.WaveProfiles.Sine, menu);
+			appendWaveProfilesMenu(ccl.ShaderNodes.WaveTexture.WaveProfiles.Saw, menu);
 		}
 	}
 }
