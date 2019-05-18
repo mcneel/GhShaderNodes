@@ -72,19 +72,34 @@ namespace ShaderGraphComponents
 			if (Enum.TryParse(m, out MappingType r)) { return r; }
 			return MappingType.Texture;
 		}
-		public static string GradientToStringR(GradientTypes u) => u.ToString().Replace("_", " ");
-		public static GradientTypes GradientFromString(string g)
+		public static string GradientToStringR(ccl.ShaderNodes.GradientTextureNode.GradientType u) => u.ToString().Replace("_", " ");
+		public static ccl.ShaderNodes.GradientTextureNode.GradientType GradientFromString(string g)
 		{
-			if (Enum.TryParse(g, out GradientTypes r)) { return r; }
-			return GradientTypes.Easing;
+			if (Enum.TryParse(g, out ccl.ShaderNodes.GradientTextureNode.GradientType r)) { return r; }
+			return ccl.ShaderNodes.GradientTextureNode.GradientType.Easing;
 
 		}
-		public static string MusgraveToStringR(MusgraveTypes u) => u.ToString().Replace("FB", "fB").Replace("_", " ");
-		public static MusgraveTypes MusgraveFromString(string g)
+		public static string MusgraveToStringR(ccl.ShaderNodes.MusgraveTexture.MusgraveTypes u) => u.ToString().Replace("FB", "fB").Replace("_", " ");
+		public static ccl.ShaderNodes.MusgraveTexture.MusgraveTypes MusgraveFromString(string g)
 		{
-			if (Enum.TryParse(g, out MusgraveTypes r)) { return r; }
-			return MusgraveTypes.FBM;
+			if (Enum.TryParse(g, out ccl.ShaderNodes.MusgraveTexture.MusgraveTypes r)) { return r; }
+			return ccl.ShaderNodes.MusgraveTexture.MusgraveTypes.fBM;
 
+		}
+		public static ccl.ShaderNodes.VoronoiTexture.ColoringTypes VoronoiColoringFromString(string g)
+		{
+			if(Enum.TryParse(g, out ccl.ShaderNodes.VoronoiTexture.ColoringTypes r)) { return r; }
+			return ccl.ShaderNodes.VoronoiTexture.ColoringTypes.Intensity;
+		}
+		public static ccl.ShaderNodes.VoronoiTexture.Metrics VoronoiMetricFromString(string g)
+		{
+			if(Enum.TryParse(g, out ccl.ShaderNodes.VoronoiTexture.Metrics r)) { return r; }
+			return ccl.ShaderNodes.VoronoiTexture.Metrics.Distance;
+		}
+		public static ccl.ShaderNodes.VoronoiTexture.Features VoronoiFeatureFromString(string g)
+		{
+			if(Enum.TryParse(g, out ccl.ShaderNodes.VoronoiTexture.Features r)) { return r; }
+			return ccl.ShaderNodes.VoronoiTexture.Features.F1;
 		}
 		public static Interpolation InterpolationFromString(string g)
 		{
@@ -120,19 +135,19 @@ namespace ShaderGraphComponents
 			if (Enum.TryParse(d, out ColorSpace r)) { return r; }
 			return ColorSpace.None;
 		}
-		public static string WaveTypesToStringR(WaveTypes d) => d.ToString().Replace("_", " ");
+		public static string WaveTypesToStringR(ccl.ShaderNodes.WaveTexture.WaveTypes d) => d.ToString().Replace("_", " ");
 		// default GGX
-		public static WaveTypes WaveTypesFromString(string d)
+		public static ccl.ShaderNodes.WaveTexture.WaveTypes WaveTypesFromString(string d)
 		{
-			if (Enum.TryParse(d, out WaveTypes r)) { return r; }
-			return WaveTypes.Bands;
+			if (Enum.TryParse(d, out ccl.ShaderNodes.WaveTexture.WaveTypes r)) { return r; }
+			return ccl.ShaderNodes.WaveTexture.WaveTypes.Bands;
 		}
-		public static string WaveProfilesToStringR(WaveProfiles d) => d.ToString().Replace("_", " ");
+		public static string WaveProfilesToStringR(ccl.ShaderNodes.WaveTexture.WaveProfiles d) => d.ToString().Replace("_", " ");
 		// default GGX
-		public static WaveProfiles WaveProfilesFromString(string d)
+		public static ccl.ShaderNodes.WaveTexture.WaveProfiles WaveProfilesFromString(string d)
 		{
-			if (Enum.TryParse(d, out WaveProfiles r)) { return r; }
-			return WaveProfiles.Sine;
+			if (Enum.TryParse(d, out ccl.ShaderNodes.WaveTexture.WaveProfiles r)) { return r; }
+			return ccl.ShaderNodes.WaveTexture.WaveProfiles.Sine;
 		}
 	}
 
@@ -173,15 +188,6 @@ namespace ShaderGraphComponents
 		Color
 	};
 
-	public enum MusgraveTypes {
-  Multifractal,
-  FBM,
-  Hybrid_Multifractal,
-  Ridged_Multifractal,
-  Hetero_Terrain
-	};
-
-
 	public enum Distribution
 	{
 		Sharp,
@@ -198,22 +204,4 @@ namespace ShaderGraphComponents
 		Vector,
 		Normal
 	};
-	public enum GradientTypes {
-  Linear,
-  Quadratic,
-  Easing,
-  Diagonal,
-  Radial,
-  Quadratic_Sphere,
-  Spherical
-	};
-	public enum WaveTypes {
-  Bands,
-	Rings
-	};
-	public enum WaveProfiles {
-		Sine,
-		Saw
-	};
-
 }
